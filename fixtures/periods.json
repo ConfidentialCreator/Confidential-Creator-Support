@@ -1,0 +1,5 @@
+{
+  "periodSeconds": 2592000,
+  "graceSeconds": 259200,
+  "maxPeriods": 12
+}
