@@ -1,0 +1,41 @@
+{
+  "label": "close",
+  "cluster": "devnet",
+  "signature": "ApcFaFqcA8WPbs9Duv7NAM9czfNKrGpeF2a9AuFtZrHR1igzNyFqQYarShTtBj76DpdrMmfMkpY9SuttQ5irgRh",
+  "slot": 498418940,
+  "blockTime": 1789418259,
+  "sizeBytes": 452,
+  "wire": "Agh4F07zJUAxj+D+Pk6sngwiqvQDsDSUSj8arMXgOe7s2IeB48uxgouMY6qLcyMKLMj8YVxTl4QbdsTGFML7DAxXsKAhWdD7DgSAFHAN3zp2eauUJ+Y33uX64he9UcpvsOseKnvnO/pvqixPQBdjWYtym4FkK/MOz/nXNA1rFNYNgAIBAgizLzn3R3Vmp8ipvwtVjE99XO6z9aiw67A4j+g81GyZndzZXta7gOOkVuWvv3HotpsjCpojICnGAsV4eo3Hz2gPLZBunCJAhxUF6vovi3IZlUSJJGJXbakCosDlMyjPStY2QJ0jVk3flWYkjNrSSFe9itd18XGmfDM2raFM8JQkvG4oPKK/G5wDu2iVK4jhdrS3SBRdYOLxGxciTdmyY1u32KnH1HSMTT+i+QQmYtvctFodNgx73hzGOfyGiKbmyUgMt/6VpV7RWx2MvdZvP0ytr7OfPOHOSpov3KrUJNv5zghjdaziruooGms3TWgbp2pTzPY4wHRVk2wF0GVAAAAAaENMoFNjrlBK59mkCPri2nFe44jeBMvNVGIwQ5+SAlEEBwMCAAABAAcDAwAAAQAHAwQAAAEABgMFAQABAwA=",
+  "logMessages": [
+    "Program ZkE1Gama1Proof11111111111111111111111111111 invoke [1]",
+    "CloseContextState",
+    "Program ZkE1Gama1Proof11111111111111111111111111111 success",
+    "Program ZkE1Gama1Proof11111111111111111111111111111 invoke [1]",
+    "CloseContextState",
+    "Program ZkE1Gama1Proof11111111111111111111111111111 success",
+    "Program ZkE1Gama1Proof11111111111111111111111111111 invoke [1]",
+    "CloseContextState",
+    "Program ZkE1Gama1Proof11111111111111111111111111111 success",
+    "Program recr1L3PCGKLbckBqMNcJhuuyU1zgo8nBhfLVsJNwr5 invoke [1]",
+    "Program log: RecordInstruction::CloseAccount",
+    "Program recr1L3PCGKLbckBqMNcJhuuyU1zgo8nBhfLVsJNwr5 consumed 781 of 790100 compute units",
+    "Program recr1L3PCGKLbckBqMNcJhuuyU1zgo8nBhfLVsJNwr5 success"
+  ],
+  "context": {
+    "mint": "6f1QTLNPh59wM26CQx1pnJTUcE814H64JaABjARPvtiC",
+    "decimals": 6,
+    "supporter": "6BUPsnbo6yqeUE5UHHz6WDp6b4saTf3PPEn5B2Mp7JGZ",
+    "supporterToken": "GtQ3RJYrsnUSUHh7bMUqAFMbdZ6kNz92WFFNAf1uQ8ac",
+    "creator": "AJ6LFWEJgLEwkfyWWipZ8Le5fV9QjCV61UCnzv9g5ZUq",
+    "creatorToken": "6hSuKztYGDo1sT98WB9LvxeHBkA58kzQrT2rJZhEbJ7q",
+    "auditorElgamalPubkey": "13yiZ6fenh4MFvMcy9BHuQWa8Brnrw8HQizYyGwmvEH9",
+    "amount": "7250000",
+    "keys": {
+      "supporterElgamalSecret": "c69c99bc86d7ea818ae530675ff50f61ddfd6048bdd68a76dee40ab45406e902",
+      "supporterAe": "7be8b24560279da050ea99a62ce2db67",
+      "creatorElgamalSecret": "413d92918f5749727052115290a3eb989820f1991814def4cb9465a55430ad07",
+      "creatorAe": "733eef875ae8833f06b17a5b5046ed01",
+      "auditorElgamalSecret": "1624296206b3784e124bf56e07b6df36d27347f700d32394e67902def33d400b"
+    }
+  }
+}

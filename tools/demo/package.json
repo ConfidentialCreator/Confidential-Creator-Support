@@ -5,13 +5,17 @@
   "type": "module",
   "scripts": {
     "demo": "node src/main.ts",
+    "spike:transfer": "node --env-file=../../.env src/spike/transfer.ts",
+    "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@ccsupport/chain": "workspace:*",
     "@ccsupport/shared": "workspace:*",
     "@solana/kit": "8.3.0",
+    "@solana-program/system": "0.14.1",
     "@solana-program/token-2022": "0.17.0",
-    "@solana/zk-sdk": "0.5.2"
+    "@solana/zk-sdk": "0.5.2",
+    "zod": "4.6.5"
   }
 }

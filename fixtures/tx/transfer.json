@@ -1,0 +1,32 @@
+{
+  "label": "transfer",
+  "cluster": "devnet",
+  "signature": "5YYN9VEL92M7MsXxLGNeZDb2bUEi1PbKmtsRNAuWVxnr3QbrMKG3CXiCMjpNFTMDrAaK3ZNzCrW3sjytu84VaqDG",
+  "slot": 498418933,
+  "blockTime": 1789418258,
+  "sizeBytes": 540,
+  "wire": "AeNEfoFRPAK9/L2ZeBsfZLYq4Q21R8prbUcM/L8KElzxa9fJrV4zGN6CxKtHE0+nZnf/7/Ht5sSpJeoAxtmwcA+AAQAFCEz5N7m4Ui2EVkzMKxSzGq+UJ7bVCzu1HzX7pKCI0l+KVKb0Z4f4vSWkMHkiceFH4CqFQ2IGSHq2TtLr2iTdSpDsCfp+7wC5jD7fL/sN+UM0bxLw9lwMxuh1Oxygdn3hcS2QbpwiQIcVBer6L4tyGZVEiSRiV22pAqLA5TMoz0rWNkCdI1ZN35VmJIza0khXvYrXdfFxpnwzNq2hTPCUJLxUBvZtosp4b7E8Co8wuNkaA3ohfIBRJV4sKMYGFLLZaW4oPKK/G5wDu2iVK4jhdrS3SBRdYOLxGxciTdmyY1u3Bt324e51j94YQl285GzN2rYa/E2DuQ0n/r35KNihi/w2oFHiBrXL9l3Nfb96xv37UxhOae36tlnPethexG+wiQEHBwIFAQMEBgCpARsH/LEcCSYavpwgn33Y86x2vFKYgDgz+47CvzYs+565gx+CaugwuH8Nuq9CEaNH+5hY3qAVfn6f0Z0e8EdMFq93uIL4UEDioK5gdjq1iFIcbCep4bUgx88G+FyuM7h7bWTsV2rdMuLQ25i+R3n4pZk5XY0z8oDmeKKI7tMOpnZt5GvW3MIblucInJ51vdwdQFH8PvMkJa5j6XJBITj79AzaKZcIuh0AAAAA",
+  "logMessages": [
+    "Program TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb invoke [1]",
+    "Program log: ConfidentialTransferInstruction::Transfer",
+    "Program TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb consumed 14708 of 200000 compute units",
+    "Program TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb success"
+  ],
+  "context": {
+    "mint": "6f1QTLNPh59wM26CQx1pnJTUcE814H64JaABjARPvtiC",
+    "decimals": 6,
+    "supporter": "6BUPsnbo6yqeUE5UHHz6WDp6b4saTf3PPEn5B2Mp7JGZ",
+    "supporterToken": "GtQ3RJYrsnUSUHh7bMUqAFMbdZ6kNz92WFFNAf1uQ8ac",
+    "creator": "AJ6LFWEJgLEwkfyWWipZ8Le5fV9QjCV61UCnzv9g5ZUq",
+    "creatorToken": "6hSuKztYGDo1sT98WB9LvxeHBkA58kzQrT2rJZhEbJ7q",
+    "auditorElgamalPubkey": "13yiZ6fenh4MFvMcy9BHuQWa8Brnrw8HQizYyGwmvEH9",
+    "amount": "7250000",
+    "keys": {
+      "supporterElgamalSecret": "c69c99bc86d7ea818ae530675ff50f61ddfd6048bdd68a76dee40ab45406e902",
+      "supporterAe": "7be8b24560279da050ea99a62ce2db67",
+      "creatorElgamalSecret": "413d92918f5749727052115290a3eb989820f1991814def4cb9465a55430ad07",
+      "creatorAe": "733eef875ae8833f06b17a5b5046ed01",
+      "auditorElgamalSecret": "1624296206b3784e124bf56e07b6df36d27347f700d32394e67902def33d400b"
+    }
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "label": "proof-1",
+  "cluster": "devnet",
+  "signature": "YoikQ4uuYtbNvRXQcip9wUaWFQ8HKgSBXPWJajmZgZAQGuEFwwYwHZ36FB6gJ5NteRU79b6EpjPFPN29gRm8xD3",
+  "slot": 498418914,
+  "blockTime": 1789418255,
+  "sizeBytes": 680,
+  "wire": "AhttiL2tAY2van6mE1XSy1sKYR0gRtncpL9CafR2IDG6buv1SjTsRKXRdZmLBdUwyj1CxLNOgQo+53fqeQJfZQ4mIBs4NxTK5449Hr6k3FY1Q5cfboBeHEkFBF1/KM5o/p7WzIqVam5hU/3PCsOtSlakcDyytRa0b59i5Wu0oQYGgAIAAgSzLzn3R3Vmp8ipvwtVjE99XO6z9aiw67A4j+g81GyZnS2QbpwiQIcVBer6L4tyGZVEiSRiV22pAqLA5TMoz0rWAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIY3Ws4q7qKBprN01oG6dqU8z2OMB0VZNsBdBlQAAAADDYnJ1i7mLxByjRU+4z1q6hrQOnjbTJ92qcZXcmQH5cAgICAAE0AAAAANhmFgAAAAAAoQAAAAAAAAAIY3Ws4q7qKBprN01oG6dqU8z2OMB0VZNsBdBlQAAAAAMCAQDBAgMeR6HeR5XiN03PVyj216d2HeVO5KVPpBjntKrSeBeKbUYtUg3yA8cR+kHQMNiJ0Y+N0HHAA6mu6d0u5KNhgLp1ik63vyC/78oD3zXISelQjatjB7lPUj4XTOJXqkGggVKuxtuDxmQSnEjw7pe36nD4wqkClMXpPZPJqV/gPZ0kSbgWsty4NE0oi8oeG22v26vmYz5JD7pF9aCjmwLhEpNTCvX42WLinx0Qc5L9OmA9uG0zB9lUcrw35Z61Vr6mtFc2kLTMIz9ghuhrhE2z3v/rg6h0JrkSQ8P3r9xB+WkXJA92dqpdQCecow6kqLZXyRLTdjrjpx6QtzcNBwmeHToAYtSod4Y0hxy/2mLD/YcNkd8wztwUryxo9AwHs/b3SwBP0FNTGfWZhFi2huPoSwUralPZtfkvIeYDjE8bvCWjBwA=",
+  "logMessages": [
+    "Program 11111111111111111111111111111111 invoke [1]",
+    "Program 11111111111111111111111111111111 success",
+    "Program ZkE1Gama1Proof11111111111111111111111111111 invoke [1]",
+    "VerifyCiphertextCommitmentEquality",
+    "Program ZkE1Gama1Proof11111111111111111111111111111 success"
+  ],
+  "context": {
+    "mint": "6f1QTLNPh59wM26CQx1pnJTUcE814H64JaABjARPvtiC",
+    "decimals": 6,
+    "supporter": "6BUPsnbo6yqeUE5UHHz6WDp6b4saTf3PPEn5B2Mp7JGZ",
+    "supporterToken": "GtQ3RJYrsnUSUHh7bMUqAFMbdZ6kNz92WFFNAf1uQ8ac",
+    "creator": "AJ6LFWEJgLEwkfyWWipZ8Le5fV9QjCV61UCnzv9g5ZUq",
+    "creatorToken": "6hSuKztYGDo1sT98WB9LvxeHBkA58kzQrT2rJZhEbJ7q",
+    "auditorElgamalPubkey": "13yiZ6fenh4MFvMcy9BHuQWa8Brnrw8HQizYyGwmvEH9",
+    "amount": "7250000",
+    "keys": {
+      "supporterElgamalSecret": "c69c99bc86d7ea818ae530675ff50f61ddfd6048bdd68a76dee40ab45406e902",
+      "supporterAe": "7be8b24560279da050ea99a62ce2db67",
+      "creatorElgamalSecret": "413d92918f5749727052115290a3eb989820f1991814def4cb9465a55430ad07",
+      "creatorAe": "733eef875ae8833f06b17a5b5046ed01",
+      "auditorElgamalSecret": "1624296206b3784e124bf56e07b6df36d27347f700d32394e67902def33d400b"
+    }
+  }
+}

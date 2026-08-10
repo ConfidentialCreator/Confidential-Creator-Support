@@ -1,0 +1,38 @@
+{
+  "label": "proof-3",
+  "cluster": "devnet",
+  "signature": "3zrcnQLbP1dABeM61aYNTDUJWadSArfz1PjJWfHFWwFbgkchGEfKD2sCxokDJPu5ioJRwtqB1ELpq7RpminQcoht",
+  "slot": 498418914,
+  "blockTime": 1789418255,
+  "sizeBytes": 1232,
+  "wire": "A5XtJX0ONhUAhXuWXNVWjmQBAcKT7DfEQq+euYdHjwyHdoy9tPZwf30w+H2kWb0Fiv3QgwUflIGqVNgwu++KaAMX3Q27x9EMsq9AiPmusy+zwa9CkrG3NycCNj8r+xnI7kALBhsKvD3vxZfQsDGIOCEtpjO4V2rpYK1e3QI5VKQL4C2GHvxdXFW0PKP4VhdmhYY5oscfWL6Eqzzs4zVlwUskLxV81knEWBxZfZG3AwTEhEpQFi9MpBPxA1orueCjDYADAQIFsy8590d1ZqfIqb8LVYxPfVzus/WosOuwOI/oPNRsmZ3YqcfUdIxNP6L5BCZi29y0Wh02DHveHMY5/IaIpubJSNzZXta7gOOkVuWvv3HotpsjCpojICnGAsV4eo3Hz2gPAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMt/6VpV7RWx2MvdZvP0ytr7OfPOHOSpov3KrUJNv5zjDYnJ1i7mLxByjRU+4z1q6hrQOnjbTJ92qcZXcmQH5cAwMCAAE0AAAAAJj+WQAAAAAACQQAAAAAAAAMt/6VpV7RWx2MvdZvP0ytr7OfPOHOSpov3KrUJNv5zgQCAQIBAAQCAQKDBgEAAAAAAAAAAPYCAACuxtuDxmQSnEjw7pe36nD4wqkClMXpPZPJqV/gPZ0kSbh/DbqvQhGjR/uYWN6gFX5+n9GdHvBHTBavd7iC+FBA4tDbmL5HefilmTldjTPygOZ4ooju0w6mdm3ka9bcwhv8VAAwIRdy2h8UIWQ5/z6myJ/14eORvvcGLyIQkXxXGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQBAgEAAAAAB25gUVrhk3wCrPXQLRlCcwAzFECg2LMWuKITxmz5qHQET6+vBzBgN70CY3ICLWHyos8yvZVRRPODapCPls7dx+BCYx/qSKk1+FLj/bGzYNXofpbh1CmBczgTUvp0V270A4F8ZRaLJkQuHs+WDyVIWafPTE+YkFSyTbFYxoY2O1HWVNz7QzBIFFyctC+6QREoho75D8rz6iro0ZY9LXWyoNX9QY6HLiu1uLEj9j8QPRADwYqJuoF2JMoV6mb0qMUwJGQncKEoLEJhMoDGxHZzNEThu2lzA6PR1J49h/+1ZyDmAlWwv92TymD/nIhUfDWr6eEmEbLWA4tLLhIX+BV2EnICvxU6G5oynNACGS88qHWSHX248CcCx9bhDW0ZvU3g7QIPBMhSC4uMBrZ3zhgUcrPNP4Mm+omWYcO1FyDDQiczxtOgmgFr1Jhp05Apr+1ROB3Qy1/ZafIM+smRnt3TdVOEr1+MOzbkTRslfFQUOPmt4HJFGfpEyrTrOA4JxgnFggetdUsxjTQ+ZXrmHFPW1MCkZ8IFIlu/KnTc4wFG3DL0ScoD/s6WbC7CJi17FTKIGDs9+cDr6bRad6y41rnA5pEuiff+/0xEBYMsKA8ntO9kq46L9aVvsqeDWRugGSsVv+Wcz/X3x2VC07HV/V6wA=",
+  "logMessages": [
+    "Program 11111111111111111111111111111111 invoke [1]",
+    "Program 11111111111111111111111111111111 success",
+    "Program recr1L3PCGKLbckBqMNcJhuuyU1zgo8nBhfLVsJNwr5 invoke [1]",
+    "Program log: RecordInstruction::Initialize",
+    "Program recr1L3PCGKLbckBqMNcJhuuyU1zgo8nBhfLVsJNwr5 consumed 548 of 402850 compute units",
+    "Program recr1L3PCGKLbckBqMNcJhuuyU1zgo8nBhfLVsJNwr5 success",
+    "Program recr1L3PCGKLbckBqMNcJhuuyU1zgo8nBhfLVsJNwr5 invoke [1]",
+    "Program log: RecordInstruction::Write",
+    "Program recr1L3PCGKLbckBqMNcJhuuyU1zgo8nBhfLVsJNwr5 consumed 650 of 402302 compute units",
+    "Program recr1L3PCGKLbckBqMNcJhuuyU1zgo8nBhfLVsJNwr5 success"
+  ],
+  "context": {
+    "mint": "6f1QTLNPh59wM26CQx1pnJTUcE814H64JaABjARPvtiC",
+    "decimals": 6,
+    "supporter": "6BUPsnbo6yqeUE5UHHz6WDp6b4saTf3PPEn5B2Mp7JGZ",
+    "supporterToken": "GtQ3RJYrsnUSUHh7bMUqAFMbdZ6kNz92WFFNAf1uQ8ac",
+    "creator": "AJ6LFWEJgLEwkfyWWipZ8Le5fV9QjCV61UCnzv9g5ZUq",
+    "creatorToken": "6hSuKztYGDo1sT98WB9LvxeHBkA58kzQrT2rJZhEbJ7q",
+    "auditorElgamalPubkey": "13yiZ6fenh4MFvMcy9BHuQWa8Brnrw8HQizYyGwmvEH9",
+    "amount": "7250000",
+    "keys": {
+      "supporterElgamalSecret": "c69c99bc86d7ea818ae530675ff50f61ddfd6048bdd68a76dee40ab45406e902",
+      "supporterAe": "7be8b24560279da050ea99a62ce2db67",
+      "creatorElgamalSecret": "413d92918f5749727052115290a3eb989820f1991814def4cb9465a55430ad07",
+      "creatorAe": "733eef875ae8833f06b17a5b5046ed01",
+      "auditorElgamalSecret": "1624296206b3784e124bf56e07b6df36d27347f700d32394e67902def33d400b"
+    }
+  }
+}

@@ -201,6 +201,9 @@ importers:
       '@ccsupport/shared':
         specifier: workspace:*
         version: link:../../packages/shared
+      '@solana-program/system':
+        specifier: 0.14.1
+        version: 0.14.1(@solana/kit@8.3.0(typescript@5.9.3))
       '@solana-program/token-2022':
         specifier: 0.17.0
         version: 0.17.0(@solana/kit@8.3.0(typescript@5.9.3))(@solana/sysvars@8.3.0(typescript@5.9.3))(@solana/zk-sdk@0.5.2)
@@ -210,6 +213,9 @@ importers:
       '@solana/zk-sdk':
         specifier: 0.5.2
         version: 0.5.2
+      zod:
+        specifier: 4.6.5
+        version: 4.6.5
 
   tools/mint:
     dependencies:

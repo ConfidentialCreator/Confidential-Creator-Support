@@ -1,0 +1,37 @@
+{
+  "label": "proof-4",
+  "cluster": "devnet",
+  "signature": "kANrwpAa23Zzn7DP9SoZEw7iLcpPKCEbq4ncy6cp2b6srQ9VoqmEdojXVxNMpd5Hx9H2JAgZXbCB4XmuiieHfcS",
+  "slot": 498418922,
+  "blockTime": 1789418256,
+  "sizeBytes": 785,
+  "wire": "AyU4kpUV6mSkALp7RrpElY7kPyDlmsvJzggTMds5yvpUCQilPyQDFVBaJcdPNuQcCol7z5jGEA8JYwhh98Mi3g+ua7ozWjmsqrXtQETX4YY39mgFsfk4WTy7v+a8+vHsbDneOYX8FoIdPskpWqxzbrcwCjqovSMe/oEZdQjgP30Clm0JRHkRph43uC5WBAS9azDP8w045r8xuxOsxlLxxEVir66XPNydWEx8xGLIt7mkudr9ggzK5UnDrJaIz5daAoADAQMHsy8590d1ZqfIqb8LVYxPfVzus/WosOuwOI/oPNRsmZ1uKDyivxucA7tolSuI4Xa0t0gUXWDi8RsXIk3ZsmNbt9zZXta7gOOkVuWvv3HotpsjCpojICnGAsV4eo3Hz2gP2KnH1HSMTT+i+QQmYtvctFodNgx73hzGOfyGiKbmyUgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAy3/pWlXtFbHYy91m8/TK2vs5884c5Kmi/cqtQk2/nOCGN1rOKu6igaazdNaBunalPM9jjAdFWTbAXQZUAAAAAVMKP6IJLPivnlG1sAPqx/F+JwgZ4+0DmHN2CXlPcGEQMFAgMC/wEB9gIAAAAAAADyAAAA+Z7w+4PzeVDtF/S4v1qjWNBQqkgQ5SskJQr7ehOaCffQklDEPYnJPZCjZyekZAJiYiueWdtl+potZ1CJrETV9AHFRVt/RQ1jYUHvalLOkmMrD8TMjIVA+k5ejBhPZr7b0RxXJi84/rgxemu6+AVZra9MmM8X6VF3yINkka5F4HkuUU6WT6RiqqvuyfKq6CDaewG6RwYcGn4PO4Dpjr9vdeKefXKkD/gk5hzY0hoY2rv0EMB+Ld2f/pJjvKx6jpJKzbnDg8aD/0mlEcYNwWIG5ooMP2KVdtZYZoeVuzQ/Ne+ybgt4VO3iWDH34GDepwWJXAsEAgABNAAAAACY8SAAAAAAACkBAAAAAAAACGN1rOKu6igaazdNaBunalPM9jjAdFWTbAXQZUAAAAAGAwMBAAUHIQAAAAA=",
+  "logMessages": [
+    "Program recr1L3PCGKLbckBqMNcJhuuyU1zgo8nBhfLVsJNwr5 invoke [1]",
+    "Program log: RecordInstruction::Write",
+    "Program recr1L3PCGKLbckBqMNcJhuuyU1zgo8nBhfLVsJNwr5 consumed 651 of 403000 compute units",
+    "Program recr1L3PCGKLbckBqMNcJhuuyU1zgo8nBhfLVsJNwr5 success",
+    "Program 11111111111111111111111111111111 invoke [1]",
+    "Program 11111111111111111111111111111111 success",
+    "Program ZkE1Gama1Proof11111111111111111111111111111 invoke [1]",
+    "VerifyBatchedRangeProofU128",
+    "Program ZkE1Gama1Proof11111111111111111111111111111 success"
+  ],
+  "context": {
+    "mint": "6f1QTLNPh59wM26CQx1pnJTUcE814H64JaABjARPvtiC",
+    "decimals": 6,
+    "supporter": "6BUPsnbo6yqeUE5UHHz6WDp6b4saTf3PPEn5B2Mp7JGZ",
+    "supporterToken": "GtQ3RJYrsnUSUHh7bMUqAFMbdZ6kNz92WFFNAf1uQ8ac",
+    "creator": "AJ6LFWEJgLEwkfyWWipZ8Le5fV9QjCV61UCnzv9g5ZUq",
+    "creatorToken": "6hSuKztYGDo1sT98WB9LvxeHBkA58kzQrT2rJZhEbJ7q",
+    "auditorElgamalPubkey": "13yiZ6fenh4MFvMcy9BHuQWa8Brnrw8HQizYyGwmvEH9",
+    "amount": "7250000",
+    "keys": {
+      "supporterElgamalSecret": "c69c99bc86d7ea818ae530675ff50f61ddfd6048bdd68a76dee40ab45406e902",
+      "supporterAe": "7be8b24560279da050ea99a62ce2db67",
+      "creatorElgamalSecret": "413d92918f5749727052115290a3eb989820f1991814def4cb9465a55430ad07",
+      "creatorAe": "733eef875ae8833f06b17a5b5046ed01",
+      "auditorElgamalSecret": "1624296206b3784e124bf56e07b6df36d27347f700d32394e67902def33d400b"
+    }
+  }
+}

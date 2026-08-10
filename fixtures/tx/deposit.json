@@ -1,0 +1,32 @@
+{
+  "label": "deposit",
+  "cluster": "devnet",
+  "signature": "5nJ9tDKNcRH5pGTnev9mtJJMYiCZMtB7CJGzewZixGReZAk1L8AD3K9WS8SHm77HyprhfN6VJnAt69YjqQ8QtcGv",
+  "slot": 498418881,
+  "blockTime": 1789418249,
+  "sizeBytes": 345,
+  "wire": "Au8hG1241kLx501b/lEpmJcFBmZnvBHiQVaPJBsbMZ57Irv9XFrwIJvIJRNaYytqow4wAqptCFcg62CCToovuQ+z25iU8+rkFkRfTMWBGZy6tMzBKDLsDyP6MCshvkecc0KFmdvEpeJ3QknvsAGD/fyClHX65R3D+onNbXgie2UMgAIBAgWzLzn3R3Vmp8ipvwtVjE99XO6z9aiw67A4j+g81GyZnUz5N7m4Ui2EVkzMKxSzGq+UJ7bVCzu1HzX7pKCI0l+K7An6fu8AuYw+3y/7DflDNG8S8PZcDMbodTscoHZ94XFUBvZtosp4b7E8Co8wuNkaA3ohfIBRJV4sKMYGFLLZaQbd9uHudY/eGEJdvORszdq2GvxNg7kNJ/69+SjYoYv8SvwBo5X0tco2WuM2ESD7LYw3eL9qK5YzjuKo5zRl9acBBAMCAwELGwVAeH0BAAAAAAYA",
+  "logMessages": [
+    "Program TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb invoke [1]",
+    "Program log: ConfidentialTransferInstruction::Deposit",
+    "Program TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb consumed 9962 of 200000 compute units",
+    "Program TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb success"
+  ],
+  "context": {
+    "mint": "6f1QTLNPh59wM26CQx1pnJTUcE814H64JaABjARPvtiC",
+    "decimals": 6,
+    "supporter": "6BUPsnbo6yqeUE5UHHz6WDp6b4saTf3PPEn5B2Mp7JGZ",
+    "supporterToken": "GtQ3RJYrsnUSUHh7bMUqAFMbdZ6kNz92WFFNAf1uQ8ac",
+    "creator": "AJ6LFWEJgLEwkfyWWipZ8Le5fV9QjCV61UCnzv9g5ZUq",
+    "creatorToken": "6hSuKztYGDo1sT98WB9LvxeHBkA58kzQrT2rJZhEbJ7q",
+    "auditorElgamalPubkey": "13yiZ6fenh4MFvMcy9BHuQWa8Brnrw8HQizYyGwmvEH9",
+    "amount": "7250000",
+    "keys": {
+      "supporterElgamalSecret": "c69c99bc86d7ea818ae530675ff50f61ddfd6048bdd68a76dee40ab45406e902",
+      "supporterAe": "7be8b24560279da050ea99a62ce2db67",
+      "creatorElgamalSecret": "413d92918f5749727052115290a3eb989820f1991814def4cb9465a55430ad07",
+      "creatorAe": "733eef875ae8833f06b17a5b5046ed01",
+      "auditorElgamalSecret": "1624296206b3784e124bf56e07b6df36d27347f700d32394e67902def33d400b"
+    }
+  }
+}
