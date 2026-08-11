@@ -3,14 +3,19 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
+  "exports": {
+    "./spike/decrypt-bench": "./src/spike/decrypt-bench.ts"
+  },
   "scripts": {
     "demo": "node src/main.ts",
     "spike:transfer": "node --env-file=../../.env src/spike/transfer.ts",
+    "spike:decrypt": "node src/spike/decrypt.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@ccsupport/chain": "workspace:*",
+    "@noble/curves": "2.4.0",
     "@ccsupport/shared": "workspace:*",
     "@solana/kit": "8.3.0",
     "@solana-program/system": "0.14.1",

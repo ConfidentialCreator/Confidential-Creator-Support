@@ -8,6 +8,7 @@ import wasm from 'vite-plugin-wasm'
 // («missing field type»), а без нього wasm-модуль ініціалізується через TLA.
 export default defineConfig({
   plugins: [react(), wasm()],
+  worker: { format: 'es', plugins: () => [wasm()] },
   build: { target: 'esnext' },
   optimizeDeps: { esbuildOptions: { target: 'esnext' } },
   server: { port: 5173 },
