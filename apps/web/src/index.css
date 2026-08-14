@@ -1,3 +1,131 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-ground text-ink font-serif text-[15px] leading-normal;
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+  input {
+    @apply font-serif text-inherit bg-transparent border-0 border-b border-ink rounded-none py-0.5 outline-none;
+  }
+  h2 {
+    @apply text-2xl font-normal mt-9 mb-3 pb-1.5 border-b border-rule;
+  }
+  th {
+    @apply text-xs italic font-normal text-muted text-left border-b border-rule py-1 pr-3;
+  }
+  td {
+    @apply border-b border-rule py-1.5 pr-3 align-baseline;
+  }
+  th:last-child,
+  td:last-child {
+    @apply pr-0;
+  }
+}
+
+@layer components {
+  .help {
+    @apply text-xs italic text-muted mt-1.5;
+  }
+  .act {
+    @apply underline cursor-pointer;
+  }
+  .act-off {
+    @apply text-muted no-underline cursor-default;
+  }
+  .kv {
+    @apply grid grid-cols-[1fr_auto];
+  }
+  .kv > div {
+    @apply border-b border-rule py-1.5;
+  }
+  .kv .l {
+    @apply text-xs italic text-muted;
+  }
+  .kv .v {
+    @apply text-right;
+  }
+  .cols {
+    column-count: 3;
+    column-gap: 32px;
+    column-rule: 1px solid #b8b2a5;
+  }
+
+  /* The redaction bar: same width for every sum, so the bar tells nothing
+     about the digits under it. The figure is printed under the bar and only
+     becomes visible once the bar has lifted. */
+  .sealed {
+    @apply relative inline-block w-[13ch] text-right align-baseline whitespace-nowrap;
+  }
+  .sealed > .fig {
+    @apply invisible;
+  }
+  .sealed > .bar {
+    @apply absolute left-0 right-0 top-[0.15em] bottom-[0.1em] bg-ink z-10;
+    transition:
+      transform 280ms ease,
+      opacity 280ms ease;
+  }
+  .sealed-on > .fig {
+    @apply visible;
+  }
+  .sealed-on > .bar {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  .sealed:not(.sealed-on):hover::after {
+    content: "Sealed on chain. Readable by the supporter, the creator and the auditor.";
+    @apply absolute right-0 bottom-[calc(100%+6px)] whitespace-nowrap text-xs italic text-ink bg-ground border border-rule px-2 py-1 z-20;
+  }
+
+  .chart {
+    @apply flex items-end gap-4 h-[200px] border-b border-rule;
+  }
+  .chart-l {
+    @apply flex gap-4;
+  }
+
+  .steps > li {
+    @apply border-b border-rule py-1.5;
+  }
+  .clip > div {
+    @apply border-b border-rule py-1.5;
+  }
+}
+
+@media (max-width: 480px) {
+  .cols {
+    column-count: 1;
+  }
+  .chart {
+    @apply gap-1.5 h-[140px];
+  }
+  .chart-l {
+    @apply gap-1.5;
+  }
+  .chart-l > div {
+    @apply text-[10px];
+  }
+  table.stack,
+  table.stack tbody {
+    display: block;
+  }
+  table.stack thead {
+    display: none;
+  }
+  table.stack tr {
+    @apply flex flex-wrap gap-x-3.5 border-b border-rule py-1.5;
+  }
+  table.stack td {
+    @apply border-0 p-0 inline-flex gap-1 items-baseline;
+  }
+  table.stack td::before {
+    content: attr(data-l);
+    @apply text-xs italic text-muted;
+  }
+  table.stack td.num {
+    @apply ml-auto;
+  }
+}
