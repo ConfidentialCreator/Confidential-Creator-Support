@@ -859,8 +859,10 @@ dependencies = [
  "base64 0.22.1",
  "mollusk-svm",
  "mollusk-svm-bencher",
+ "serde_json",
  "solana-account",
  "solana-instruction",
+ "solana-instructions-sysvar 3.0.1",
  "solana-pubkey 4.2.1",
  "solana-svm-log-collector",
 ]

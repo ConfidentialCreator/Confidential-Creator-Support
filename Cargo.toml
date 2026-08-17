@@ -25,7 +25,11 @@ solana-account = "4.3"
 solana-instruction = "3.4"
 solana-pubkey = "4.2"
 solana-svm-log-collector = "4.2"
+# Читання sysvar `Instructions` у `pledge`: anchor-lang 1.2 реекспортує лише
+# `construct_instructions_data`, без `load_instruction_at_checked`.
+solana-instructions-sysvar = "3.0"
 base64 = "0.22"
+serde_json = "1"
 
 [profile.release]
 # `expires_at = max(now, expires_at) + periods × 30 днів` — тихе переповнення
