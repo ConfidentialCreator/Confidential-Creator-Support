@@ -1,0 +1,5 @@
+{
+  "pattern": "^[a-z0-9-]{3,32}$",
+  "valid": ["abc", "marrow-dispatch", "a1-b2-c3", "abcdefghijklmnopqrstuvwxyz012345"],
+  "invalid": ["", "ab", "Marrow", "marrow_dispatch", "marrow dispatch", "марроу", "abcdefghijklmnopqrstuvwxyz0123456"]
+}
