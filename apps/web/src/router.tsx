@@ -5,7 +5,7 @@ import { CreatorPage } from './screens/CreatorPage/CreatorPage.tsx'
 import { Dashboard } from './screens/Dashboard/Dashboard.tsx'
 import { Support } from './screens/Support/Support.tsx'
 
-export function App() {
+export function Router() {
   return (
     <BrowserRouter>
       <Routes>

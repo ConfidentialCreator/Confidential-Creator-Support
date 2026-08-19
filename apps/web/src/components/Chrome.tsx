@@ -1,6 +1,8 @@
 import { Fragment, type ReactNode } from 'react'
 import { NavLink } from 'react-router'
 import { creator } from '../mockData.ts'
+import { ApiStatus } from './ApiStatus.tsx'
+import { WalletRow } from './WalletRow.tsx'
 
 export const routes = {
   page: `/c/${creator.handle}`,
@@ -19,9 +21,11 @@ const nav = [
 export function Chrome({ children }: { children: ReactNode }) {
   return (
     <div className="mx-auto max-w-[1200px] px-4 pt-4 pb-10 sm:px-10 sm:pt-5 sm:pb-16">
-      <div className="text-xs italic text-muted">
-        Prototype — mock data. Not connected to any network.
+      <div className="flex flex-wrap justify-between gap-x-4 text-xs italic text-muted">
+        <span>Prototype — mock data. Screens are not connected to any network.</span>
+        <ApiStatus />
       </div>
+      <WalletRow />
       <nav className="my-2 mb-5 flex gap-3">
         {nav.map(([label, to], i) => (
           <span key={to} className="flex gap-3">
