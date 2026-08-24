@@ -1,6 +1,7 @@
 use anchor_lang::prelude::*;
 
 pub mod errors;
+pub mod events;
 pub mod instructions;
 pub mod state;
 
@@ -14,5 +15,23 @@ pub mod ccsupport {
 
     pub fn init_config(ctx: Context<InitConfig>) -> Result<()> {
         instructions::init_config_handler(ctx)
+    }
+
+    pub fn register_creator(
+        ctx: Context<RegisterCreator>,
+        handle: String,
+        name: String,
+        description: String,
+    ) -> Result<()> {
+        instructions::register_creator_handler(ctx, handle, name, description)
+    }
+
+    pub fn update_creator(
+        ctx: Context<UpdateCreator>,
+        name: String,
+        description: String,
+        suggested_amount: u64,
+    ) -> Result<()> {
+        instructions::update_creator_handler(ctx, name, description, suggested_amount)
     }
 }

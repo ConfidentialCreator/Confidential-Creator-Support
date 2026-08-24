@@ -2,10 +2,10 @@
 // інакше падає під `-D warnings` як dead_code.
 #![allow(dead_code)]
 
-use anchor_lang::{InstructionData, ToAccountMetas};
+use anchor_lang::{AnchorDeserialize, Discriminator, InstructionData, ToAccountMetas};
 use base64::engine::general_purpose::STANDARD;
 use base64::Engine as _;
-use ccsupport::state::Config;
+use ccsupport::state::{Config, Creator, Handle};
 use mollusk_svm::program::loader_keys::LOADER_V3;
 use mollusk_svm::result::{Check, InstructionResult};
 use mollusk_svm::Mollusk;
@@ -255,4 +255,90 @@ pub fn init_config_accounts(s: &ConfigSetup) -> Vec<(Pubkey, Account)> {
         (s.mint, mint_account(TOKEN_2022)),
         mollusk_svm::program::keyed_account_for_system_program(),
     ]
+}
+
+pub struct CreatorSetup {
+    pub wallet: Pubkey,
+    pub creator: Pubkey,
+    pub creator_bump: u8,
+    pub handle: String,
+    pub handle_account: Pubkey,
+    pub handle_bump: u8,
+}
+
+pub fn creator_setup(handle: &str) -> CreatorSetup {
+    let wallet = Pubkey::new_unique();
+    let (creator, creator_bump) =
+        Pubkey::find_program_address(&[Creator::SEED, wallet.as_ref()], &ccsupport::ID);
+    let (handle_account, handle_bump) =
+        Pubkey::find_program_address(&[Handle::SEED, handle.as_bytes()], &ccsupport::ID);
+    CreatorSetup {
+        wallet,
+        creator,
+        creator_bump,
+        handle: handle.to_string(),
+        handle_account,
+        handle_bump,
+    }
+}
+
+pub fn register_creator(s: &CreatorSetup, name: &str, description: &str) -> Instruction {
+    Instruction {
+        program_id: ccsupport::ID,
+        accounts: ccsupport::accounts::RegisterCreator {
+            wallet: s.wallet,
+            creator: s.creator,
+            handle_account: s.handle_account,
+            system_program: anchor_lang::system_program::ID,
+        }
+        .to_account_metas(None),
+        data: ccsupport::instruction::RegisterCreator {
+            handle: s.handle.clone(),
+            name: name.to_string(),
+            description: description.to_string(),
+        }
+        .data(),
+    }
+}
+
+pub fn register_creator_accounts(s: &CreatorSetup) -> Vec<(Pubkey, Account)> {
+    vec![
+        (s.wallet, signer_account()),
+        (s.creator, Account::default()),
+        (s.handle_account, Account::default()),
+        mollusk_svm::program::keyed_account_for_system_program(),
+    ]
+}
+
+pub fn update_creator(
+    s: &CreatorSetup,
+    name: &str,
+    description: &str,
+    suggested_amount: u64,
+) -> Instruction {
+    Instruction {
+        program_id: ccsupport::ID,
+        accounts: ccsupport::accounts::UpdateCreator {
+            wallet: s.wallet,
+            creator: s.creator,
+        }
+        .to_account_metas(None),
+        data: ccsupport::instruction::UpdateCreator {
+            name: name.to_string(),
+            description: description.to_string(),
+            suggested_amount,
+        }
+        .data(),
+    }
+}
+
+// Події `emit!` лягають у лог рядком `Program data: <base64>`; перші 8 байтів —
+// дискримінатор події.
+pub fn events<T: Discriminator + AnchorDeserialize>(logs: &[String]) -> Vec<T> {
+    logs.iter()
+        .filter_map(|l| l.strip_prefix("Program data: "))
+        .map(|b64| STANDARD.decode(b64).unwrap())
+        .filter(|bytes| bytes.starts_with(T::DISCRIMINATOR))
+        .map(|bytes| T::deserialize(&mut &bytes[T::DISCRIMINATOR.len()..]).unwrap())
+        .collect()
 }
