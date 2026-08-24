@@ -1,19 +1,12 @@
 mod common;
 
 use anchor_lang::prelude::AccountInfo;
-use anchor_lang::{InstructionData, ToAccountMetas};
-use common::{fixture_transfer, instructions_sysvar, Harness, TOKEN_2022};
+use common::{
+    config_setup, fixture_transfer, init_config, init_config_accounts, instructions_sysvar,
+    Harness, TOKEN_2022,
+};
 use mollusk_svm::result::Check;
-use solana_instruction::Instruction;
 use solana_instructions_sysvar::{load_current_index_checked, load_instruction_at_checked};
-
-fn init_config() -> Instruction {
-    Instruction {
-        program_id: ccsupport::ID,
-        accounts: ccsupport::accounts::InitConfig {}.to_account_metas(None),
-        data: ccsupport::instruction::InitConfig {}.data(),
-    }
-}
 
 #[test]
 fn pubkey_types_are_one() {
@@ -28,7 +21,12 @@ fn pubkey_types_are_one() {
 #[test]
 fn runs_the_deployed_elf() {
     let mut h = Harness::new();
-    let result = h.process(&init_config(), &[], &[Check::success()]);
+    let s = config_setup();
+    let result = h.process(
+        &init_config(&s),
+        &init_config_accounts(&s),
+        &[Check::success()],
+    );
     assert!(result.compute_units_consumed > 0);
     assert!(h
         .logs()
@@ -51,13 +49,15 @@ fn warp_sets_slot_and_unix_timestamp_together() {
 #[test]
 fn logs_hold_only_the_current_run() {
     let mut h = Harness::new();
-    let ix = init_config();
-    h.process(&ix, &[], &[Check::success()]);
+    let s = config_setup();
+    let ix = init_config(&s);
+    let accounts = init_config_accounts(&s);
+    h.process(&ix, &accounts, &[Check::success()]);
     let first = h.logs();
     assert!(first.iter().any(|l| l.contains("Instruction: InitConfig")));
 
     for run in 1..200 {
-        h.process(&ix, &[], &[Check::success()]);
+        h.process(&ix, &accounts, &[Check::success()]);
         let logs = h.logs();
         assert_eq!(logs, first, "run {run}: logs differ from the first run");
     }
@@ -97,7 +97,8 @@ fn fixture_transfer_is_token_2022_confidential_transfer() {
 #[test]
 fn instructions_sysvar_round_trips_through_the_program_side_reader() {
     let transfer = fixture_transfer();
-    let (key, mut account) = instructions_sysvar(&[transfer.clone(), init_config()], 1);
+    let (key, mut account) =
+        instructions_sysvar(&[transfer.clone(), init_config(&config_setup())], 1);
     assert_eq!(key, solana_instructions_sysvar::ID);
 
     let mut lamports = account.lamports;

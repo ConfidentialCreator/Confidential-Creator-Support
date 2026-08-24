@@ -1,5 +1,11 @@
+// Один модуль на кілька тестових бінарників: те, чого не вживає котрийсь із них,
+// інакше падає під `-D warnings` як dead_code.
+#![allow(dead_code)]
+
+use anchor_lang::{InstructionData, ToAccountMetas};
 use base64::engine::general_purpose::STANDARD;
 use base64::Engine as _;
+use ccsupport::state::Config;
 use mollusk_svm::program::loader_keys::LOADER_V3;
 use mollusk_svm::result::{Check, InstructionResult};
 use mollusk_svm::Mollusk;
@@ -11,6 +17,8 @@ use solana_svm_log_collector::LogCollector;
 
 pub const TOKEN_2022: Pubkey =
     Pubkey::from_str_const("TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb");
+pub const TOKEN_LEGACY: Pubkey =
+    Pubkey::from_str_const("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA");
 
 const ELF: &str = concat!(
     env!("CARGO_MANIFEST_DIR"),
@@ -185,4 +193,66 @@ fn decode_message_instructions(wire: &[u8]) -> Vec<Instruction> {
     };
     assert_eq!(lookups, 0, "таблиці адрес у фікстурі не підтримуються");
     instructions
+}
+
+pub fn signer_account() -> Account {
+    Account::new(1_000_000_000, 0, &Pubkey::default())
+}
+
+// Базовий Mint без розширень: COption authority (4+32), supply (8), decimals (1),
+// is_initialized (1), COption freeze (4+32) = 82 байти; для `InterfaceAccount<Mint>`
+// важливі лише власник і прапорець ініціалізації.
+pub fn mint_account(owner: Pubkey) -> Account {
+    let mut data = vec![0u8; 82];
+    data[0] = 1;
+    data[4..36].copy_from_slice(Pubkey::new_unique().as_ref());
+    data[44] = 6;
+    data[45] = 1;
+    Account {
+        lamports: 1_000_000_000,
+        data,
+        owner,
+        executable: false,
+        rent_epoch: 0,
+    }
+}
+
+pub struct ConfigSetup {
+    pub config: Pubkey,
+    pub bump: u8,
+    pub authority: Pubkey,
+    pub mint: Pubkey,
+}
+
+pub fn config_setup() -> ConfigSetup {
+    let (config, bump) = Pubkey::find_program_address(&[Config::SEED], &ccsupport::ID);
+    ConfigSetup {
+        config,
+        bump,
+        authority: Pubkey::new_unique(),
+        mint: Pubkey::new_unique(),
+    }
+}
+
+pub fn init_config(s: &ConfigSetup) -> Instruction {
+    Instruction {
+        program_id: ccsupport::ID,
+        accounts: ccsupport::accounts::InitConfig {
+            config: s.config,
+            authority: s.authority,
+            mint: s.mint,
+            system_program: anchor_lang::system_program::ID,
+        }
+        .to_account_metas(None),
+        data: ccsupport::instruction::InitConfig {}.data(),
+    }
+}
+
+pub fn init_config_accounts(s: &ConfigSetup) -> Vec<(Pubkey, Account)> {
+    vec![
+        (s.config, Account::default()),
+        (s.authority, signer_account()),
+        (s.mint, mint_account(TOKEN_2022)),
+        mollusk_svm::program::keyed_account_for_system_program(),
+    ]
 }
