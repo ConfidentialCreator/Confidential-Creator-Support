@@ -34,6 +34,9 @@ unexpected_cfgs = { level = "warn", check-cfg = ['cfg(target_os, values("solana"
 anchor-lang.workspace = true
 # `token_interface` — читання ATA прихильника й автора під Token-2022 у `pledge`.
 anchor-spl = { workspace = true, features = ["token_2022", "associated_token"] }
+# `pledge` читає sysvar `Instructions`: anchor-lang 1.2 не реекспортує
+# `load_instruction_at_checked`.
+solana-instructions-sysvar.workspace = true
 
 [dev-dependencies]
 mollusk-svm.workspace = true
@@ -42,6 +45,5 @@ solana-account.workspace = true
 solana-instruction.workspace = true
 solana-pubkey.workspace = true
 solana-svm-log-collector.workspace = true
-solana-instructions-sysvar.workspace = true
 base64.workspace = true
 serde_json.workspace = true

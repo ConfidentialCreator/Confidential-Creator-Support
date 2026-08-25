@@ -20,4 +20,6 @@ pub enum CcsError {
     WrongAuthority,
     #[msg("periods must be within 1..=12")]
     InvalidPeriods,
+    #[msg("transfer source is not the supporter's token account")]
+    WrongSource,
 }

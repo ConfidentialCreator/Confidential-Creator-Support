@@ -96,4 +96,5 @@ fn error_codes_are_stable_from_the_anchor_custom_base() {
     assert_eq!(u32::from(CcsError::WrongDestination), 6006);
     assert_eq!(u32::from(CcsError::WrongAuthority), 6007);
     assert_eq!(u32::from(CcsError::InvalidPeriods), 6008);
+    assert_eq!(u32::from(CcsError::WrongSource), 6009);
 }
