@@ -21,3 +21,18 @@ pub struct CreatorUpdated {
     pub suggested_amount: u64,
     pub slot: u64,
 }
+
+// Знімок `Pledge` після внеску: worker робить upsert у `pledges` і додає рядок у
+// `contributions` (перший внесок — `contributions == 1`) без дочитування акаунта.
+#[event]
+pub struct Pledged {
+    pub creator: Pubkey,
+    pub supporter: Pubkey,
+    pub periods: u8,
+    pub started_at: i64,
+    pub expires_at: i64,
+    pub periods_total: u32,
+    pub contributions: u32,
+    pub show_publicly: bool,
+    pub slot: u64,
+}

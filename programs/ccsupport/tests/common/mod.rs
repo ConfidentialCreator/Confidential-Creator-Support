@@ -5,7 +5,7 @@
 use anchor_lang::{AnchorDeserialize, Discriminator, InstructionData, ToAccountMetas};
 use base64::engine::general_purpose::STANDARD;
 use base64::Engine as _;
-use ccsupport::state::{Config, Creator, Handle};
+use ccsupport::state::{Config, Creator, Handle, Pledge};
 use mollusk_svm::program::loader_keys::LOADER_V3;
 use mollusk_svm::result::{Check, InstructionResult};
 use mollusk_svm::Mollusk;
@@ -267,7 +267,10 @@ pub struct CreatorSetup {
 }
 
 pub fn creator_setup(handle: &str) -> CreatorSetup {
-    let wallet = Pubkey::new_unique();
+    creator_setup_for(Pubkey::new_unique(), handle)
+}
+
+pub fn creator_setup_for(wallet: Pubkey, handle: &str) -> CreatorSetup {
     let (creator, creator_bump) =
         Pubkey::find_program_address(&[Creator::SEED, wallet.as_ref()], &ccsupport::ID);
     let (handle_account, handle_bump) =
@@ -341,4 +344,124 @@ pub fn events<T: Discriminator + AnchorDeserialize>(logs: &[String]) -> Vec<T> {
         .filter(|bytes| bytes.starts_with(T::DISCRIMINATOR))
         .map(|bytes| T::deserialize(&mut &bytes[T::DISCRIMINATOR.len()..]).unwrap())
         .collect()
+}
+
+// Адреси з `context` фікстури `fixtures/tx/transfer.json` (devnet, T006): ATA
+// прихильника й автора в переказі виведені саме з цих гаманців і цього мінта.
+pub const FIXTURE_MINT: Pubkey =
+    Pubkey::from_str_const("6f1QTLNPh59wM26CQx1pnJTUcE814H64JaABjARPvtiC");
+pub const FIXTURE_SUPPORTER: Pubkey =
+    Pubkey::from_str_const("6BUPsnbo6yqeUE5UHHz6WDp6b4saTf3PPEn5B2Mp7JGZ");
+pub const FIXTURE_CREATOR: Pubkey =
+    Pubkey::from_str_const("AJ6LFWEJgLEwkfyWWipZ8Le5fV9QjCV61UCnzv9g5ZUq");
+
+pub struct PledgeSetup {
+    pub config: ConfigSetup,
+    pub creator: CreatorSetup,
+    pub supporter: Pubkey,
+    pub pledge: Pubkey,
+    pub pledge_bump: u8,
+}
+
+pub fn pledge_setup() -> PledgeSetup {
+    let mut config = config_setup();
+    config.mint = FIXTURE_MINT;
+    let creator = creator_setup_for(FIXTURE_CREATOR, "marrow-dispatch");
+    let (pledge, pledge_bump) = Pubkey::find_program_address(
+        &[
+            Pledge::SEED,
+            creator.wallet.as_ref(),
+            FIXTURE_SUPPORTER.as_ref(),
+        ],
+        &ccsupport::ID,
+    );
+    PledgeSetup {
+        config,
+        creator,
+        supporter: FIXTURE_SUPPORTER,
+        pledge,
+        pledge_bump,
+    }
+}
+
+// `Config` і `Creator` після `init_config` та `register_creator` — стан, який
+// `pledge` читає; mollusk між прогонами нічого не зберігає.
+pub struct PledgeState {
+    pub config: Account,
+    pub creator: Account,
+    pub pledge: Account,
+}
+
+pub fn bootstrap(h: &mut Harness, s: &PledgeSetup) -> PledgeState {
+    let config = h
+        .process(
+            &init_config(&s.config),
+            &init_config_accounts(&s.config),
+            &[Check::success()],
+        )
+        .get_account(&s.config.config)
+        .unwrap()
+        .clone();
+    let creator = h
+        .process(
+            &register_creator(&s.creator, "Ilse Marrow", "The Marrow Dispatch"),
+            &register_creator_accounts(&s.creator),
+            &[Check::success()],
+        )
+        .get_account(&s.creator.creator)
+        .unwrap()
+        .clone();
+    PledgeState {
+        config,
+        creator,
+        pledge: Account::default(),
+    }
+}
+
+impl PledgeState {
+    pub fn after(&self, result: &InstructionResult, s: &PledgeSetup) -> PledgeState {
+        PledgeState {
+            config: self.config.clone(),
+            creator: result.get_account(&s.creator.creator).unwrap().clone(),
+            pledge: result.get_account(&s.pledge).unwrap().clone(),
+        }
+    }
+}
+
+pub fn pledge(s: &PledgeSetup, periods: u8, show_publicly: bool) -> Instruction {
+    Instruction {
+        program_id: ccsupport::ID,
+        accounts: ccsupport::accounts::MakePledge {
+            supporter: s.supporter,
+            config: s.config.config,
+            creator: s.creator.creator,
+            pledge: s.pledge,
+            instructions: solana_instructions_sysvar::ID,
+            system_program: anchor_lang::system_program::ID,
+        }
+        .to_account_metas(None),
+        data: ccsupport::instruction::Pledge {
+            periods,
+            show_publicly,
+        }
+        .data(),
+    }
+}
+
+// Транзакція «переказ, потім pledge»: sysvar складено з обох інструкцій,
+// поточний індекс — 1.
+pub fn pledge_accounts(
+    s: &PledgeSetup,
+    state: &PledgeState,
+    transfer: &Instruction,
+    ix: &Instruction,
+) -> Vec<(Pubkey, Account)> {
+    vec![
+        (s.supporter, signer_account()),
+        (s.config.config, state.config.clone()),
+        (s.creator.creator, state.creator.clone()),
+        (s.pledge, state.pledge.clone()),
+        instructions_sysvar(&[transfer.clone(), ix.clone()], 1),
+        mollusk_svm::program::keyed_account_for_system_program(),
+    ]
 }

@@ -4,6 +4,7 @@ pub mod errors;
 pub mod events;
 pub mod instructions;
 pub mod introspect;
+pub mod periods;
 pub mod state;
 
 use instructions::*;
@@ -34,5 +35,9 @@ pub mod ccsupport {
         suggested_amount: u64,
     ) -> Result<()> {
         instructions::update_creator_handler(ctx, name, description, suggested_amount)
+    }
+
+    pub fn pledge(ctx: Context<MakePledge>, periods: u8, show_publicly: bool) -> Result<()> {
+        instructions::pledge_handler(ctx, periods, show_publicly)
     }
 }
