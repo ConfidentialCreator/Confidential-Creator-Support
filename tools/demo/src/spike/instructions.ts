@@ -1,11 +1,5 @@
-import { CCS_PROGRAM_ID } from '@ccsupport/chain'
-import {
-  AccountRole,
-  type Address,
-  address,
-  getAddressDecoder,
-  type Instruction,
-} from '@solana/kit'
+import { CCSUPPORT_PROGRAM_ADDRESS } from '@ccsupport/chain'
+import { AccountRole, type Address, getAddressDecoder, type Instruction } from '@solana/kit'
 import {
   CONFIDENTIAL_TRANSFER_CONFIDENTIAL_TRANSFER_DISCRIMINATOR,
   CONFIDENTIAL_TRANSFER_DISCRIMINATOR,
@@ -36,7 +30,7 @@ export function syntheticPledge(supporter: Address, extraAccounts: number): Inst
     role: AccountRole.WRITABLE,
   }))
   return {
-    programAddress: address(CCS_PROGRAM_ID),
+    programAddress: CCSUPPORT_PROGRAM_ADDRESS,
     accounts: [{ address: supporter, role: AccountRole.READONLY_SIGNER }, ...extras],
     data: new Uint8Array(PLEDGE_DATA_BYTES),
   }

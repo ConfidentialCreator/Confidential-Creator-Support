@@ -7,23 +7,25 @@
     ".": "./src/index.ts"
   },
   "scripts": {
+    "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "codama": "node scripts/codama.mjs"
   },
   "dependencies": {
     "@ccsupport/shared": "workspace:*",
-    "@solana/kit": "8.3.0",
-    "@solana/sysvars": "8.3.0",
-    "@solana-program/token-2022": "0.17.0",
-    "@solana/zk-sdk": "0.5.2",
-    "@solana-program/zk-elgamal-proof": "0.4.0",
+    "@solana-program/compute-budget": "0.18.1",
     "@solana-program/record": "0.4.1",
     "@solana-program/system": "0.14.1",
-    "@solana-program/compute-budget": "0.18.1"
+    "@solana-program/token-2022": "0.17.0",
+    "@solana-program/zk-elgamal-proof": "0.4.0",
+    "@solana/kit": "8.3.0",
+    "@solana/program-client-core": "8.3.0",
+    "@solana/sysvars": "8.3.0",
+    "@solana/zk-sdk": "0.5.2"
   },
   "devDependencies": {
-    "codama": "1.10.2",
     "@codama/nodes-from-anchor": "1.5.5",
-    "@codama/renderers-js": "2.4.0"
+    "@codama/renderers-js": "2.4.0",
+    "codama": "1.10.2"
   }
 }

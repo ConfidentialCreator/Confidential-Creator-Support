@@ -1,6 +1,6 @@
-import { CCS_PROGRAM_ID } from '@ccsupport/chain'
+import { CCSUPPORT_PROGRAM_ADDRESS } from '@ccsupport/chain'
 import { createDb } from '@ccsupport/db'
-import { address, createSolanaRpc, createSolanaRpcSubscriptions } from '@solana/kit'
+import { createSolanaRpc, createSolanaRpcSubscriptions } from '@solana/kit'
 import { pino } from 'pino'
 import { backfill, rpcFor } from './backfill.ts'
 import { workerConfigFromEnv } from './config.ts'
@@ -18,9 +18,9 @@ async function main(): Promise<void> {
     base: { service: 'worker' },
     timestamp: pino.stdTimeFunctions.isoTime,
   })
-  const programId = address(CCS_PROGRAM_ID)
+  const programId = CCSUPPORT_PROGRAM_ADDRESS
   const database = createDb(config.databaseUrl)
-  const store = cursorStore(database.db, CCS_PROGRAM_ID)
+  const store = cursorStore(database.db, CCSUPPORT_PROGRAM_ADDRESS)
   const rpc = rpcFor(createSolanaRpc(config.rpcUrl), programId)
 
   const indexer = createIndexer({
@@ -57,7 +57,7 @@ async function main(): Promise<void> {
     signal: stop.signal,
   })
   const timer = setInterval(() => void backfillPass(), BACKFILL_EVERY_MS)
-  logger.info({ program: CCS_PROGRAM_ID, rpc: config.rpcUrl }, 'worker listening')
+  logger.info({ program: CCSUPPORT_PROGRAM_ADDRESS, rpc: config.rpcUrl }, 'worker listening')
 
   for (const signal of ['SIGTERM', 'SIGINT'] as const) {
     process.once(signal, () => {

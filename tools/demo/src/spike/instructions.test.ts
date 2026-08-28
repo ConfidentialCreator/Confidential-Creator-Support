@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs'
-import { CCS_PROGRAM_ID } from '@ccsupport/chain'
+import { CCSUPPORT_PROGRAM_ADDRESS } from '@ccsupport/chain'
 import {
   AccountRole,
   address,
@@ -67,7 +67,7 @@ describe('isConfidentialTransfer', () => {
 
   it('rejects the same bytes under a foreign program and empty data', () => {
     const ix = transferIx()
-    expect(isConfidentialTransfer({ ...ix, programAddress: address(CCS_PROGRAM_ID) })).toBe(false)
+    expect(isConfidentialTransfer({ ...ix, programAddress: CCSUPPORT_PROGRAM_ADDRESS })).toBe(false)
     expect(isConfidentialTransfer({ programAddress: TOKEN_2022_PROGRAM_ADDRESS })).toBe(false)
     expect(
       isConfidentialTransfer({
@@ -92,7 +92,7 @@ describe('findConfidentialTransfer', () => {
 describe('syntheticPledge', () => {
   it('costs exactly what the plan budgets: program + N accounts + 13 bytes', () => {
     const ix = syntheticPledge(SUPPORTER, 4)
-    expect(ix.programAddress).toBe(CCS_PROGRAM_ID)
+    expect(ix.programAddress).toBe(CCSUPPORT_PROGRAM_ADDRESS)
     expect(ix.data).toHaveLength(13)
     expect(ix.accounts).toHaveLength(5)
     expect(ix.accounts?.[0]).toEqual({ address: SUPPORTER, role: AccountRole.READONLY_SIGNER })

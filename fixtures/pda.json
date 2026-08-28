@@ -1,0 +1,23 @@
+{
+  "program": "8tX3MJt6vzw9fw7gAeBdEtom5cfXR8BMZn9UCPQJrj6z",
+  "config": {
+    "address": "CUcWJA1yKsD9cNBcL6DZ7DY4hk9zkKcQUsVpkE4owZmX",
+    "bump": 255
+  },
+  "creator": {
+    "wallet": "AJ6LFWEJgLEwkfyWWipZ8Le5fV9QjCV61UCnzv9g5ZUq",
+    "address": "5fYcti57g62ebbVdxYqShKogfAdAq88kdL73EHc49yiq",
+    "bump": 254
+  },
+  "handle": {
+    "handle": "marrow-dispatch",
+    "address": "2QhYTf3pjR4E2sNL77JFshRKvERukqmCn7ULGj1wByyi",
+    "bump": 254
+  },
+  "pledge": {
+    "creatorWallet": "AJ6LFWEJgLEwkfyWWipZ8Le5fV9QjCV61UCnzv9g5ZUq",
+    "supporter": "6BUPsnbo6yqeUE5UHHz6WDp6b4saTf3PPEn5B2Mp7JGZ",
+    "address": "3MgNqgJrmp66bjrtjQWHaeaKeu1EsYkLdPm2J3ZP8wze",
+    "bump": 254
+  }
+}
