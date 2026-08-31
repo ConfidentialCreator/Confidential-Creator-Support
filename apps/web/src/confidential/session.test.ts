@@ -1,7 +1,7 @@
 import type { Address } from '@ccsupport/shared'
 import type { MessageModifyingSigner } from '@solana/kit'
 import { describe, expect, it, vi } from 'vitest'
-import { createKeySession, type DeriveKeys, notImplemented } from './session.ts'
+import { createKeySession, type DeriveKeys } from './session.ts'
 
 const OWNER = 'SupZRdr1Demo4kQ9pW2mR7sXb5nLc8dFg3hJt6yUvQ' as Address
 const OTHER = 'Ccs1MarrowDemo4kQ9pW2mR7sXb5nLc8dFg3hJt6yUvE' as Address
@@ -63,9 +63,5 @@ describe('createKeySession', () => {
     session.forget()
     await session.get(signer, OWNER, MINT)
     expect(derive).toHaveBeenCalledTimes(2)
-  })
-
-  it('the placeholder derivation refuses', async () => {
-    await expect(notImplemented(signer, OWNER, MINT)).rejects.toThrow('NotImplemented')
   })
 })

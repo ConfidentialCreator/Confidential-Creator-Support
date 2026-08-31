@@ -8,10 +8,6 @@ export type DeriveKeys = (
   mint: Address,
 ) => Promise<ConfidentialKeys>
 
-export const notImplemented: DeriveKeys = async () => {
-  throw new Error('NotImplemented: key derivation is not wired yet')
-}
-
 export type KeySession = {
   get: DeriveKeys
   forget: () => void
