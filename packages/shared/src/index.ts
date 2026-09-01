@@ -1,4 +1,5 @@
 export * from './address.ts'
+export * from './api/relay.ts'
 export * from './api-error.ts'
 export * from './handle.ts'
 export * from './periods.ts'
