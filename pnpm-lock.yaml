@@ -145,6 +145,9 @@ importers:
       '@ccsupport/shared':
         specifier: workspace:*
         version: link:../shared
+      '@noble/curves':
+        specifier: 2.4.0
+        version: 2.4.0
       '@solana-program/compute-budget':
         specifier: 0.18.1
         version: 0.18.1(@solana/kit@8.3.0(typescript@5.9.3))
