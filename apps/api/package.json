@@ -15,10 +15,13 @@
     "@ccsupport/shared": "workspace:*",
     "@hono/node-server": "2.1.1",
     "@hono/zod-validator": "0.9.1",
+    "@solana-program/record": "0.4.1",
+    "@solana-program/system": "0.14.1",
+    "@solana-program/zk-elgamal-proof": "0.4.0",
+    "@solana/kit": "8.3.0",
     "hono": "4.13.7",
     "pino": "10.3.1",
-    "zod": "4.6.5",
-    "@solana/kit": "8.3.0"
+    "zod": "4.6.5"
   },
   "devDependencies": {
     "pino-pretty": "13.1.3"

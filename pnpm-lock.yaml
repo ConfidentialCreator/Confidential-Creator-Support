@@ -41,6 +41,15 @@ importers:
       '@hono/zod-validator':
         specifier: 0.9.1
         version: 0.9.1(hono@4.13.7)(zod@4.6.5)
+      '@solana-program/record':
+        specifier: 0.4.1
+        version: 0.4.1(@solana/kit@8.3.0(typescript@5.9.3))
+      '@solana-program/system':
+        specifier: 0.14.1
+        version: 0.14.1(@solana/kit@8.3.0(typescript@5.9.3))
+      '@solana-program/zk-elgamal-proof':
+        specifier: 0.4.0
+        version: 0.4.0(@solana/kit@8.3.0(typescript@5.9.3))
       '@solana/kit':
         specifier: 8.3.0
         version: 8.3.0(typescript@5.9.3)
