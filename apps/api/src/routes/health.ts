@@ -1,9 +1,11 @@
+import type { Address } from '@solana/kit'
 import { Hono } from 'hono'
 import type { AppEnv } from '../env.ts'
 
 export const HEALTH_TIMEOUT_MS = 2_000
 
 export type HealthDeps = {
+  payer: Address
   slot: () => Promise<bigint>
   payerLamports: () => Promise<bigint>
   timeoutMs?: number
@@ -25,6 +27,8 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
 export function healthRoute(deps: HealthDeps): Hono<AppEnv> {
   const timeoutMs = deps.timeoutMs ?? HEALTH_TIMEOUT_MS
 
+  const { payer } = deps
+
   return new Hono<AppEnv>().get('/health', async (c) => {
     try {
       const [slot, payerLamports] = await withTimeout(
@@ -32,11 +36,11 @@ export function healthRoute(deps: HealthDeps): Hono<AppEnv> {
         timeoutMs,
       )
       return c.json({
-        data: { ok: true, slot: Number(slot), payerLamports: Number(payerLamports) },
+        data: { ok: true, slot: Number(slot), payer, payerLamports: Number(payerLamports) },
       })
     } catch (err) {
       c.get('logger')?.error({ err }, 'health check failed')
-      return c.json({ data: { ok: false, slot: null, payerLamports: null } }, 503)
+      return c.json({ data: { ok: false, slot: null, payer, payerLamports: null } }, 503)
     }
   })
 }

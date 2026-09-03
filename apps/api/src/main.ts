@@ -1,22 +1,28 @@
 import { serve } from '@hono/node-server'
-import { createKeyPairSignerFromBytes, createSolanaRpc } from '@solana/kit'
+import { createKeyPairFromBytes, createSolanaRpc } from '@solana/kit'
 import { createApp } from './app.ts'
 import { apiConfigFromEnv } from './config.ts'
 import { createLogger } from './logger.ts'
+import { createRelayPayer, payerRpcFromKit } from './relay/payer.ts'
 
 async function main(): Promise<void> {
   const config = apiConfigFromEnv(process.env)
   const logger = createLogger(config.logLevel)
   const rpc = createSolanaRpc(config.rpcUrl)
-  const payer = await createKeyPairSignerFromBytes(config.proofPayerSecret)
+  const payer = await createRelayPayer(
+    payerRpcFromKit(rpc),
+    await createKeyPairFromBytes(config.proofPayerSecret),
+  )
 
   const app = createApp({
     logger,
     webOrigin: config.webOrigin,
     health: {
+      payer: payer.address,
       slot: () => rpc.getSlot().send(),
-      payerLamports: async () => (await rpc.getBalance(payer.address).send()).value,
+      payerLamports: () => payer.lamports(),
     },
+    relay: { payer },
   })
 
   const server = serve({ fetch: app.fetch, port: config.port, hostname: '0.0.0.0' }, (info) => {

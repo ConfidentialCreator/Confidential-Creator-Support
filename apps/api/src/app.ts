@@ -5,11 +5,13 @@ import { type Logger, requestLogger } from './logger.ts'
 import { errorHandler, notFoundHandler } from './middleware/errors.ts'
 import { type RateLimitOptions, rateLimit } from './middleware/rate-limit.ts'
 import { type HealthDeps, healthRoute } from './routes/health.ts'
+import { type RelayDeps, relayRoute } from './routes/relay.ts'
 
 export type AppDeps = {
   logger: Logger
   webOrigin: string
   health: HealthDeps
+  relay: RelayDeps
   rateLimit?: RateLimitOptions
 }
 
@@ -27,7 +29,7 @@ export function createApp(deps: AppDeps) {
   app.notFound(notFoundHandler)
   app.onError(errorHandler)
 
-  return app.route('/', healthRoute(deps.health))
+  return app.route('/', healthRoute(deps.health)).route('/', relayRoute(deps.relay))
 }
 
 export type App = ReturnType<typeof createApp>
