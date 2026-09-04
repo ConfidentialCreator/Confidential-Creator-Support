@@ -6,6 +6,7 @@ import { apiConfigFromEnv, DEFAULT_PORT } from './config.ts'
 const secret = (fill: number) => getBase58Decoder().decode(new Uint8Array(64).fill(fill))
 const PAYER = secret(1)
 const FAUCET = secret(2)
+const MINT = 'HApEuJSUaLofM9Z7PUhAKfxpHkapxBTmpdsnjG9nud36'
 
 const base = {
   SOLANA_RPC_URL: 'https://api.devnet.solana.com',
@@ -30,13 +31,25 @@ describe('apiConfigFromEnv', () => {
     expect(config.logLevel).toBe('debug')
   })
 
-  it('requires FAUCET_SECRET only when the faucet is enabled', () => {
+  it('requires FAUCET_SECRET and CCS_MINT only when the faucet is enabled', () => {
     expect(
       apiConfigFromEnv({ ...base, FAUCET_ENABLED: 'false', FAUCET_SECRET: '' }).faucet,
     ).toBeNull()
     expect(() => apiConfigFromEnv({ ...base, FAUCET_ENABLED: 'true' })).toThrow(/FAUCET_SECRET/)
-    const enabled = apiConfigFromEnv({ ...base, FAUCET_ENABLED: 'true', FAUCET_SECRET: FAUCET })
+    expect(() =>
+      apiConfigFromEnv({ ...base, FAUCET_ENABLED: 'true', FAUCET_SECRET: FAUCET }),
+    ).toThrow(/CCS_MINT/)
+    expect(() =>
+      apiConfigFromEnv({ ...base, FAUCET_ENABLED: 'true', FAUCET_SECRET: FAUCET, CCS_MINT: 'x' }),
+    ).toThrow(/CCS_MINT/)
+    const enabled = apiConfigFromEnv({
+      ...base,
+      FAUCET_ENABLED: 'true',
+      FAUCET_SECRET: FAUCET,
+      CCS_MINT: MINT,
+    })
     expect(enabled.faucet?.secret).toHaveLength(64)
+    expect(enabled.faucet?.mint).toBe(MINT)
   })
 
   it('refuses an empty value and a placeholder left from .env.example', () => {

@@ -4,6 +4,7 @@ import type { AppEnv } from './env.ts'
 import { type Logger, requestLogger } from './logger.ts'
 import { errorHandler, notFoundHandler } from './middleware/errors.ts'
 import { type RateLimitOptions, rateLimit } from './middleware/rate-limit.ts'
+import { type DevnetDeps, devnetRoute } from './routes/devnet.ts'
 import { type HealthDeps, healthRoute } from './routes/health.ts'
 import { type RelayDeps, relayRoute } from './routes/relay.ts'
 
@@ -12,6 +13,8 @@ export type AppDeps = {
   webOrigin: string
   health: HealthDeps
   relay: RelayDeps
+  // Absent outside devnet: the route is not mounted, so /devnet/faucet is a plain 404.
+  devnet?: DevnetDeps
   rateLimit?: RateLimitOptions
 }
 
@@ -29,7 +32,8 @@ export function createApp(deps: AppDeps) {
   app.notFound(notFoundHandler)
   app.onError(errorHandler)
 
-  return app.route('/', healthRoute(deps.health)).route('/', relayRoute(deps.relay))
+  const routed = app.route('/', healthRoute(deps.health)).route('/', relayRoute(deps.relay))
+  return deps.devnet ? routed.route('/', devnetRoute(deps.devnet)) : routed
 }
 
 export type App = ReturnType<typeof createApp>

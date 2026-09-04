@@ -1,3 +1,4 @@
+import { addressSchema } from '@ccsupport/shared'
 import { getBase58Encoder } from '@solana/kit'
 import { z } from 'zod'
 
@@ -48,15 +49,19 @@ export const apiConfigSchema = z
     proofPayerSecret: keypairSecret,
     faucetEnabled: flag,
     faucetSecret: z.string().optional(),
+    mint: z.string().optional(),
   })
-  .transform(({ faucetEnabled, faucetSecret, ...rest }, ctx) => {
+  .transform(({ faucetEnabled, faucetSecret, mint, ...rest }, ctx) => {
     if (!faucetEnabled) return { ...rest, faucet: null }
-    const parsed = keypairSecret.safeParse(faucetSecret)
+    // The mint is only needed to hand out the demo token, so it is required with the faucet.
+    const parsed = z
+      .object({ FAUCET_SECRET: keypairSecret, CCS_MINT: filledEnv.pipe(addressSchema) })
+      .safeParse({ FAUCET_SECRET: faucetSecret, CCS_MINT: mint })
     if (!parsed.success) {
-      for (const issue of parsed.error.issues) ctx.addIssue({ ...issue, path: ['FAUCET_SECRET'] })
+      for (const issue of parsed.error.issues) ctx.addIssue({ ...issue })
       return z.NEVER
     }
-    return { ...rest, faucet: { secret: parsed.data } }
+    return { ...rest, faucet: { secret: parsed.data.FAUCET_SECRET, mint: parsed.data.CCS_MINT } }
   })
 
 export type ApiConfig = z.infer<typeof apiConfigSchema>
@@ -70,5 +75,6 @@ export function apiConfigFromEnv(env: Record<string, string | undefined>): ApiCo
     proofPayerSecret: env.PROOF_PAYER_SECRET,
     faucetEnabled: env.FAUCET_ENABLED,
     faucetSecret: env.FAUCET_SECRET,
+    mint: env.CCS_MINT,
   })
 }

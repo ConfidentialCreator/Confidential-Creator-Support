@@ -57,6 +57,36 @@ describe('GET /health', () => {
   })
 })
 
+describe('faucet', () => {
+  it('is a plain 404 when devnet deps are absent', async () => {
+    const res = await build().request('/devnet/faucet', { method: 'POST' })
+    expect(res.status).toBe(404)
+    expect(apiErrorBodySchema.parse(await res.json()).error.code).toBe('NOT_FOUND')
+  })
+
+  it('shows the faucet balances on /health when it is on', async () => {
+    const app = build({
+      health: {
+        payer: PAYER,
+        slot: async () => 1n,
+        payerLamports: async () => 2n,
+        faucet: { lamports: async () => 3n, units: async () => 4n },
+      },
+    })
+    const res = await app.request('/health')
+    expect(await res.json()).toEqual({
+      data: {
+        ok: true,
+        slot: 1,
+        payer: PAYER,
+        payerLamports: 2,
+        faucetLamports: 3,
+        faucetUnits: 4,
+      },
+    })
+  })
+})
+
 describe('cors', () => {
   it('allows only WEB_ORIGIN', async () => {
     const ours = await build().request('/health', { headers: { origin: ORIGIN } })

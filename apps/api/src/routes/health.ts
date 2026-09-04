@@ -8,6 +8,7 @@ export type HealthDeps = {
   payer: Address
   slot: () => Promise<bigint>
   payerLamports: () => Promise<bigint>
+  faucet?: { lamports: () => Promise<bigint>; units: () => Promise<bigint> }
   timeoutMs?: number
 }
 
@@ -31,12 +32,26 @@ export function healthRoute(deps: HealthDeps): Hono<AppEnv> {
 
   return new Hono<AppEnv>().get('/health', async (c) => {
     try {
-      const [slot, payerLamports] = await withTimeout(
-        Promise.all([deps.slot(), deps.payerLamports()]),
+      const [slot, payerLamports, faucetLamports, faucetUnits] = await withTimeout(
+        Promise.all([
+          deps.slot(),
+          deps.payerLamports(),
+          deps.faucet?.lamports(),
+          deps.faucet?.units(),
+        ]),
         timeoutMs,
       )
       return c.json({
-        data: { ok: true, slot: Number(slot), payer, payerLamports: Number(payerLamports) },
+        data: {
+          ok: true,
+          slot: Number(slot),
+          payer,
+          payerLamports: Number(payerLamports),
+          ...(deps.faucet && {
+            faucetLamports: Number(faucetLamports),
+            faucetUnits: Number(faucetUnits),
+          }),
+        },
       })
     } catch (err) {
       c.get('logger')?.error({ err }, 'health check failed')
