@@ -6,6 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from "./creatorRegistered";
-export * from "./creatorUpdated";
-export * from "./pledged";
+export * from "./creatorRegistered.ts";
+export * from "./creatorUpdated.ts";
+export * from "./pledged.ts";

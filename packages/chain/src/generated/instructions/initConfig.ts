@@ -36,8 +36,8 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findConfigPda } from "../pdas";
-import { CCSUPPORT_PROGRAM_ADDRESS } from "../programs";
+import { findConfigPda } from "../pdas/index.ts";
+import { CCSUPPORT_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const INIT_CONFIG_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   23, 235, 115, 232, 168, 96, 1, 231,

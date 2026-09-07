@@ -6,5 +6,5 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from "./config";
-export * from "./creator";
+export * from "./config.ts";
+export * from "./creator.ts";

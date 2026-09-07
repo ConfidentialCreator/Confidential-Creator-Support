@@ -46,7 +46,7 @@ import {
   type HandleArgs,
   type Pledge,
   type PledgeArgs,
-} from "../accounts";
+} from "../accounts/index.ts";
 import {
   getInitConfigInstructionAsync,
   getMakePledgeInstructionAsync,
@@ -64,18 +64,27 @@ import {
   type ParsedUpdateCreatorInstruction,
   type RegisterCreatorAsyncInput,
   type UpdateCreatorAsyncInput,
-} from "../instructions";
-import { findConfigPda, findCreatorPda } from "../pdas";
+} from "../instructions/index.ts";
+import { findConfigPda, findCreatorPda } from "../pdas/index.ts";
 
 export const CCSUPPORT_PROGRAM_ADDRESS =
   "8tX3MJt6vzw9fw7gAeBdEtom5cfXR8BMZn9UCPQJrj6z" as Address<"8tX3MJt6vzw9fw7gAeBdEtom5cfXR8BMZn9UCPQJrj6z">;
 
-export enum CcsupportAccount {
-  Config,
-  Creator,
-  Handle,
-  Pledge,
-}
+export const CcsupportAccount = {
+  0: "Config",
+  1: "Creator",
+  2: "Handle",
+  3: "Pledge",
+  Config: 0,
+  Creator: 1,
+  Handle: 2,
+  Pledge: 3,
+} as const;
+
+export type CcsupportAccount = (typeof CcsupportAccount)[Exclude<
+  keyof typeof CcsupportAccount,
+  number
+>];
 
 export function identifyCcsupportAccount(
   account: { data: ReadonlyUint8Array } | ReadonlyUint8Array,
@@ -131,11 +140,19 @@ export function identifyCcsupportAccount(
   );
 }
 
-export enum CcsupportEvent {
-  CreatorRegistered,
-  CreatorUpdated,
-  Pledged,
-}
+export const CcsupportEvent = {
+  0: "CreatorRegistered",
+  1: "CreatorUpdated",
+  2: "Pledged",
+  CreatorRegistered: 0,
+  CreatorUpdated: 1,
+  Pledged: 2,
+} as const;
+
+export type CcsupportEvent = (typeof CcsupportEvent)[Exclude<
+  keyof typeof CcsupportEvent,
+  number
+>];
 
 export function identifyCcsupportEvent(
   event: { data: ReadonlyUint8Array } | ReadonlyUint8Array,
@@ -179,12 +196,21 @@ export function identifyCcsupportEvent(
   );
 }
 
-export enum CcsupportInstruction {
-  InitConfig,
-  MakePledge,
-  RegisterCreator,
-  UpdateCreator,
-}
+export const CcsupportInstruction = {
+  0: "InitConfig",
+  1: "MakePledge",
+  2: "RegisterCreator",
+  3: "UpdateCreator",
+  InitConfig: 0,
+  MakePledge: 1,
+  RegisterCreator: 2,
+  UpdateCreator: 3,
+} as const;
+
+export type CcsupportInstruction = (typeof CcsupportInstruction)[Exclude<
+  keyof typeof CcsupportInstruction,
+  number
+>];
 
 export function identifyCcsupportInstruction(
   instruction: { data: ReadonlyUint8Array } | ReadonlyUint8Array,
@@ -244,16 +270,16 @@ export type ParsedCcsupportInstruction<
   TProgram extends string = "8tX3MJt6vzw9fw7gAeBdEtom5cfXR8BMZn9UCPQJrj6z",
 > =
   | ({
-      instructionType: CcsupportInstruction.InitConfig;
+      instructionType: typeof CcsupportInstruction.InitConfig;
     } & ParsedInitConfigInstruction<TProgram>)
   | ({
-      instructionType: CcsupportInstruction.MakePledge;
+      instructionType: typeof CcsupportInstruction.MakePledge;
     } & ParsedMakePledgeInstruction<TProgram>)
   | ({
-      instructionType: CcsupportInstruction.RegisterCreator;
+      instructionType: typeof CcsupportInstruction.RegisterCreator;
     } & ParsedRegisterCreatorInstruction<TProgram>)
   | ({
-      instructionType: CcsupportInstruction.UpdateCreator;
+      instructionType: typeof CcsupportInstruction.UpdateCreator;
     } & ParsedUpdateCreatorInstruction<TProgram>);
 
 export function parseCcsupportInstruction<TProgram extends string>(
@@ -355,7 +381,7 @@ export function ccsupportProgram() {
     client: T,
   ): ExtendedClient<T, { ccsupport: CcsupportPlugin }> => {
     return extendClient(client, {
-      ccsupport: <CcsupportPlugin>{
+      ccsupport: {
         accounts: {
           config: addSelfFetchFunctions(client, getConfigCodec()),
           creator: addSelfFetchFunctions(client, getCreatorCodec()),
@@ -388,7 +414,7 @@ export function ccsupportProgram() {
         identifyAccount: identifyCcsupportAccount,
         identifyInstruction: identifyCcsupportInstruction,
         parseInstruction: parseCcsupportInstruction,
-      },
+      } as CcsupportPlugin,
     });
   };
 }

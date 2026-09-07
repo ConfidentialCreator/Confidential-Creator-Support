@@ -13,7 +13,13 @@ const codama = createFromRoot(rootNodeFromAnchor(idl))
 // інструкція йде під ім'ям accounts-структури програми, `MakePledge`.
 codama.update(updateInstructionsVisitor({ pledge: { name: 'makePledge' } }))
 // Рендерер приймає теку пакета й пише в її `src/generated`; версії залежностей
-// у package.json тримаємо самі, тому синхронізацію вимкнено.
+// у package.json тримаємо самі, тому синхронізацію вимкнено. Клієнт виконує не лише
+// Vite, а й Node без транспіляції (`apps/api`, `tools/*`): імпорти з `.ts` замість
+// тек, і жодного `enum` — strip-only режим Node його не стирає.
 codama.accept(
-  renderVisitor(fileURLToPath(new URL('..', import.meta.url)), { syncPackageJson: false }),
+  renderVisitor(fileURLToPath(new URL('..', import.meta.url)), {
+    erasableSyntax: true,
+    importExtension: 'ts',
+    syncPackageJson: false,
+  }),
 )

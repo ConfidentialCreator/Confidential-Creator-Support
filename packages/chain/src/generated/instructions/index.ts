@@ -6,7 +6,7 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from "./initConfig";
-export * from "./makePledge";
-export * from "./registerCreator";
-export * from "./updateCreator";
+export * from "./initConfig.ts";
+export * from "./makePledge.ts";
+export * from "./registerCreator.ts";
+export * from "./updateCreator.ts";

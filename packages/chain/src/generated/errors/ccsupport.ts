@@ -12,7 +12,7 @@ import {
   type SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM,
   type SolanaError,
 } from "@solana/kit";
-import { CCSUPPORT_PROGRAM_ADDRESS } from "../programs";
+import { CCSUPPORT_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 /** HandleTaken: handle is already taken */
 export const CCSUPPORT_ERROR__HANDLE_TAKEN = 0x1770; // 6000

@@ -44,8 +44,8 @@ import {
   getAddressFromResolvedInstructionAccount,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findCreatorPda } from "../pdas";
-import { CCSUPPORT_PROGRAM_ADDRESS } from "../programs";
+import { findCreatorPda } from "../pdas/index.ts";
+import { CCSUPPORT_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const UPDATE_CREATOR_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   39, 221, 251, 213, 194, 161, 31, 207,

@@ -6,7 +6,7 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from "./config";
-export * from "./creator";
-export * from "./handle";
-export * from "./pledge";
+export * from "./config.ts";
+export * from "./creator.ts";
+export * from "./handle.ts";
+export * from "./pledge.ts";
