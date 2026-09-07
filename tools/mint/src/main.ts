@@ -1,8 +1,9 @@
 // Оператор платформи: `create-mint` випускає токен SUPD із ConfidentialTransferMint і
 // ключем аудиту, `mint-to <wallet> <units>` поповнює публічний баланс (faucet-гаманець
-// тощо). Ключі — у CCS_KEYS_DIR (типово ~/.config/ccsupport), у репо не потрапляють.
+// тощо), `init-config` створює `Config` програми з цим мінтом. Ключі — у CCS_KEYS_DIR
+// (типово ~/.config/ccsupport), у репо не потрапляють.
 //
-// Запуск: pnpm --filter @ccsupport/mint mint <create-mint | mint-to <wallet> <units>>
+// Запуск: pnpm --filter @ccsupport/mint mint <create-mint | mint-to <wallet> <units> | init-config>
 import { addressSchema } from '@ccsupport/shared'
 import {
   assertIsSuccessfulTransactionPlanResult,
@@ -25,6 +26,7 @@ import {
 import { fetchMint } from '@solana-program/token-2022'
 import { z } from 'zod'
 import { createMintPlan, DECIMALS, elgamalAddress, TOKEN_SYMBOL } from './create-mint.ts'
+import { findConfig, initConfigPlan } from './init-config.ts'
 import {
   AUDITOR_FILE,
   DEFAULT_KEYS_DIR,
@@ -116,6 +118,24 @@ async function mintTo(argv: readonly string[]): Promise<void> {
   console.log(`\nminted ${args.units} units to ${args.wallet}`)
 }
 
+async function initConfig(): Promise<void> {
+  const mint = env.CCS_MINT
+  if (!mint) throw new Error('CCS_MINT is not set — run create-mint first')
+  const existing = await findConfig(rpc)
+  if (existing) {
+    console.log(
+      `config ${existing.address} already exists  mint ${existing.mint}  authority ${existing.authority}`,
+    )
+    if (existing.mint !== mint) throw new Error(`config mint differs from CCS_MINT=${mint}`)
+    return
+  }
+  const { signer: authority } = await loadOrCreateMintAuthority(env.CCS_KEYS_DIR)
+  await requireBalance(authority)
+  await runPlan(authority, await initConfigPlan({ authority, mint }))
+  const created = await findConfig(rpc)
+  console.log(`\nconfig ${created?.address}  mint ${mint}  authority ${authority.address}`)
+}
+
 async function main(): Promise<void> {
   const [command, ...rest] = process.argv.slice(2)
   switch (command) {
@@ -123,8 +143,10 @@ async function main(): Promise<void> {
       return createMint()
     case 'mint-to':
       return mintTo(rest)
+    case 'init-config':
+      return initConfig()
     default:
-      throw new Error('usage: mint <create-mint | mint-to <wallet> <units>>')
+      throw new Error('usage: mint <create-mint | mint-to <wallet> <units> | init-config>')
   }
 }
 
