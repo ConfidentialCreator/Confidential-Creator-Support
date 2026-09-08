@@ -3,6 +3,12 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
+  "exports": {
+    "./app": "./src/app.ts",
+    "./logger": "./src/logger.ts",
+    "./relay/payer": "./src/relay/payer.ts",
+    "./routes/devnet": "./src/routes/devnet.ts"
+  },
   "scripts": {
     "dev": "node --watch --env-file-if-exists=../../.env src/main.ts",
     "start": "node --env-file-if-exists=../../.env src/main.ts",

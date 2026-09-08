@@ -222,12 +222,18 @@ importers:
 
   tools/demo:
     dependencies:
+      '@ccsupport/api':
+        specifier: workspace:*
+        version: link:../../apps/api
       '@ccsupport/chain':
         specifier: workspace:*
         version: link:../../packages/chain
       '@ccsupport/shared':
         specifier: workspace:*
         version: link:../../packages/shared
+      '@hono/node-server':
+        specifier: 2.1.1
+        version: 2.1.1(hono@4.13.7)
       '@noble/curves':
         specifier: 2.4.0
         version: 2.4.0

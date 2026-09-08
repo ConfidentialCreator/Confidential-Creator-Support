@@ -7,16 +7,18 @@
     "./spike/decrypt-bench": "./src/spike/decrypt-bench.ts"
   },
   "scripts": {
-    "demo": "node src/main.ts",
+    "demo": "node --env-file=../../.env src/main.ts",
     "spike:transfer": "node --env-file=../../.env src/spike/transfer.ts",
     "spike:decrypt": "node src/spike/decrypt.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@ccsupport/api": "workspace:*",
     "@ccsupport/chain": "workspace:*",
     "@noble/curves": "2.4.0",
     "@ccsupport/shared": "workspace:*",
+    "@hono/node-server": "2.1.1",
     "@solana/kit": "8.3.0",
     "@solana-program/system": "0.14.1",
     "@solana-program/token-2022": "0.17.0",
