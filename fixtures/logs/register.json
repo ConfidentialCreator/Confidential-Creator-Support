@@ -1,0 +1,19 @@
+{
+  "label": "register",
+  "cluster": "devnet",
+  "signature": "WNqaNLjrR7EfH8ph1Z78tLTFwL2QvmEpTtYHXdjDq7MS2rCNBbSWfCa4GcCm5AUkX6d923VGYLBvu4GrV74H6wn",
+  "slot": "498814836",
+  "blockTime": "1789483263",
+  "logMessages": [
+    "Program 8tX3MJt6vzw9fw7gAeBdEtom5cfXR8BMZn9UCPQJrj6z invoke [1]",
+    "Program log: Instruction: RegisterCreator",
+    "Program 11111111111111111111111111111111 invoke [2]",
+    "Program 11111111111111111111111111111111 success",
+    "Program 11111111111111111111111111111111 invoke [2]",
+    "Program 11111111111111111111111111111111 success",
+    "Program data: q5oJCjCCuoBZGHwx+4nziRcEWhqDx1ryKSaH/Tg2uuBwympArIRK+Q8AAABtYXJyb3ctZGlzcGF0Y2gTAAAAVGhlIE1hcnJvdyBEaXNwYXRjaEIAAABJbmRlcGVuZGVudCByZXBvcnRpbmcgb24gbXVuaWNpcGFsIGJ1ZGdldHMgYW5kIHB1YmxpYyBwcm9jdXJlbWVudC4AAAAAAAAAAHRPux0AAAAA",
+    "Program 8tX3MJt6vzw9fw7gAeBdEtom5cfXR8BMZn9UCPQJrj6z consumed 16472 of 200000 compute units",
+    "Program 8tX3MJt6vzw9fw7gAeBdEtom5cfXR8BMZn9UCPQJrj6z success"
+  ],
+  "wire": "ARlVS624i9E/r2WncuOv0IRyRFBPTU+8NNIqDv2ki2h4ke6hzRcUrbJMH8kSH04d5tOSS6vKfOL6/89LvYfUQA2AAQACBVkYfDH7ifOJFwRaGoPHWvIpJof9ODa64HDKakCshEr5FO3jESZdhvwz9ZjuyM7iabfJyIgeb7+ouHwaipvQ2KnfNX1mZ/65kpMTb7pD6oiwnjegXgrfppFhESIsm49gWQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAdTRljD6mpwSQjRtFd8JMtdfGeCEb/rs+CRCRW1YW1luFbH8zYxGa4GRzE1C59D7SI/f5bkl4X0VEwMP9DhIEggEEBAACAQN4VQPC0qSMoMMPAAAAbWFycm93LWRpc3BhdGNoEwAAAFRoZSBNYXJyb3cgRGlzcGF0Y2hCAAAASW5kZXBlbmRlbnQgcmVwb3J0aW5nIG9uIG11bmljaXBhbCBidWRnZXRzIGFuZCBwdWJsaWMgcHJvY3VyZW1lbnQuAA=="
+}

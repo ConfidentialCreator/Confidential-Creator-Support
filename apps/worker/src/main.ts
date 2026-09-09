@@ -2,7 +2,9 @@ import { CCSUPPORT_PROGRAM_ADDRESS } from '@ccsupport/chain'
 import { createDb } from '@ccsupport/db'
 import { createSolanaRpc, createSolanaRpcSubscriptions } from '@solana/kit'
 import { pino } from 'pino'
+import { createApplier, drizzleWriter } from './apply.ts'
 import { backfill, rpcFor } from './backfill.ts'
+import { chainReader } from './ciphertext.ts'
 import { workerConfigFromEnv } from './config.ts'
 import { createIndexer, cursorStore } from './cursor.ts'
 import { logSourceFor, subscribeLogs } from './subscribe.ts'
@@ -21,14 +23,13 @@ async function main(): Promise<void> {
   const programId = CCSUPPORT_PROGRAM_ADDRESS
   const database = createDb(config.databaseUrl)
   const store = cursorStore(database.db, CCSUPPORT_PROGRAM_ADDRESS)
-  const rpc = rpcFor(createSolanaRpc(config.rpcUrl), programId)
+  const solana = createSolanaRpc(config.rpcUrl)
+  const rpc = rpcFor(solana, programId)
 
   const indexer = createIndexer({
     store,
     initial: await store.load(),
-    // The applier arrives with US1; until then the cursor follows the chain over
-    // transactions that carry no events yet.
-    handle: async () => {},
+    handle: createApplier({ writer: drizzleWriter(database.db), chain: chainReader(solana) }),
     onError: (err, tx) => logger.error({ err, signature: tx.signature }, 'apply failed'),
   })
 
