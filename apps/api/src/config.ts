@@ -39,6 +39,8 @@ const flag = z
   .transform((value) => value === 'true' || value === '1')
 
 const httpUrl = filledEnv.pipe(z.url({ protocol: /^https?$/ }))
+// Only the shape: the pooler port is asserted where the pool is opened.
+const postgresUrl = filledEnv.pipe(z.url({ protocol: /^postgres(ql)?$/ }))
 
 export const apiConfigSchema = z
   .object({
@@ -46,6 +48,7 @@ export const apiConfigSchema = z
     logLevel: z.enum(LOG_LEVELS).prefault('info'),
     webOrigin: httpUrl,
     rpcUrl: httpUrl,
+    databaseUrl: postgresUrl,
     proofPayerSecret: keypairSecret,
     faucetEnabled: flag,
     faucetSecret: z.string().optional(),
@@ -72,6 +75,7 @@ export function apiConfigFromEnv(env: Record<string, string | undefined>): ApiCo
     logLevel: env.LOG_LEVEL,
     webOrigin: env.WEB_ORIGIN,
     rpcUrl: env.SOLANA_RPC_URL,
+    databaseUrl: env.DATABASE_URL,
     proofPayerSecret: env.PROOF_PAYER_SECRET,
     faucetEnabled: env.FAUCET_ENABLED,
     faucetSecret: env.FAUCET_SECRET,

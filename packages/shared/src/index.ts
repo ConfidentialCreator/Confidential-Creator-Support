@@ -1,4 +1,5 @@
 export * from './address.ts'
+export * from './api/creators.ts'
 export * from './api/devnet.ts'
 export * from './api/relay.ts'
 export * from './api-error.ts'

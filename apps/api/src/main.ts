@@ -1,4 +1,5 @@
 import { fetchPublicBalance } from '@ccsupport/chain'
+import { createDb, drizzleCreatorsReader } from '@ccsupport/db'
 import { serve } from '@hono/node-server'
 import { createKeyPairFromBytes, createSolanaRpc, type Rpc, type SolanaRpcApi } from '@solana/kit'
 import { createApp } from './app.ts'
@@ -35,6 +36,7 @@ async function main(): Promise<void> {
   const config = apiConfigFromEnv(process.env)
   const logger = createLogger(config.logLevel)
   const rpc = createSolanaRpc(config.rpcUrl)
+  const database = createDb(config.databaseUrl)
   const payer = await createRelayPayer(
     payerRpcFromKit(rpc),
     await createKeyPairFromBytes(config.proofPayerSecret),
@@ -51,6 +53,7 @@ async function main(): Promise<void> {
       ...(faucet && { faucet: faucet.health }),
     },
     relay: { payer },
+    creators: { reader: drizzleCreatorsReader(database.db) },
     ...(faucet && { devnet: faucet.devnet }),
   })
 
@@ -68,8 +71,10 @@ async function main(): Promise<void> {
       logger.info({ signal }, 'shutting down')
       const forceExit = setTimeout(() => process.exit(1), 10_000)
       server.close(() => {
-        clearTimeout(forceExit)
-        process.exit(0)
+        database.close().finally(() => {
+          clearTimeout(forceExit)
+          process.exit(0)
+        })
       })
     })
   }

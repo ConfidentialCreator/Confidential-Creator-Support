@@ -10,6 +10,7 @@ const MINT = 'HApEuJSUaLofM9Z7PUhAKfxpHkapxBTmpdsnjG9nud36'
 
 const base = {
   SOLANA_RPC_URL: 'https://api.devnet.solana.com',
+  DATABASE_URL: 'postgres://postgres.x:pw@aws-0-eu-central-1.pooler.supabase.com:6543/postgres',
   WEB_ORIGIN: 'http://localhost:5173',
   PROOF_PAYER_SECRET: PAYER,
 }
@@ -67,9 +68,11 @@ describe('apiConfigFromEnv', () => {
     expect(() => apiConfigFromEnv({ ...base, PROOF_PAYER_SECRET: '0OIl' })).toThrow(/base58/)
   })
 
-  it('refuses a bad origin, a non-http rpc url and a bad port', () => {
+  it('refuses a bad origin, a non-http rpc url, a non-postgres database url and a bad port', () => {
     expect(() => apiConfigFromEnv({ ...base, WEB_ORIGIN: 'localhost' })).toThrow()
     expect(() => apiConfigFromEnv({ ...base, SOLANA_RPC_URL: 'ws://x' })).toThrow()
+    expect(() => apiConfigFromEnv({ ...base, DATABASE_URL: 'https://x' })).toThrow()
+    expect(() => apiConfigFromEnv({ ...base, DATABASE_URL: undefined })).toThrow()
     expect(() => apiConfigFromEnv({ ...base, API_PORT: '70000' })).toThrow()
   })
 })
