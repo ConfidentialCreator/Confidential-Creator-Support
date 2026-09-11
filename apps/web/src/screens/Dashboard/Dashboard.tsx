@@ -29,7 +29,7 @@ export function Dashboard() {
   }, [revealed, schedule.settled])
 
   return (
-    <Chrome>
+    <Chrome mock>
       <h1 className="text-2xl font-normal">{creator.publication}</h1>
       <div className="mt-1 text-xs italic text-muted">
         <Mono>{trunc(creator.wallet)}</Mono> · publishing since {creator.since} · suggested{' '}

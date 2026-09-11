@@ -7,7 +7,8 @@
     @apply bg-ground text-ink font-serif text-[15px] leading-normal;
     font-variant-numeric: tabular-nums lining-nums;
   }
-  input {
+  input,
+  textarea {
     @apply font-serif text-inherit bg-transparent border-0 border-b border-ink rounded-none py-0.5 outline-none;
   }
   h2 {
@@ -34,6 +35,9 @@
   }
   .act-off {
     @apply text-muted no-underline cursor-default;
+  }
+  .field {
+    @apply block w-full max-w-[60ch] mt-1;
   }
   .kv {
     @apply grid grid-cols-[1fr_auto];

@@ -18,11 +18,13 @@ const nav = [
   ['Audit', routes.audit],
 ] as const
 
-export function Chrome({ children }: { children: ReactNode }) {
+export function Chrome({ mock = false, children }: { mock?: boolean; children: ReactNode }) {
   return (
     <div className="mx-auto max-w-[1200px] px-4 pt-4 pb-10 sm:px-10 sm:pt-5 sm:pb-16">
       <div className="flex flex-wrap justify-between gap-x-4 text-xs italic text-muted">
-        <span>Prototype — mock data. Screens are not connected to any network.</span>
+        <span>
+          {mock ? 'Prototype — mock data. This screen is not connected to any network.' : ''}
+        </span>
         <ApiStatus />
       </div>
       <WalletRow />

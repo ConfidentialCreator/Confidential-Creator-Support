@@ -1,79 +1,88 @@
-import { Link } from 'react-router'
-import { Chrome, Kv, Mono, routes } from '../../components/Chrome.tsx'
+import type { CreatorProfile } from '@ccsupport/shared'
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
+import { Link, useParams } from 'react-router'
+import { fetchCreator, fetchSupporters } from '../../api/creators.ts'
+import { Chrome, Kv, Mono } from '../../components/Chrome.tsx'
 import { Sealed } from '../../components/Sealed.tsx'
-import {
-  CLOCK,
-  creator,
-  DATE,
-  listed,
-  months,
-  SLOT,
-  totals,
-  trunc,
-  withUnit,
-} from '../../mockData.ts'
-
-function Chart() {
-  const max = Math.max(...months.map((m) => m.active))
-  return (
-    <>
-      <div className="chart">
-        {months.map((m) => (
-          <div key={m.name} className="flex h-full flex-1 flex-col items-center justify-end">
-            <div className="mb-1 text-xs">{m.active}</div>
-            <div
-              className="w-full bg-ink"
-              style={{ height: `${Math.round((m.active / max) * 84)}%` }}
-            />
-          </div>
-        ))}
-      </div>
-      <div className="chart-l">
-        {months.map((m) => (
-          <div key={m.name} className="flex-1 pt-1 text-center text-xs text-muted">
-            {m.name.split(' ')[0]}
-          </div>
-        ))}
-      </div>
-    </>
-  )
-}
+import { webEnv } from '../../config.ts'
+import { TOKEN, trunc, withUnit } from '../../mockData.ts'
+import { formatDay, formatUnits, formatUtc, TOKEN_DECIMALS } from './format.ts'
 
 export function CreatorPage() {
+  const { handle = '' } = useParams()
+  const creator = useQuery({
+    queryKey: ['creator', handle],
+    queryFn: () => fetchCreator(webEnv.apiUrl, handle),
+  })
+
+  if (creator.isPending) {
+    return (
+      <Chrome>
+        <div className="help">loading {handle}…</div>
+      </Chrome>
+    )
+  }
+  if (creator.isError) {
+    return (
+      <Chrome>
+        <div className="text-refused">the api did not answer: {creator.error.message}</div>
+      </Chrome>
+    )
+  }
+  if (creator.data === null) {
+    return (
+      <Chrome>
+        <h1 className="text-2xl font-normal">No creator with the handle {handle}</h1>
+        <p className="mb-3">
+          Nobody has registered it on chain, or the index has not caught up with a registration made
+          in the last few seconds.
+        </p>
+        <p>
+          <Link to="/creator/new" className="act">
+            Register as a creator
+          </Link>
+        </p>
+      </Chrome>
+    )
+  }
+  return <Profile profile={creator.data} asOf={new Date(creator.dataUpdatedAt)} />
+}
+
+function Profile({ profile, asOf }: { profile: CreatorProfile; asOf: Date }) {
   return (
     <Chrome>
       <div className="border-t-2 border-b border-t-ink border-b-rule px-0 pt-3.5 pb-2.5 text-center">
-        <h1 className="text-[30px] font-normal leading-[1.1] sm:text-[44px]">
-          {creator.publication}
-        </h1>
+        <h1 className="text-[30px] font-normal leading-[1.1] sm:text-[44px]">{profile.name}</h1>
         <div className="mt-1.5 text-xs text-muted">
-          {creator.publication} · {DATE} · slot {SLOT} · {creator.handle}
+          {profile.handle} · registered at slot {profile.createdSlot.toLocaleString('en-US')}
         </div>
       </div>
 
       <div className="mt-6 flex flex-col gap-1 sm:flex-row sm:items-baseline sm:gap-5">
-        <div className="text-[96px] leading-none sm:text-[160px]">{totals.active}</div>
-        <div className="text-xl sm:text-2xl">people support {creator.publication} this period</div>
+        <div className="text-[96px] leading-none sm:text-[160px]">{profile.activeSupporters}</div>
+        <div className="text-xl sm:text-2xl">people support {profile.name} this period</div>
       </div>
-      <div className="help">active as of {CLOCK} · counted from the chain, not from this site</div>
+      <div className="help">
+        active as of {formatUtc(asOf)} · counted from the chain, not from this site
+      </div>
 
       <h2>About</h2>
-      <p className="mb-3">{creator.description}</p>
+      <p className="mb-3">{profile.description}</p>
       <Kv
         rows={[
-          ['Publishing since', creator.since],
-          ['Suggested support', withUnit(creator.suggested)],
-          ["Creator's wallet", <Mono key="w">{trunc(creator.wallet)}</Mono>],
-          ['Payments in', String(totals.paymentsAll)],
+          ['Suggested support', withUnit(formatUnits(profile.suggestedAmount, TOKEN_DECIMALS))],
+          ["Creator's wallet", <Mono key="w">{trunc(profile.wallet)}</Mono>],
+          ['Supporters ever', String(profile.totalSupporters)],
         ]}
       />
       <div className="help">
-        The suggestion is the creator's; the chain accepts any amount and tells no one what it was.
+        The suggestion is the creator's; the chain accepts any {TOKEN} figure and tells no one what
+        it was.
       </div>
 
       <h2>Support this reporting</h2>
       <p className="mb-3">
-        <Link to={routes.support} className="act">
+        <Link to={`/support/${profile.handle}`} className="act">
           Support this reporting
         </Link>
       </p>
@@ -82,65 +91,8 @@ export function CreatorPage() {
         the auditor, and by nobody else.
       </p>
 
-      <h2>Supporters by month</h2>
-      <Chart />
-      <table className="stack mt-4 w-full border-collapse">
-        <thead>
-          <tr>
-            <th>Month</th>
-            <th className="text-right">Active supporters</th>
-            <th className="text-right">Payments received</th>
-          </tr>
-        </thead>
-        <tbody>
-          {months.map((m) => (
-            <tr key={m.name}>
-              <td data-l="Month">{m.name}</td>
-              <td className="num text-right" data-l="Active">
-                {m.active}
-              </td>
-              <td className="num text-right" data-l="Payments">
-                {m.payments}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
       <h2>Listed supporters</h2>
-      <p className="mb-3">
-        {totals.listed} of {totals.active} chose to be listed.
-      </p>
-      <table className="stack w-full border-collapse">
-        <thead>
-          <tr>
-            <th>Wallet</th>
-            <th>Since</th>
-            <th>Until</th>
-            <th className="text-right">Amount</th>
-          </tr>
-        </thead>
-        <tbody>
-          {listed.map((s) => (
-            <tr key={s.wallet}>
-              <td data-l="Wallet">
-                <Mono>{trunc(s.wallet)}</Mono>
-              </td>
-              <td data-l="Since">{s.since}</td>
-              <td data-l="Until">
-                {s.until}
-                {s.note ? ` · ${s.note}` : ''}
-              </td>
-              <td className="num text-right" data-l="Amount">
-                <Sealed revealed={false} />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <div className="help">
-        Every supporter is visible on chain. This list is only those who asked to be on it.
-      </div>
+      <Listed handle={profile.handle} />
 
       <h2>How it is checked</h2>
       <div className="cols">
@@ -162,5 +114,68 @@ export function CreatorPage() {
         </p>
       </div>
     </Chrome>
+  )
+}
+
+function Listed({ handle }: { handle: string }) {
+  const pages = useInfiniteQuery({
+    queryKey: ['supporters', handle],
+    queryFn: ({ pageParam }) => fetchSupporters(webEnv.apiUrl, handle, pageParam),
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (last) => last.nextCursor ?? undefined,
+  })
+
+  if (pages.isPending) return <div className="help">loading…</div>
+  if (pages.isError) {
+    return <div className="text-refused">the list did not load: {pages.error.message}</div>
+  }
+  const first = pages.data.pages[0]
+  const rows = pages.data.pages.flatMap((page) => page.items)
+  return (
+    <>
+      <p className="mb-3">
+        {rows.length}
+        {pages.hasNextPage ? '+' : ''} of {first?.count ?? 0} chose to be listed.
+      </p>
+      <table className="stack w-full border-collapse">
+        <thead>
+          <tr>
+            <th>Wallet</th>
+            <th>Since</th>
+            <th>Until</th>
+            <th className="text-right">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((s) => (
+            <tr key={s.wallet}>
+              <td data-l="Wallet">
+                <Mono>{trunc(s.wallet)}</Mono>
+              </td>
+              <td data-l="Since">{formatDay(s.since)}</td>
+              <td data-l="Until">{formatDay(s.expiresAt)}</td>
+              <td className="num text-right" data-l="Amount">
+                <Sealed revealed={false} />
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {pages.hasNextPage && (
+        <p className="mt-3">
+          <button
+            type="button"
+            className="act"
+            disabled={pages.isFetchingNextPage}
+            onClick={() => pages.fetchNextPage()}
+          >
+            show more
+          </button>
+        </p>
+      )}
+      <div className="help">
+        Every supporter is visible on chain. This list is only those who asked to be on it.
+      </div>
+    </>
   )
 }

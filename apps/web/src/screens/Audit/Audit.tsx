@@ -16,7 +16,7 @@ export function Audit() {
   const schedule = liftSchedule([months.length, payments.length])
 
   return (
-    <Chrome>
+    <Chrome mock>
       <h1 className="text-2xl font-normal">Audit</h1>
       <div className="mt-1 text-xs italic text-muted">
         {TOKEN_NAME} · one audit key per token · nothing here writes to the chain

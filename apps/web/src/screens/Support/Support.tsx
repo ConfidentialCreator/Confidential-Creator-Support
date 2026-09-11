@@ -19,7 +19,7 @@ export function Support() {
   const ends = endDate(periods)
 
   return (
-    <Chrome>
+    <Chrome mock>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-2xl font-normal">Support {creator.publication}</h1>
