@@ -10,11 +10,11 @@ import {
   type AeKey,
   BatchedGroupedCiphertext3HandlesValidityProofData,
   ElGamalCiphertext,
-  type ElGamalKeypair,
-  type ElGamalSecretKey,
+  ElGamalKeypair,
+  ElGamalSecretKey,
   GroupedElGamalCiphertext3Handles,
 } from '@solana/zk-sdk'
-import type { Token } from '@solana-program/token-2022'
+import type { Extension, Token } from '@solana-program/token-2022'
 import {
   ZK_ELGAMAL_PROOF_PROGRAM_ADDRESS,
   ZkElGamalProofInstruction,
@@ -100,6 +100,10 @@ function tryDecrypt(run: () => bigint): bigint | undefined {
   }
 }
 
+// A worker gets the secret as bytes; the web app does not depend on zk-sdk itself.
+export const elgamalFromSecret = (secret: Uint8Array): ElGamalKeypair =>
+  ElGamalKeypair.fromSecretKey(ElGamalSecretKey.fromBytes(secret))
+
 export function decryptContribution(
   elgamal: ElGamalKeypair,
   ciphertext: ValidityContext,
@@ -125,13 +129,35 @@ export function decryptContribution(
   return { ok: true, units: partLo + (partHi << LO_BITS) }
 }
 
-export function decryptAvailable(ae: AeKey, account: Token): DecryptResult {
-  const extension = isSome(account.extensions)
-    ? account.extensions.value.find((e) => e.__kind === 'ConfidentialTransferAccount')
+function confidentialExtension(account: Token) {
+  return isSome(account.extensions)
+    ? account.extensions.value.find(
+        (e): e is Extract<Extension, { __kind: 'ConfidentialTransferAccount' }> =>
+          e.__kind === 'ConfidentialTransferAccount',
+      )
     : undefined
+}
+
+export function decryptAvailable(ae: AeKey, account: Token): DecryptResult {
+  const extension = confidentialExtension(account)
   if (!extension) return fail('unconfigured')
   const decryptable = AeCiphertext.fromBytes(new Uint8Array(extension.decryptableAvailableBalance))
   if (!decryptable) return fail('malformed')
   const units = tryDecrypt(() => ae.decrypt(decryptable))
   return units === undefined ? fail('wrong-key') : { ok: true, units }
+}
+
+// Pending їде двома ElGamal-шифротекстами: lo — 16 біт, hi — решта; кожна частина
+// шукається окремим логарифмом.
+export function decryptPending(elgamal: ElGamalKeypair, account: Token): DecryptResult {
+  const extension = confidentialExtension(account)
+  if (!extension) return fail('unconfigured')
+  const lo = ElGamalCiphertext.fromBytes(new Uint8Array(extension.pendingBalanceLow))
+  const hi = ElGamalCiphertext.fromBytes(new Uint8Array(extension.pendingBalanceHigh))
+  if (!lo || !hi) return fail('malformed')
+  const secret = elgamal.secret()
+  const partLo = tryDecrypt(() => secret.decrypt(lo))
+  const partHi = tryDecrypt(() => secret.decrypt(hi))
+  if (partLo === undefined || partHi === undefined) return fail('wrong-key')
+  return { ok: true, units: partLo + (partHi << LO_BITS) }
 }

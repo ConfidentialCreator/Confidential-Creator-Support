@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { fetchCreator, fetchSupporters } from './creators.ts'
+import { fetchAllContributions, fetchCreator, fetchSupporters } from './creators.ts'
 
 const CREATOR = '6znwWkzSGUcgFzLaXHo28o5uaweFn1hNeuW4pcaekQSk'
 const SUPPORTER = 'D4TkDq52FCqPyvwgQWBDepBumsYKB5ZjroRLfGckrYnQ'
@@ -73,6 +73,56 @@ describe('fetchSupporters', () => {
     const { impl } = respond(404, notFound)
     await expect(fetchSupporters('http://api', 'nobody-here', undefined, impl)).rejects.toThrow(
       /no creator/,
+    )
+  })
+})
+
+describe('fetchAllContributions', () => {
+  const half = Buffer.alloc(128, 7).toString('base64')
+  const item = (n: number) => ({
+    sig: `sig-${n}`,
+    supporter: SUPPORTER,
+    slot: 498_000_000 + n,
+    blockTime: '2026-09-14T10:00:00.000Z',
+    periods: 1,
+    groupedLo: half,
+    groupedHi: half,
+  })
+
+  function pages(bodies: readonly unknown[]) {
+    const seen: string[] = []
+    const impl: typeof fetch = async (input) => {
+      seen.push(String(input))
+      return new Response(JSON.stringify(bodies[seen.length - 1]), { status: 200 })
+    }
+    return { impl, seen }
+  }
+
+  it('follows the cursor to the last page at the largest page size and joins the items', async () => {
+    const { impl, seen } = pages([
+      { data: { items: [item(2), item(1)], nextCursor: 'c1' } },
+      { data: { items: [item(0)], nextCursor: null } },
+    ])
+    const items = await fetchAllContributions('http://api', 'marrow-dispatch', impl)
+    expect(items.map((c) => c.sig)).toEqual(['sig-2', 'sig-1', 'sig-0'])
+    expect(seen).toEqual([
+      'http://api/creators/marrow-dispatch/contributions?limit=100',
+      'http://api/creators/marrow-dispatch/contributions?limit=100&cursor=c1',
+    ])
+  })
+
+  it('returns an empty list for a creator without contributions', async () => {
+    const { impl } = pages([{ data: { items: [], nextCursor: null } }])
+    expect(await fetchAllContributions('http://api', 'marrow-dispatch', impl)).toEqual([])
+  })
+
+  it('throws when a later page fails: a partial list would understate the period', async () => {
+    const { impl } = pages([
+      { data: { items: [item(1)], nextCursor: 'c1' } },
+      { error: { code: 'INTERNAL', message: 'internal error' } },
+    ])
+    await expect(fetchAllContributions('http://api', 'marrow-dispatch', impl)).rejects.toThrow(
+      /internal/,
     )
   })
 })

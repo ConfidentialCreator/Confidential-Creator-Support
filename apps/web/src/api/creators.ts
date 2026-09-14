@@ -1,10 +1,13 @@
 import {
   ApiError,
   apiErrorBodySchema,
+  type CreatorContributions,
   type CreatorProfile,
   type CreatorSupporters,
+  creatorContributionsSchema,
   creatorProfileSchema,
   creatorSupportersSchema,
+  PAGE_LIMIT_MAX,
 } from '@ccsupport/shared'
 import { z } from 'zod'
 
@@ -46,4 +49,29 @@ export function fetchSupporters(
 ): Promise<CreatorSupporters> {
   const query = cursor === undefined ? '' : `?cursor=${encodeURIComponent(cursor)}`
   return read(`${apiUrl}/creators/${handle}/supporters${query}`, creatorSupportersSchema, fetchImpl)
+}
+
+export type Contribution = CreatorContributions['items'][number]
+
+// The cabinet needs every contribution before it can sum the period, so the pages
+// are walked to the end at the largest size the api allows.
+export async function fetchAllContributions(
+  apiUrl: string,
+  handle: string,
+  fetchImpl: typeof fetch = fetch,
+): Promise<Contribution[]> {
+  const base = `${apiUrl}/creators/${handle}/contributions?limit=${PAGE_LIMIT_MAX}`
+  const items: Contribution[] = []
+  let cursor: string | null = null
+  do {
+    const query: string = cursor === null ? '' : `&cursor=${encodeURIComponent(cursor)}`
+    const page: CreatorContributions = await read(
+      `${base}${query}`,
+      creatorContributionsSchema,
+      fetchImpl,
+    )
+    items.push(...page.items)
+    cursor = page.nextCursor
+  } while (cursor !== null)
+  return items
 }

@@ -26,6 +26,8 @@ import { z } from 'zod'
 import {
   decryptAvailable,
   decryptContribution,
+  decryptPending,
+  elgamalFromSecret,
   extractValidityContext,
   HANDLE,
   type ValidityContext,
@@ -131,6 +133,12 @@ describe('decryptContribution', () => {
       ok: true,
       units: AMOUNT,
     })
+  })
+
+  it('decrypts with a keypair rebuilt from the secret bytes, as the worker does', () => {
+    const rebuilt = elgamalFromSecret(creator.secret().toBytes())
+    expect(decryptContribution(rebuilt, validityContext())).toEqual({ ok: true, units: AMOUNT })
+    expect(() => elgamalFromSecret(new Uint8Array(5))).toThrow()
   })
 
   it('reports wrong-key for a key that is not on the handle', () => {
@@ -260,6 +268,73 @@ describe('decryptAvailable', () => {
 
   it('reports malformed when the decryptable balance does not parse', () => {
     expect(decryptAvailable(creatorAe, configured(new Uint8Array(3)))).toEqual({
+      ok: false,
+      reason: 'malformed',
+    })
+  })
+})
+
+describe('decryptPending', () => {
+  const MINT = address('6f1QTLNPh59wM26CQx1pnJTUcE814H64JaABjARPvtiC')
+  const OWNER = address('AJ6LFWEJgLEwkfyWWipZ8Le5fV9QjCV61UCnzv9g5ZUq')
+
+  function withPending(lo: Uint8Array, hi: Uint8Array, extension = true): Token {
+    return {
+      mint: MINT,
+      owner: OWNER,
+      amount: 0n,
+      delegate: none(),
+      state: AccountState.Initialized,
+      isNative: none(),
+      delegatedAmount: 0n,
+      closeAuthority: none(),
+      extensions: extension
+        ? some([
+            {
+              __kind: 'ConfidentialTransferAccount',
+              approved: true,
+              elgamalPubkey: OWNER,
+              pendingBalanceLow: lo,
+              pendingBalanceHigh: hi,
+              availableBalance: new Uint8Array(64),
+              decryptableAvailableBalance: new Uint8Array(36),
+              allowConfidentialCredits: true,
+              allowNonConfidentialCredits: true,
+              pendingBalanceCreditCounter: 1n,
+              maximumPendingBalanceCreditCounter: 65_536n,
+              expectedPendingBalanceCreditCounter: 0n,
+              actualPendingBalanceCreditCounter: 0n,
+            },
+          ])
+        : none(),
+    }
+  }
+  const pending = (lo: bigint, hi: bigint) =>
+    withPending(
+      creator.pubkey().encryptU64(lo).toBytes(),
+      creator.pubkey().encryptU64(hi).toBytes(),
+    )
+
+  it('adds the low 16 bits to the high part shifted, as the token program does', () => {
+    expect(decryptPending(creator, pending(0xffffn, 3n))).toEqual({
+      ok: true,
+      units: 0xffffn + (3n << 16n),
+    })
+    expect(decryptPending(creator, pending(0n, 0n))).toEqual({ ok: true, units: 0n })
+  })
+
+  it('reports wrong-key for a foreign ElGamal key', () => {
+    expect(decryptPending(supporter, pending(5n, 0n))).toEqual({ ok: false, reason: 'wrong-key' })
+  })
+
+  it('reports unconfigured without the extension and malformed for bytes that do not parse', () => {
+    expect(
+      decryptPending(creator, withPending(new Uint8Array(64), new Uint8Array(64), false)),
+    ).toEqual({
+      ok: false,
+      reason: 'unconfigured',
+    })
+    expect(decryptPending(creator, withPending(new Uint8Array(3), new Uint8Array(64)))).toEqual({
       ok: false,
       reason: 'malformed',
     })
