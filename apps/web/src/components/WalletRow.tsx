@@ -78,7 +78,7 @@ function KeysControl() {
   }
   return (
     <>
-      <button type="button" className="act" onClick={derive}>
+      <button type="button" className="act" onClick={() => derive().catch(() => undefined)}>
         derive keys
       </button>
       {error && <span className="text-refused">{error.message}</span>}

@@ -16,8 +16,9 @@ import { createKeySession, type DeriveKeys, type KeySession } from './session.ts
 export type ConfidentialKeysState = {
   keys: ConfidentialKeys | null
   error: Error | null
-  // null when there is no wallet to sign with or no mint to bind the keys to
-  derive: (() => Promise<void>) | null
+  // null when there is no wallet to sign with or no mint to bind the keys to;
+  // rejects when the wallet refuses, with the same error kept in `error`
+  derive: (() => Promise<ConfidentialKeys>) | null
   forget: () => void
 }
 
@@ -64,9 +65,13 @@ function WithSigner({ account, mint, session, children }: SignerProps) {
   const derive = useCallback(async () => {
     setError(null)
     try {
-      setKeys(await session.get(signer, account.address as Address, mint))
+      const derived = await session.get(signer, account.address as Address, mint)
+      setKeys(derived)
+      return derived
     } catch (err) {
-      setError(err instanceof Error ? err : new Error(String(err)))
+      const failure = err instanceof Error ? err : new Error(String(err))
+      setError(failure)
+      throw failure
     }
   }, [session, signer, account.address, mint])
 
