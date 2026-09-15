@@ -91,7 +91,7 @@ const faucetSchema = apiResponseSchema(faucetResponseSchema)
 
 // Локально проксі немає, тож кожен прихильник приходить зі своєю адресою — як у
 // реальності зі 128 гаманців; ліміт relay 20/хв тоді рахується по-прихильниково.
-function forwardedFetch(ip: string): typeof fetch {
+export function forwardedFetch(ip: string): typeof fetch {
   return (input, init) => {
     const headers = new Headers(init?.headers)
     headers.set('x-forwarded-for', ip)
@@ -120,7 +120,7 @@ export async function requestFaucet(
   throw new Error(`faucet: ${body.error.code} ${body.error.message}`)
 }
 
-async function prepare(
+export async function prepare(
   ctx: DemoContext,
   supporter: KeyPairSigner,
   keys: ConfidentialKeys,
@@ -165,7 +165,7 @@ async function relayBatch(
   return signatures
 }
 
-async function contribute(
+export async function contribute(
   ctx: DemoContext,
   supporter: KeyPairSigner,
   keys: ConfidentialKeys,
@@ -200,7 +200,7 @@ async function contribute(
   }
 }
 
-async function verify(
+export async function verify(
   ctx: DemoContext,
   sent: Omit<ContributionResult, 'amountTraces' | 'decryptedMatches'>,
   units: bigint,

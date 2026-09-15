@@ -6,9 +6,14 @@ import { contributions, creators, pledges } from '../schema.ts'
 export type SupporterKey = { startedAt: Date; supporter: string }
 export type ContributionKey = { slot: string; sig: string }
 
+// A Date inside a raw fragment reaches postgres.js as an object: the postgres-js driver
+// makes the timestamptz serializer transparent and only column-typed params go through
+// drizzle's own Date → ISO mapping, so raw timestamps are passed as text.
+const timestamp = (at: Date): SQL => sql`${at.toISOString()}::timestamptz`
+
 // `now` is a parameter, not `now()`: tests and the demo fix the clock.
 const activeAt = (expiresAt: SQL, now: Date): SQL =>
-  sql`${expiresAt} + make_interval(secs => ${GRACE_SECONDS}) > ${now}`
+  sql`${expiresAt} + make_interval(secs => ${GRACE_SECONDS}) > ${timestamp(now)}`
 
 // Explicit alias: inside a one-table select drizzle strips table qualifiers from
 // column references, and a correlated `"creator" = "wallet"` names no column of pledges.
@@ -55,7 +60,7 @@ export function supportersPage(
         eq(pledges.showPublicly, true),
         activeAt(sql`${pledges.expiresAt}`, now),
         after
-          ? sql`(${pledges.startedAt}, ${pledges.supporter}) > (${after.startedAt}::timestamptz, ${after.supporter})`
+          ? sql`(${pledges.startedAt}, ${pledges.supporter}) > (${timestamp(after.startedAt)}, ${after.supporter})`
           : undefined,
       ),
     )

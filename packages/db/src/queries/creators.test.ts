@@ -29,7 +29,7 @@ describe('creatorByHandle', () => {
       sql.match(/select count\(\*\) from "pledges" as p where p\.creator = "creators"\.wallet/g),
     ).toHaveLength(2)
     expect(sql.match(/p\.expires_at \+ make_interval\(secs => \$\d+\) > \$\d+/g)).toHaveLength(1)
-    expect(params).toEqual([GRACE_SECONDS, NOW, 'marrow-dispatch', 1])
+    expect(params).toEqual([GRACE_SECONDS, NOW.toISOString(), 'marrow-dispatch', 1])
   })
 
   it('selects only the public profile columns', () => {
@@ -57,14 +57,22 @@ describe('supportersPage', () => {
     expect(sql).toContain('make_interval(secs => $')
     expect(sql).toContain('order by "pledges"."started_at" asc, "pledges"."supporter" asc')
     expect(sql).not.toContain('(("pledges"."started_at", "pledges"."supporter") >')
-    expect(params).toEqual([CREATOR, true, GRACE_SECONDS, NOW, 51])
+    expect(params).toEqual([CREATOR, true, GRACE_SECONDS, NOW.toISOString(), 51])
   })
 
   it('continues after the keyset of the last listed supporter', () => {
     const after = { startedAt: new Date('2026-09-01T00:00:00Z'), supporter: SUPPORTER }
     const { sql, params } = supportersPage(db(), CREATOR, NOW, after, 10).toSQL()
     expect(sql).toContain('("pledges"."started_at", "pledges"."supporter") > ($5::timestamptz, $6)')
-    expect(params).toEqual([CREATOR, true, GRACE_SECONDS, NOW, after.startedAt, SUPPORTER, 10])
+    expect(params).toEqual([
+      CREATOR,
+      true,
+      GRACE_SECONDS,
+      NOW.toISOString(),
+      after.startedAt.toISOString(),
+      SUPPORTER,
+      10,
+    ])
   })
 })
 

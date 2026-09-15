@@ -45,6 +45,7 @@ function readerFor(
         address === fixture.ciphertext.context ? fixture.ciphertext.signatures : [],
       )
     },
+    blockTime: () => Promise.resolve(null),
   }
 }
 

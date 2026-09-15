@@ -105,6 +105,11 @@ function chainOf(fixtures: Fixture[]): ChainReader & { calls: number } {
       reader.calls += 1
       return Promise.resolve(histories.get(address) ?? [])
     },
+    blockTime: (signature: string) => {
+      reader.calls += 1
+      const time = fixtures.find((f) => f.signature === signature)?.blockTime ?? null
+      return Promise.resolve(time === null ? null : Number(time))
+    },
   }
   return reader
 }
@@ -236,6 +241,26 @@ describe('createApplier', () => {
     await apply(txOf(first, { logs: ['Program log: nothing'] }))
     expect(chain.calls).toBe(0)
     expect(memory.transactions).toEqual([])
+  })
+
+  it('reads the block time from the chain when the subscription delivered none', async () => {
+    const memory = memoryWriter()
+    const chain = chainOf([first])
+    const apply = createApplier({ writer: memory.writer, chain, now: () => NOW })
+    await apply(txOf(first, { blockTime: null }))
+    expect(memory.contributions.get(first.signature)).toMatchObject({
+      blockTime: new Date(Number(first.blockTime) * 1000),
+    })
+  })
+
+  it('does not ask the chain for a block time the transaction already carries', async () => {
+    const memory = memoryWriter()
+    const chain = chainOf([first])
+    const apply = createApplier({ writer: memory.writer, chain, now: () => NOW })
+    await apply(txOf(first))
+    const withTime = chain.calls
+    await apply(txOf(first, { blockTime: null }))
+    expect(chain.calls).toBe(withTime * 2 + 1)
   })
 
   it('rejects when the proof transaction cannot be read, writing nothing', async () => {

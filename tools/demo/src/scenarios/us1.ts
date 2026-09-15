@@ -54,7 +54,7 @@ const SWEEP_BATCH = 6
 export type Us1Options = { supporters: number; repeats: number; concurrency: number; rps: number }
 
 const signatureSchema = z.string().min(1)
-const contributionSchema = z.object({
+export const contributionSchema = z.object({
   kind: z.enum(['first', 'repeat']),
   periods: z.number().int(),
   proofSignatures: z.array(signatureSchema),
@@ -219,7 +219,7 @@ async function creatorReceived(
 
 // Прихильники ефемерні: SOL і публічний SUPD повертаються на faucet пачками, faucet
 // платить комісію. Депонований SUPD без Withdraw-доказу не повернути — лишається.
-async function sweep(ctx: DemoContext, signers: KeyPairSigner[]): Promise<Signature[]> {
+export async function sweep(ctx: DemoContext, signers: KeyPairSigner[]): Promise<Signature[]> {
   const tokenProgram = TOKEN_2022_PROGRAM_ADDRESS
   const [faucetToken] = await findAssociatedTokenPda({
     owner: ctx.faucet.address,
@@ -312,7 +312,7 @@ function summarize(
 
 // Депонований SUPD з ефемерних гаманців не повертається, тож кожен прогін коштує
 // faucet-у N порцій; SOL повертається sweep-ом, у польоті — паралельність + пачка.
-async function requireFaucetStock(
+export async function requireFaucetStock(
   ctx: Omit<DemoContext, 'creator'>,
   options: Us1Options,
 ): Promise<void> {

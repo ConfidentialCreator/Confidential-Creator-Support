@@ -58,7 +58,11 @@ async function main(): Promise<void> {
     signal: stop.signal,
   })
   const timer = setInterval(() => void backfillPass(), BACKFILL_EVERY_MS)
-  logger.info({ program: CCSUPPORT_PROGRAM_ADDRESS, rpc: config.rpcUrl }, 'worker listening')
+  // The Helius key sits in the query string: only the host goes to the log.
+  logger.info(
+    { program: CCSUPPORT_PROGRAM_ADDRESS, rpc: new URL(config.rpcUrl).host },
+    'worker listening',
+  )
 
   for (const signal of ['SIGTERM', 'SIGINT'] as const) {
     process.once(signal, () => {

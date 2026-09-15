@@ -15,6 +15,7 @@ export type RecipientCiphertext = { groupedLo: Uint8Array; groupedHi: Uint8Array
 export type ChainReader = {
   wire: (signature: string) => Promise<string | null>
   signaturesFor: (address: Address) => Promise<string[]>
+  blockTime: (signature: string) => Promise<number | null>
 }
 
 const TOKEN_2022 = 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb'
@@ -74,6 +75,16 @@ export function chainReader(rpc: Rpc<SolanaRpcApi>): ChainReader {
     signaturesFor: async (address) => {
       const page = await rpc.getSignaturesForAddress(address, { commitment: 'confirmed' }).send()
       return page.map((info) => info.signature)
+    },
+    blockTime: async (signature) => {
+      const tx = await rpc
+        .getTransaction(signature as Signature, {
+          commitment: 'confirmed',
+          maxSupportedTransactionVersion: 0,
+          encoding: 'base64',
+        })
+        .send()
+      return tx?.blockTime == null ? null : Number(tx.blockTime)
     },
   }
 }

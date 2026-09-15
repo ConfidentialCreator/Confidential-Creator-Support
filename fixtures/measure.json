@@ -1,0 +1,258 @@
+{
+  "cluster": "devnet",
+  "startedAt": "2026-09-15T19:04:42.951Z",
+  "finishedAt": "2026-09-15T19:06:05.494Z",
+  "api": "http://127.0.0.1:8787",
+  "handle": "marrow-dispatch",
+  "probes": [
+    {
+      "index": 0,
+      "wallet": "HTB6x2gsryJcCFdtccvdPNFKzhSWTSQeXGyFoDSthxrF",
+      "token": "CrQ5C86XZR6mSCEYpWsw4kMvboJx9hUiSbCCDRgUyrPJ",
+      "faucetSignature": "5ZD6MUQbpGJUxHhAogN1Pu3uYysdmvDkH6t7S1ULM4Y1jKp74nMbM4q9e52ykNPdJXRtSkTkcusuUQaBnrJLe2eq",
+      "preparationSignatures": [
+        "yMCQTrCAHW8eDngqA1Kg18TpnbzKjFwWLTYtTXRPH4XGsbVjdZKYyUa4bcDeJHRmspHp3RaTkqWVxZeDFjwQzL1"
+      ],
+      "contributions": [
+        {
+          "kind": "first",
+          "periods": 1,
+          "proofSignatures": [
+            "5XVTNznsFZTtVvYts7mSxqkH5E588V7Jb7RoxKFLRc91giZATeq8PEnAVK5KVK7fNTBfDod5pNokKtDcrQpW14Pq",
+            "27nxsP5okEoHDqMNpXsvttLLHfVy1oitfHb4u5BhbYuXFnHvprQ1kjpNA1x6F5PDAZAWWMvnEbDaY8XqP3FW6sYc",
+            "4buadiyVRz7AkEc6jz9uUbNgaRVBNw9MUVzCwDBJsHE41MLXFzAy4BnU9GLjxjNPW7brP6DVWRqDgw1rYJwNaJjk",
+            "2mH2R8ktE6R7frsMY2fJD9tG7BoQs17KURHz2ze6gNSumiS41tipvNoR3dBWcMCe9PD3uxyLV5wQfvJ5UMVUbmD"
+          ],
+          "transferSignature": "NRDyeqJJQCpCg84e3SsTFuZdozqAY6wTeeZ8aHYqJy82RoKiLRm9b55SKjH1TAosYe1gznNMoa1bpB58fAyjAYB",
+          "closeSignatures": [
+            "YqGoQmoMiobadASeX18AiEAnGxVhvREA8a6RDcAXvkEvgfvbxpeWxkUnqv6mD5LHg2r6isfnKQjyQ3o7qG62WhK"
+          ],
+          "confirmedMs": 10818.634,
+          "totalMs": 12360.826299999999,
+          "amountTraces": [],
+          "decryptedMatches": true,
+          "signatures": {
+            "transactions": 2,
+            "messages": 1
+          },
+          "counter": {
+            "ms": 1662.8433999999997,
+            "polls": 1,
+            "before": 344,
+            "after": 345
+          },
+          "indexed": {
+            "ms": 1777.4349000000002,
+            "polls": 1
+          }
+        },
+        {
+          "kind": "repeat",
+          "periods": 12,
+          "proofSignatures": [
+            "2NPWavNPQUPeZW8rQUy8yQ8h9S7p5yHPETZ82MAfzV3EiikWDQ9akCAFCkS2n7VmewZKaa5LzyRpwb8mKXzzv66v",
+            "pdy16hzCtpnDHjSweibYLvDScZAbnkJKqyFFEe8pKn7RHqQ7G2vpT672qFtWebm6qv3vaD5m6i6ieDoZmXxCWY3",
+            "5V7Bjc1FLPHn2mfCjtbzrpSWy7hggi425R7Gtfm2XhhfiVPTNsZUUXfGQWmWD6rRnxwcEJNj96yV518CZGkScEVp",
+            "2ZPTkDgwJvmuyGfPFBB79JXEosH58oPNhkAKUhjqa46vf3KV5NMeSo13HJMy4AxMuR9y5g6vCYfEYkbk4v9mti8p"
+          ],
+          "transferSignature": "428gA9rBd22YiAViQGv3nwWQAtKG1v6SffpWq4a8YvPP3E2TE5pT3tmoyzTVcSyq1m4cjpHG1rMAKgH6JtkNvaCj",
+          "closeSignatures": [
+            "5apj4kYBkX7Wm7F5FXczmaTJQHnjNAmziR1GJD3BaiwnzcosF3KqEFv3puNG5am9PGVAZv1QiRov16QYJzUG7JEk"
+          ],
+          "confirmedMs": 7473.673599999998,
+          "totalMs": 8883.214899999999,
+          "amountTraces": [],
+          "decryptedMatches": true,
+          "signatures": {
+            "transactions": 1,
+            "messages": 0
+          },
+          "counter": null,
+          "indexed": {
+            "ms": 1645.7665000000015,
+            "polls": 1
+          }
+        }
+      ],
+      "error": null
+    },
+    {
+      "index": 1,
+      "wallet": "3UkCWkm34AitxdMAjf1FZwR9KjzGcqE9xFG6F1Hbesba",
+      "token": "2EdDf1rQn26fQxMZfXwMK8rfufXXjHxvUp88jYRbEykP",
+      "faucetSignature": "33Eng3Te728ok9FHv3N3JkSMnbh56uAVHwBMJGuugmJ6G3ox9pqCAXSRtgyN25hRuLSbZo9UM2geBacbgYBfC8R5",
+      "preparationSignatures": [
+        "27MUAkoZYD4jgWhvBXDxDS9f7x48vsrc1nVt3JrYgvn5g7pK6hyJnij3Ddt9nHReKhTcrQLgDQVtU4DDg1iuRyEN"
+      ],
+      "contributions": [
+        {
+          "kind": "first",
+          "periods": 2,
+          "proofSignatures": [
+            "3nTpgBU3gpCLw8nQLQaZWsTi6ehmkpuuVpaZrVKcU1VvQLiZ3nHEi7ffFabVBbVsA4w91zBUfgtepkbSQR3DMREK",
+            "Kwn5WWRk8N1qL6TW4T3PL3p5otuDqGL2uhVjHHobbddVwg5hPqAsUqUxHtA15nfYkcQ7ZemWpQhHTxTa8GJVS7X",
+            "5Qg6pyEujqHtiQWmKMtyNChzTdkzGRCBvRzG5j6X5Tjvz8HCi46HSLoobA23kRGrGizvCwf3tF5FdeLMt7QGF78Y",
+            "3pcTFyFos7dHh9yp68vAmiS4dJzFe89ytsoDrQwUUksihWqdfGYbz66RWcCorPK1ZNWKemhhgYKgRzvnJDCerU9G"
+          ],
+          "transferSignature": "4Mi1TufJqT3kW7CeB38Qnt47hn2x3WkqWhWzvqHKQ6ReXgHmjGPwbBVEM7VcGRwnVxuM87GaT1An8M6PR1NnHJvt",
+          "closeSignatures": [
+            "4fks6M1dqVnV2nkcwfhV4iFgQo4GfYE7A4RXSX5uC9adDsEWSmkVNrZQqELeUmm7iVLPywHq1BJZuXErP2ry2rCS"
+          ],
+          "confirmedMs": 9842.5468,
+          "totalMs": 11494.753800000002,
+          "amountTraces": [],
+          "decryptedMatches": true,
+          "signatures": {
+            "transactions": 2,
+            "messages": 1
+          },
+          "counter": {
+            "ms": 1775.0028999999995,
+            "polls": 1,
+            "before": 345,
+            "after": 346
+          },
+          "indexed": {
+            "ms": 1887.3531000000003,
+            "polls": 1
+          }
+        },
+        {
+          "kind": "repeat",
+          "periods": 1,
+          "proofSignatures": [
+            "2uVTErz6Rj9yT4bUQDW3EkCfqdE9bELwNGxhMNe6wPUxGh1JFEx7S5TkGFHUYbZLNthsw4ANAz3dqSwTLebae4Ha",
+            "2Rrez41LDUMpDrdr1EcWZoxGUG1eCRX7dJDZA52CuDjWQk7KwizskEYMV3SynNmVPiWU5PcpzXqcXd3yFCD7PBen",
+            "XkYRrV1HJY2HRo817JVksuU48TwLSXQ2gLDDxvqdnCgtRSKricsrFAJGHCpnRXCnTSnq53FZ893xSktfth7WCSq",
+            "UHrCxUgzgXnL154GvcAYBZAsKqpZLncG8zGWBkQ1e4Jit37mERjy2TET9GHoTtRqJdcLEutNuUmf3fVVcQ1zz5G"
+          ],
+          "transferSignature": "497rTLqXR1yYJdQ1KbKp9Lb3rXHcyc6ioJ8eJU8e72rK5PPcx8U3zV99ezcaJR1jBCwDQqUsAVbT1rv3ddBpiJXy",
+          "closeSignatures": [
+            "4bYSFmcbsxcgxs1RaZ9fWpXYHkb4uA2YTqiT9bX7x61KChKnwCu9NvJ61KCE2YA3XP2emdUsmT419DbWQ3wFBdu7"
+          ],
+          "confirmedMs": 11964.034400000004,
+          "totalMs": 13429.7958,
+          "amountTraces": [],
+          "decryptedMatches": true,
+          "signatures": {
+            "transactions": 1,
+            "messages": 0
+          },
+          "counter": null,
+          "indexed": {
+            "ms": 1701.9305000000022,
+            "polls": 1
+          }
+        }
+      ],
+      "error": null
+    },
+    {
+      "index": 2,
+      "wallet": "4zFV7UJ8wyHvvDVfGqCvyYLGkQBnLWZvKJxQFLD2kD9Z",
+      "token": "8Bou2sFxY1tgjisnT4G9Xm6E2MjmNEXee2rdFAuoknfu",
+      "faucetSignature": "3iXXWdPX6di5xKFv8GeVB1RQdjKwVfSYpykDa5tcMAPyPuKABdTfG3nTReSKDTEWS4SkKfD7aVWZvThbWDNnfENQ",
+      "preparationSignatures": [
+        "51cH36Dz9KjHEoyWc27ZCTPhtc5ccEYh6tb6BkgN4jYia97Z8vrAYcYp8Qh6t1mhjQ4NsrMxqaK6ePEPEeiJSiTC"
+      ],
+      "contributions": [
+        {
+          "kind": "first",
+          "periods": 3,
+          "proofSignatures": [
+            "p9MtTHGin5hcn23pwYMFFYcwJqT8Q1o8BoB55rJ9r4ucSMKKrhmUJJgkqoD7yCXskXYvgmGXbv46hAJQWK47qEq",
+            "6LqxxZDtMwh7T6hvxr36WkUKb8Bh7rkt9xJXn8sz4iBeKmcqEft48V8FQ532Nn6yozfqjjMYLTsxRUvg5aopbXS",
+            "4aC8TYm2ockj7nCemQP2siW65cs8fsWyiZmDw2XN4GKvKUX1kDQUjV1Xv6upxwztzfGdUESr7iEUsGpef7xjFWFL",
+            "5sLmF7kf7pf9x2aA6DGFHTeQYz49PYpocH6nusVMnATFV7LMe74L6EecczfinmHu63XrM6KE1osTxVj5zj7h2mQv"
+          ],
+          "transferSignature": "4i2rKNTXaRbTHfRpFB2DESm5ZksKT3KwsY7FdjrDp17V8sb9K9uaxJqXb7oWdzFMtToMB9jn7YSvAUwDHSx32FrB",
+          "closeSignatures": [
+            "3GyRYmvBfYwRPbDvrjA9ikbi6VYXvNg4LPjSGrrPPWnJMAEPd9SH1sxyfWAuJEACdBgNg7ztxCGPEpi2fAP8TDfy"
+          ],
+          "confirmedMs": 10240.0556,
+          "totalMs": 11559.000800000002,
+          "amountTraces": [],
+          "decryptedMatches": true,
+          "signatures": {
+            "transactions": 2,
+            "messages": 1
+          },
+          "counter": {
+            "ms": 1438.8553000000102,
+            "polls": 1,
+            "before": 346,
+            "after": 347
+          },
+          "indexed": {
+            "ms": 1554.4290000000037,
+            "polls": 1
+          }
+        },
+        {
+          "kind": "repeat",
+          "periods": 2,
+          "proofSignatures": [
+            "ozw7LrbSRydnN4mTTgPeXM96NJCRLnzwgR91wmxR4LoWmYKsYpDgPDYX1Zp4s439k76Fax5dzhQoNTfn7y2YfbR",
+            "5TDPFzuoMakxtRJkUu4SVnbrV7bBDoThyFTcuSfP1yhMRrsAP7ySoX9RctMvb4vf42HgBjn9qPfLmCuqtwy7gNtL",
+            "2wsuP29sDtVPsvSFVkD7DiWNoGDvs3LMRxnFPNGyZGGQdpWbiLJ7UUp1W4H5ucS6Ww3gGtAhurH9SosoDsZqR4dy",
+            "5uTmhyxi5edETNDnXo5B38BBMqrhG6t3tNDZ1ir1pEeTE9euMDDyUhuJdAH9fWejV5HQ2pGuVBQ5jgY5D6N3b2mQ"
+          ],
+          "transferSignature": "4XmFzPhoYapYhnYADAxi25twcftyGgZfCU689mWdFSwykE9VvyQVr74ShTBgax2qkBpFpYWBiDHHNW21fVsDJ227",
+          "closeSignatures": [
+            "7HVZ5j18Pg5MDeS9A5FJZvgvHpj72g4iAFxF5ULGj6LdGPwEbHL17cn9bDB9xsENKnai1jfhZftaNt3wQixZ11u"
+          ],
+          "confirmedMs": 8407.137399999992,
+          "totalMs": 10085.0821,
+          "amountTraces": [],
+          "decryptedMatches": true,
+          "signatures": {
+            "transactions": 1,
+            "messages": 0
+          },
+          "counter": null,
+          "indexed": {
+            "ms": 1915.0474000000104,
+            "polls": 1
+          }
+        }
+      ],
+      "error": null
+    }
+  ],
+  "summary": {
+    "failed": 0,
+    "sc001": {
+      "checked": 6,
+      "clean": 6,
+      "pass": true
+    },
+    "sc002": {
+      "samples": 3,
+      "maxMs": 1775.0028999999995,
+      "pass": true
+    },
+    "sc003": {
+      "first": {
+        "samples": 3,
+        "p95Ms": 10818.634,
+        "maxMs": 10818.634,
+        "signaturesMax": 3
+      },
+      "repeat": {
+        "samples": 3,
+        "p95Ms": 11964.034400000004,
+        "maxMs": 11964.034400000004,
+        "signaturesMax": 1
+      },
+      "cliP95Ms": {
+        "first": 38335.19720000005,
+        "repeat": 33569.644700000004
+      },
+      "pass": true
+    },
+    "sc008": {
+      "totalMs": 1202105.214,
+      "pass": true
+    }
+  }
+}

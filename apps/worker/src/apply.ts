@@ -103,10 +103,12 @@ export function createApplier({
     if (events.length === 0) return
     // One Transfer per transaction, hence one ciphertext; read it before the database
     // transaction opens so the pooled connection is not held across RPC round-trips.
-    const ciphertext = events.some((e) => e.kind === 'pledged')
-      ? await fetchRecipientCiphertext(chain, tx.signature)
-      : null
-    const writes = planWrites(tx, events, ciphertext, now())
+    const pledged = events.some((e) => e.kind === 'pledged')
+    const ciphertext = pledged ? await fetchRecipientCiphertext(chain, tx.signature) : null
+    // The log subscription delivers no block time; the backfill does.
+    const blockTime =
+      pledged && tx.blockTime === null ? await chain.blockTime(tx.signature) : tx.blockTime
+    const writes = planWrites({ ...tx, blockTime }, events, ciphertext, now())
     await writer(async (w) => {
       for (const write of writes) {
         if (write.table === 'creators') await w.upsertCreator(write.row)
