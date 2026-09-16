@@ -13,8 +13,8 @@ impl Handle {
     pub const SEED: &'static [u8] = b"handle";
 }
 
-// Те саме, що `^[a-z0-9-]{3,32}$` у `fixtures/handle.json`; довжина в байтах, бо
-// handle іде seed-ом PDA, а seed обмежений 32 байтами.
+// The same as `^[a-z0-9-]{3,32}$` in `fixtures/handle.json`; the length is in bytes because
+// the handle is a PDA seed, and a seed is capped at 32 bytes.
 pub fn is_valid_handle(handle: &str) -> bool {
     (3..=HANDLE_LEN).contains(&handle.len())
         && handle
@@ -45,7 +45,7 @@ mod tests {
     fn accepts_every_valid_handle_from_the_shared_fixture() {
         let json = fixture();
         for handle in strings(&json["valid"]) {
-            assert!(is_valid_handle(handle), "{handle:?} має бути валідним");
+            assert!(is_valid_handle(handle), "{handle:?} should be valid");
         }
     }
 
@@ -53,13 +53,13 @@ mod tests {
     fn rejects_every_invalid_handle_from_the_shared_fixture() {
         let json = fixture();
         for handle in strings(&json["invalid"]) {
-            assert!(!is_valid_handle(handle), "{handle:?} має бути невалідним");
+            assert!(!is_valid_handle(handle), "{handle:?} should be invalid");
         }
     }
 
     #[test]
     fn length_is_counted_in_bytes_not_chars() {
-        // «а» — 2 байти в UTF-8: 16 таких символів дають 32 байти, але це не [a-z0-9-]
+        // Cyrillic "а" is 2 bytes in UTF-8: 16 of them make 32 bytes, but that is not [a-z0-9-]
         assert!(!is_valid_handle(&"а".repeat(16)));
         assert!(is_valid_handle(&"a".repeat(32)));
         assert!(!is_valid_handle(&"a".repeat(33)));

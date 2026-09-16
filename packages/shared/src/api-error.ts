@@ -12,7 +12,7 @@ export const apiErrorCodeSchema = z.enum(API_ERROR_CODES)
 
 export type ApiErrorCode = z.infer<typeof apiErrorCodeSchema>
 
-// Відмова relay — не окремий код, а `INVALID_INPUT` з причиною в `details.reason`.
+// A relay refusal is not a separate code but `INVALID_INPUT` with the reason in `details.reason`.
 export const apiErrorDetailsSchema = z.looseObject({ reason: z.string().optional() })
 
 export type ApiErrorDetails = z.infer<typeof apiErrorDetailsSchema>

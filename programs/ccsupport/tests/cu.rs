@@ -7,13 +7,13 @@ use common::{
 use mollusk_svm::result::Check;
 use solana_pubkey::Pubkey;
 
-// Стеля = виміряне ×1,5, округлене вгору до 5 000. Ліміт мережі на транзакцію —
-// 200 000 CU, а поруч із `pledge` у ній стоїть сам конфіденційний переказ.
+// Ceiling = measured × 1.5, rounded up to 5 000. The network limit per transaction is
+// 200 000 CU, and the confidential transfer itself sits next to `pledge` in it.
 const REGISTER_CREATOR_CU: u64 = 30_000;
 const PLEDGE_CU: u64 = 35_000;
 
-// Пошук bump у `find_program_address` коштує ~1 500 CU на спробу, тож
-// випадковий гаманець дає різне число від прогону до прогону.
+// The bump search in `find_program_address` costs ~1 500 CU per attempt, so a
+// random wallet gives a different number from run to run.
 const WALLET: Pubkey = Pubkey::new_from_array([7; 32]);
 
 #[test]
@@ -26,7 +26,7 @@ fn register_creator_stays_under_its_ceiling() {
         &[Check::success()],
     );
     let cu = result.compute_units_consumed;
-    println!("register_creator: {cu} CU (стеля {REGISTER_CREATOR_CU})");
+    println!("register_creator: {cu} CU (ceiling {REGISTER_CREATOR_CU})");
     assert!(cu <= REGISTER_CREATOR_CU, "register_creator: {cu} CU");
 }
 
@@ -52,7 +52,7 @@ fn pledge_stays_under_its_ceiling_on_the_first_and_repeat_contribution() {
     );
 
     let (first, renewal) = (first.compute_units_consumed, renewal.compute_units_consumed);
-    println!("pledge: перший {first} CU, поновлення {renewal} CU (стеля {PLEDGE_CU})");
-    assert!(first <= PLEDGE_CU, "pledge (перший): {first} CU");
-    assert!(renewal <= PLEDGE_CU, "pledge (поновлення): {renewal} CU");
+    println!("pledge: first {first} CU, renewal {renewal} CU (ceiling {PLEDGE_CU})");
+    assert!(first <= PLEDGE_CU, "pledge (first): {first} CU");
+    assert!(renewal <= PLEDGE_CU, "pledge (renewal): {renewal} CU");
 }

@@ -5,7 +5,7 @@ export const faucetRequestSchema = z.object({ wallet: addressSchema })
 
 export type FaucetRequest = z.infer<typeof faucetRequestSchema>
 
-// Порції — числа: 0,02 SOL і 100 SUPD у базових одиницях уміщаються в safe integer.
+// The portions are numbers: 0.02 SOL and 100 SUPD in base units fit a safe integer.
 export const faucetResponseSchema = z.object({
   signature: z.string().min(1),
   lamports: z.number().int().positive(),

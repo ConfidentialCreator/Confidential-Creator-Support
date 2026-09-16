@@ -24,8 +24,8 @@ const INSTRUCTIONS_SYSVAR = address('Sysvar1nstructions1111111111111111111111111
 
 const first = async (pda: Promise<readonly [Address, number]>): Promise<Address> => (await pda)[0]
 
-// Кодери kit пишуть `undefined` як 0 і `false`, тому кожен білдер перевіряється
-// повним циклом encode → decode, а не лише «байти є».
+// kit encoders write `undefined` as 0 and `false`, so every builder is checked with
+// a full encode → decode round trip, not just "bytes exist".
 describe('initConfigInstruction', () => {
   it('resolves the Config PDA and the system program', async () => {
     const authority = createNoopSigner(SUPPORTER)

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { relayRequestSchema, relaySignaturesSchema } from './relay.ts'
 
-const tx = 'AQID' // будь-який base64
+const tx = 'AQID' // any base64
 
 describe('relayRequestSchema', () => {
   it('accepts one to four base64 transactions', () => {

@@ -21,8 +21,8 @@ export const configPda = (): Promise<ProgramDerivedAddress> => derive([utf8.enco
 export const creatorPda = (wallet: Address): Promise<ProgramDerivedAddress> =>
   derive([utf8.encode('creator'), addressBytes.encode(wallet)])
 
-// Seed — сирі байти рядка. Невалідний handle програма відхиляє (6001), тож
-// клієнт для нього адресу не виводить узагалі.
+// The seed is the raw bytes of the string. The program rejects an invalid handle (6001),
+// so the client derives no address for it at all.
 export const handlePda = async (handle: string): Promise<ProgramDerivedAddress> =>
   derive([utf8.encode('handle'), utf8.encode(handleSchema.parse(handle))])
 

@@ -1,5 +1,5 @@
-// Константи періоду й grace дублюються в програмі (`programs/ccsupport`) і в
-// SQL-запитах індексу; фікстура `fixtures/periods.json` звіряє всі три.
+// The period and grace constants are duplicated in the program (`programs/ccsupport`) and in
+// the index SQL queries; the `fixtures/periods.json` fixture cross-checks all three.
 export const PERIOD_SECONDS = 30 * 24 * 60 * 60
 export const GRACE_SECONDS = 3 * 24 * 60 * 60
 export const MAX_PERIODS = 12

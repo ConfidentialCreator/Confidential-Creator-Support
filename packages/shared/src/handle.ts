@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-// Той самий патерн перевіряє програма (seed `Handle` PDA); `fixtures/handle.json` звіряє обидва.
+// The program checks the same pattern (the `Handle` PDA seed); `fixtures/handle.json` cross-checks both.
 export const HANDLE_PATTERN = /^[a-z0-9-]{3,32}$/
 
 export const handleSchema = z.string().regex(HANDLE_PATTERN)

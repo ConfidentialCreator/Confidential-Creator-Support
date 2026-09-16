@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-// Одна tx на доказ; T006 показав ≤ 4 на переказ і 1 на закриття.
+// One tx per proof; T006 showed ≤ 4 per transfer and 1 per close.
 export const RELAY_MAX_TRANSACTIONS = 4
 
 export const relayRequestSchema = z.object({

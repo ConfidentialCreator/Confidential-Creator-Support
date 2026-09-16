@@ -8,8 +8,8 @@ use mollusk_svm::result::InstructionResult;
 use solana_instruction::Instruction;
 use solana_pubkey::Pubkey;
 
-// Позиції з розкладки CT-переказу у фікстурі T006: source, mint, destination, …,
-// authority останній.
+// Positions from the CT transfer layout in the T006 fixture: source, mint, destination, …,
+// authority last.
 const SOURCE: usize = 0;
 const MINT: usize = 1;
 const DESTINATION: usize = 2;
@@ -55,12 +55,12 @@ fn assert_rejected(result: &InstructionResult, s: &PledgeSetup, code: &str) {
     assert!(raw(result).contains(code), "{}", raw(result));
     assert!(
         result.get_account(&s.pledge).unwrap().data.is_empty(),
-        "запис Pledge не має з'явитись"
+        "no Pledge record should appear"
     );
     assert_eq!(
         result.get_account(&s.pledge).unwrap().lamports,
         0,
-        "рента не має списатись"
+        "no rent should be charged"
     );
 }
 
@@ -169,7 +169,7 @@ fn a_config_off_the_canonical_pda_is_rejected_even_with_a_real_transfer() {
     let mut h = Harness::new();
     let state = bootstrap(&mut h, &s);
 
-    // Та сама розкладка й той самий мінт, лише адреса не з `find_program_address`.
+    // The same layout and the same mint, only the address is not from `find_program_address`.
     s.config.config = Pubkey::new_unique();
     let result = attempt(&mut h, &s, &state, &fixture_transfer(), 1);
 

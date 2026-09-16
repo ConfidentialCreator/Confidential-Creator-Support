@@ -3,8 +3,8 @@ mod common;
 use common::pledge_setup;
 use solana_pubkey::Pubkey;
 
-// Ті самі адреси дериває `packages/chain/src/pda.ts`; фікстура тримає обидві
-// сторони на одних seeds.
+// `packages/chain/src/pda.ts` derives the same addresses; the fixture keeps both
+// sides on the same seeds.
 const FIXTURE: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/../../fixtures/pda.json");
 
 fn key(v: &serde_json::Value) -> Pubkey {

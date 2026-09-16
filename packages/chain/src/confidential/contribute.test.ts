@@ -56,7 +56,7 @@ const AVAILABLE = 25_000_000n
 const UNITS = 7_250_000n
 const BLOCKHASH = blockhash('9zwFRXGrRTvgmxRvMyBYyGqYr8WLrN5rBmhdEcGB5b9A')
 const TX_SIZE_LIMIT = 1232
-// Виміряно у T006 на devnet: переказ 540 B + 4 нові акаунти `pledge` = 721 B.
+// Measured in T006 on devnet: transfer 540 B + 4 new `pledge` accounts = 721 B.
 const TRANSFER_WITH_PLEDGE_BYTES_T006 = 721
 
 let supporter: KeyPairSigner
@@ -153,7 +153,7 @@ function rpcWith(accounts: Map<Address, ReadonlyUint8Array>, calls: RpcCall[] = 
 const kindOf = (ix: Instruction): string => {
   const data = ix.data ?? new Uint8Array()
   switch (ix.programAddress) {
-    // `identifyZkElGamalProofInstruction` є лише в типах пакета; дискримінатор — перший байт.
+    // `identifyZkElGamalProofInstruction` exists only in the package types; the discriminator is the first byte.
     case ZK_ELGAMAL_PROOF_PROGRAM_ADDRESS:
       return `zk:${ZkElGamalProofInstruction[data[0] ?? -1]}`
     case RECORD_PROGRAM_ADDRESS:
@@ -165,7 +165,7 @@ const kindOf = (ix: Instruction): string => {
   }
 }
 
-// Дзеркало білого переліку relay (PLAN, T025): усе, що не тут, relay відхилить.
+// Mirror of the relay allow-list (PLAN, T025): anything not here the relay rejects.
 const RELAY_ALLOWED = new Set([
   'zk:CloseContextState',
   'zk:VerifyCiphertextCommitmentEquality',
@@ -301,8 +301,8 @@ describe('buildContribution', () => {
     )
     const size = getTransactionSize(tx)
     expect(size).toBeLessThanOrEqual(TX_SIZE_LIMIT)
-    // 5 нових акаунтів проти 4 у заглушці T006 (System program під `init_if_needed`) = +33 B,
-    // дані 10 B проти 13 B = −3 B.
+    // 5 new accounts versus 4 in the T006 stub (System program under `init_if_needed`) = +33 B,
+    // data 10 B versus 13 B = −3 B.
     expect(size).toBe(TRANSFER_WITH_PLEDGE_BYTES_T006 + 33 - 3)
   })
 

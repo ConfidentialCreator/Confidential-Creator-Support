@@ -1,5 +1,5 @@
-// Один модуль на кілька тестових бінарників: те, чого не вживає котрийсь із них,
-// інакше падає під `-D warnings` як dead_code.
+// One module shared by several test binaries: whatever one of them does not use
+// would otherwise fail under `-D warnings` as dead_code.
 #![allow(dead_code)]
 
 use anchor_lang::{AnchorDeserialize, Discriminator, InstructionData, ToAccountMetas};
@@ -40,24 +40,24 @@ impl Default for Harness {
 }
 
 impl Harness {
-    // ELF береться явно з `target/deploy`, а не через пошук mollusk по cwd:
-    // `cargo test` запускається з теки пакета, де `target/` немає.
+    // The ELF is taken explicitly from `target/deploy`, not through mollusk's cwd lookup:
+    // `cargo test` runs from the package folder, where there is no `target/`.
     pub fn new() -> Self {
-        let elf = std::fs::read(ELF).unwrap_or_else(|e| panic!("{ELF}: {e} — спершу build-sbf"));
+        let elf = std::fs::read(ELF).unwrap_or_else(|e| panic!("{ELF}: {e} — run build-sbf first"));
         let mut mollusk = Mollusk::default();
         mollusk.add_program_with_loader_and_elf(&ccsupport::ID, &LOADER_V3, &elf);
         Self { mollusk }
     }
 
-    // `warp_to_slot` перебудовує Clock з нуля і обнуляє unix_timestamp —
-    // вестинг-тести з таким годинником зеленіють на «зараз = 0».
+    // `warp_to_slot` rebuilds Clock from scratch and zeroes unix_timestamp —
+    // vesting tests with such a clock go green on "now = 0".
     pub fn warp(&mut self, slot: u64, unix_timestamp: i64) {
         self.mollusk.warp_to_slot(slot);
         self.mollusk.sysvars.clock.unix_timestamp = unix_timestamp;
     }
 
-    // Ліміт LogCollector (10 КБ) рахується за все життя збирача, а не за прогін:
-    // зі спільним збирачем події зникають десь із 15-го виклику.
+    // The LogCollector limit (10 KB) counts over the collector's whole life, not per run:
+    // with a shared collector the events vanish from about the 15th call.
     pub fn process(
         &mut self,
         instruction: &Instruction,
@@ -78,9 +78,9 @@ impl Harness {
     }
 }
 
-// mollusk підкладає sysvar `Instructions` лише з тієї інструкції, яку виконує, і
-// поточний індекс не записує (це робить solana-svm, якого тут немає). Акаунт,
-// переданий явно, має пріоритет над підкладеним.
+// mollusk fills the `Instructions` sysvar only from the instruction it executes and
+// does not store the current index (solana-svm does that, and it is absent here). An
+// account passed explicitly takes priority over the injected one.
 pub fn instructions_sysvar(instructions: &[Instruction], current: usize) -> (Pubkey, Account) {
     let (key, mut account) = mollusk_svm::instructions_sysvar::keyed_account(instructions.iter());
     store_current_index_checked(&mut account.data, current as u16).unwrap();
@@ -92,7 +92,11 @@ pub fn fixture_transfer() -> Instruction {
         serde_json::from_str(&std::fs::read_to_string(TRANSFER_FIXTURE).unwrap()).unwrap();
     let wire = STANDARD.decode(json["wire"].as_str().unwrap()).unwrap();
     let mut instructions = decode_message_instructions(&wire);
-    assert_eq!(instructions.len(), 1, "фікстура має рівно одну інструкцію");
+    assert_eq!(
+        instructions.len(),
+        1,
+        "the fixture has exactly one instruction"
+    );
     instructions.pop().unwrap()
 }
 
@@ -128,8 +132,8 @@ impl<'a> Cursor<'a> {
     }
 }
 
-// Wire-формат транзакції з kit: підписи, далі повідомлення legacy або v0 (старший
-// біт першого байта). Таблиць адрес у фікстурах немає — всі ключі статичні.
+// Wire format of a kit transaction: signatures, then a legacy or v0 message (high
+// bit of the first byte). The fixtures carry no address tables — every key is static.
 fn decode_message_instructions(wire: &[u8]) -> Vec<Instruction> {
     let mut c = Cursor {
         bytes: wire,
@@ -191,7 +195,7 @@ fn decode_message_instructions(wire: &[u8]) -> Vec<Instruction> {
     } else {
         0
     };
-    assert_eq!(lookups, 0, "таблиці адрес у фікстурі не підтримуються");
+    assert_eq!(lookups, 0, "address tables in a fixture are not supported");
     instructions
 }
 
@@ -199,9 +203,9 @@ pub fn signer_account() -> Account {
     Account::new(1_000_000_000, 0, &Pubkey::default())
 }
 
-// Базовий Mint без розширень: COption authority (4+32), supply (8), decimals (1),
-// is_initialized (1), COption freeze (4+32) = 82 байти; для `InterfaceAccount<Mint>`
-// важливі лише власник і прапорець ініціалізації.
+// A base Mint without extensions: COption authority (4+32), supply (8), decimals (1),
+// is_initialized (1), COption freeze (4+32) = 82 bytes; for `InterfaceAccount<Mint>`
+// only the owner and the initialised flag matter.
 pub fn mint_account(owner: Pubkey) -> Account {
     let mut data = vec![0u8; 82];
     data[0] = 1;
@@ -335,8 +339,8 @@ pub fn update_creator(
     }
 }
 
-// Події `emit!` лягають у лог рядком `Program data: <base64>`; перші 8 байтів —
-// дискримінатор події.
+// `emit!` events land in the log as `Program data: <base64>`; the first 8 bytes are
+// the event discriminator.
 pub fn events<T: Discriminator + AnchorDeserialize>(logs: &[String]) -> Vec<T> {
     logs.iter()
         .filter_map(|l| l.strip_prefix("Program data: "))
@@ -346,8 +350,8 @@ pub fn events<T: Discriminator + AnchorDeserialize>(logs: &[String]) -> Vec<T> {
         .collect()
 }
 
-// Адреси з `context` фікстури `fixtures/tx/transfer.json` (devnet, T006): ATA
-// прихильника й автора в переказі виведені саме з цих гаманців і цього мінта.
+// Addresses from the `context` of the `fixtures/tx/transfer.json` fixture (devnet, T006): the
+// supporter's and creator's ATAs in the transfer derive from exactly these wallets and this mint.
 pub const FIXTURE_MINT: Pubkey =
     Pubkey::from_str_const("6f1QTLNPh59wM26CQx1pnJTUcE814H64JaABjARPvtiC");
 pub const FIXTURE_SUPPORTER: Pubkey =
@@ -384,8 +388,8 @@ pub fn pledge_setup() -> PledgeSetup {
     }
 }
 
-// `Config` і `Creator` після `init_config` та `register_creator` — стан, який
-// `pledge` читає; mollusk між прогонами нічого не зберігає.
+// `Config` and `Creator` after `init_config` and `register_creator` — the state that
+// `pledge` reads; mollusk keeps nothing between runs.
 pub struct PledgeState {
     pub config: Account,
     pub creator: Account,
@@ -448,8 +452,8 @@ pub fn pledge(s: &PledgeSetup, periods: u8, show_publicly: bool) -> Instruction 
     }
 }
 
-// Транзакція «переказ, потім pledge»: sysvar складено з обох інструкцій,
-// поточний індекс — 1.
+// A "transfer, then pledge" transaction: the sysvar is built from both instructions,
+// the current index is 1.
 pub fn pledge_accounts(
     s: &PledgeSetup,
     state: &PledgeState,

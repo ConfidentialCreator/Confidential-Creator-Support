@@ -48,7 +48,7 @@ const DECIMALS = 6
 const PUBLIC = 25_000_000n
 const UNITS = 7_250_000n
 const INSTRUCTIONS_SYSVAR = address('Sysvar1nstructions1111111111111111111111111')
-// Жоден тест не має ходити в мережу: адреса без сервера падає при першому виклику.
+// No test may reach the network: an address with no server fails on the first call.
 const deadRpc = createSolanaRpc('http://127.0.0.1:1')
 
 let owner: KeyPairSigner
@@ -103,7 +103,7 @@ const only = (step: PreparationStep | undefined) => {
   if (!ix || step.instructions.length !== 1) throw new Error('expected exactly one instruction')
   return ix
 }
-// Парсери SDK хочуть обов'язкові `accounts`/`data`, у типі `Instruction` вони optional.
+// The SDK parsers want `accounts`/`data` required; in the `Instruction` type they are optional.
 const parts = (ix: Instruction) => ({
   ...ix,
   accounts: ix.accounts ?? [],
@@ -197,7 +197,7 @@ describe('planPreparation', () => {
     expect(parsed.data.proofInstructionOffset).toBe(1)
     expect(parsed.data.maximumPendingBalanceCreditCounter).toBe(65_536n)
     expect(keys.ae().decrypt(AeCiphertextOf(parsed.data.decryptableZeroBalance))).toBe(0n)
-    // pubkey-validity інлайн: доказ у наступній інструкції, а не в context-state акаунті
+    // pubkey-validity inline: the proof is in the next instruction, not in a context-state account
     expect(verify.data?.[0]).toBe(4)
     expect(verify.accounts ?? []).toHaveLength(0)
   })

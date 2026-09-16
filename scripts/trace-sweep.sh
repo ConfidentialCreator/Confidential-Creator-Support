@@ -1,38 +1,38 @@
 #!/usr/bin/env bash
-# Прохід по слідах — умова першого push у публічний репозиторій.
+# The trace sweep — a precondition for the first push to a public repository.
 #
-# Питання, на яке відповідає скрипт: чи не лишилося в репозиторії чогось, що
-# описує **машину автора**, а не проект, — абсолютних локальних шляхів, тек
-# користувача, ключів і мнемонік.
+# The question this script answers: is anything left in the repository that describes
+# the **author's machine** rather than the project — absolute local paths, user
+# folders, keys and mnemonics.
 #
-# Кликати:
-#   scripts/trace-sweep.sh          # уся історія — перед push
-#   scripts/trace-sweep.sh tree     # тільки робоча копія — швидко, під час роботи
-#   scripts/trace-sweep.sh ci       # уся історія, але без проходу по іменах
+# Usage:
+#   scripts/trace-sweep.sh          # the whole history — before push
+#   scripts/trace-sweep.sh tree     # only the working copy — fast, while working
+#   scripts/trace-sweep.sh ci       # the whole history, but without the identities pass
 #
-# # Чому по історії, а не по робочій копії
+# # Why the history rather than the working copy
 #
-# Після push історія публічна така, яка є, і зняти з неї рядок можна лише
-# переписуванням — тобто зміною всіх хешів у вже опублікованому репо. Тому
-# прохід іде по всіх ревізіях, і не тільки по вмісту файлів: слід так само
-# добре ховається в повідомленні коміта і в самому шляху файла, який колись
-# існував і був видалений.
+# After push the history is public as it is, and a line can only be removed from it by
+# rewriting — i.e. by changing every hash in an already published repo. So the
+# sweep goes over all revisions, and not only over file contents: a trace hides just
+# as well in a commit message and in the very path of a file that once
+# existed and was deleted.
 #
-# # Чому є самоперевірка
+# # Why there is a self-check
 #
-# Порожній вивід буває двох різновидів: «нічого немає» і «патерн не працює».
-# Ззовні вони не відрізняються, а ціна другого — слід у публічній історії
-# назавжди. Тому кожен патерн спершу проганяється по зразку, який ЗОБОВ'ЯЗАНИЙ
-# збігтися; якщо не збігся хоч один, скрипт відмовляється звітувати «чисто».
+# Empty output comes in two kinds: "there is nothing" and "the pattern does not work".
+# From outside they are indistinguishable, and the price of the second is a trace in public
+# history forever. So every pattern is first run against a sample that MUST
+# match; if even one does not, the script refuses to report "clean".
 #
-# # Чому список особистих даних лежить поза репозиторієм
+# # Why the list of personal data lives outside the repository
 #
-# Патерн, що шукає ім'я автора, сам містить це ім'я. Скрипт із таким рядком у
-# публічному репо був би рівно тим слідом, який шукає. Тому імена читаються з
-# `.git/info/trace-identities` — по одному рядку на ім'я, файл не комітиться
-# ніколи. Якщо його немає, цей прохід ПРОПУСКАЄТЬСЯ, і скрипт каже про це
-# окремим рядком у підсумку: «чисто» без такого рядка означало б перевірене, а
-# воно неперевірене.
+# A pattern that looks for the author's name contains that name. A script with such a line in
+# a public repo would be exactly the trace it looks for. So the names are read from
+# `.git/info/trace-identities` — one line per name, a file that is never
+# committed. If it is missing, this pass is SKIPPED, and the script says so in
+# a separate line of the summary: "clean" without such a line would mean checked, while
+# it is unchecked.
 
 set -uo pipefail
 
@@ -40,16 +40,16 @@ MODE="${1:-history}"
 case "$MODE" in
   history | tree | ci) ;;
   *)
-    echo "невідомий режим: $MODE (history | tree | ci)" >&2
+    echo "unknown mode: $MODE (history | tree | ci)" >&2
     exit 2
     ;;
 esac
 
-# Режим `ci` — це `history` плюс одна поступка: списку імен там немає і бути не
-# може (він навмисно живе поза репозиторієм), тож його відсутність — очікуваний
-# стан, а не недогляд. Структурні патерни при цьому ганяються всі, і саме вони
-# ловлять те, що частіше за все й потрапляє в публічне репо: абсолютний шлях із
-# машини, де збирали.
+# The `ci` mode is `history` plus one concession: the identities list is not there and
+# cannot be (it deliberately lives outside the repository), so its absence is the expected
+# state, not an oversight. All structural patterns still run, and they are the ones that
+# catch what most often ends up in a public repo: an absolute path from the
+# machine where the build ran.
 CI=0
 if [ "$MODE" = ci ]; then
   CI=1
@@ -57,21 +57,21 @@ if [ "$MODE" = ci ]; then
 fi
 
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || {
-  echo "не git-репозиторій" >&2
+  echo "not a git repository" >&2
   exit 2
 }
 cd "$ROOT" || exit 2
 
-# Сам скрипт із перевірки виключається: він за визначенням містить усе, що
-# шукає, і без цього кожен прохід звітував би про власні патерни. Наслідок, який
-# треба тримати в голові: справжній слід усередині ЦЬОГО файла прохід не
-# побачить, тож правки тут читаються очима.
+# The script itself is excluded from the check: by definition it contains everything it
+# looks for, and without this every sweep would report its own patterns. The consequence
+# to keep in mind: a real trace inside THIS file will not be seen by the sweep,
+# so edits here are reviewed by eye.
 readonly SELF='scripts/trace-sweep.sh'
 readonly IDENTITIES='.git/info/trace-identities'
 
-# Заголовок PEM склеєний із двох частин навмисно: цілим рядком він тут не
-# з'являється, інакше цей файл сам не проходив би перевірки на секрети — ні цієї,
-# ні тієї, що стоїть на pre-commit.
+# The PEM header is glued from two parts on purpose: as a whole line it does not
+# appear here, otherwise this file itself would fail the secrets check — neither this one
+# nor the one on pre-commit.
 readonly PEM_A='BEGIN ([A-Z0-9]+ )*PRIV'
 readonly PEM_B='ATE KEY'
 
@@ -79,7 +79,7 @@ REVS=''
 if [ "$MODE" = history ]; then
   REVS="$(git rev-list --all)"
   if [ -z "$REVS" ]; then
-    echo "в історії немає жодного коміта" >&2
+    echo "there are no commits in the history" >&2
     exit 2
   fi
 fi
@@ -88,29 +88,29 @@ found=0
 broken=0
 skipped_identities=0
 
-# Три поверхні, на яких ховається слід: вміст, повідомлення коміта, шлях файла.
+# Three surfaces where a trace hides: content, commit message, file path.
 scan() {
   local re="$1"
   {
     if [ "$MODE" = tree ]; then
       git grep -nEI -i -e "$re" -- . ":(exclude)$SELF"
     else
-      # $REVS навмисно без лапок: git grep чекає ревізії окремими аргументами.
+      # $REVS deliberately unquoted: git grep expects revisions as separate arguments.
       # shellcheck disable=SC2086
       git grep -nEI -i -e "$re" $REVS -- . ":(exclude)$SELF"
-      git log --all --format='повідомлення %h: %s %b' | grep -Ei -e "$re"
+      git log --all --format='message %h: %s %b' | grep -Ei -e "$re"
       git log --all --pretty=format: --name-only | sort -u | grep -Ei -e "$re" |
-        sed 's/^/шлях у історії: /'
+        sed 's/^/path in history: /'
     fi
   } 2>/dev/null | sort -u
 }
 
-# check <назва> <регекс> <зразок, який зобов'язаний збігтися>
+# check <name> <regex> <sample that must match>
 check() {
   local name="$1" re="$2" sample="$3" hits
 
   if ! printf '%s\n' "$sample" | grep -qEi -e "$re"; then
-    printf '  ✗ САМОПЕРЕВІРКА: «%s» не ловить власний зразок — виводу не вірити\n' "$name"
+    printf '  ✗ SELF-CHECK: "%s" does not match its own sample — do not trust the output\n' "$name"
     broken=$((broken + 1))
     return
   fi
@@ -126,65 +126,65 @@ check() {
 }
 
 if [ "$MODE" = history ]; then
-  printf '── прохід по слідах: уся історія (%s комітів) ──\n' "$(printf '%s\n' "$REVS" | wc -l | tr -d ' ')"
+  printf '── trace sweep: whole history (%s commits) ──\n' "$(printf '%s\n' "$REVS" | wc -l | tr -d ' ')"
 else
-  printf '── прохід по слідах: робоча копія ──\n'
+  printf '── trace sweep: working copy ──\n'
 fi
 
-# Абсолютні шляхи. Перший патерн — той, через який прохід уже давав хибне
-# «чисто»: у формі /mnt/<диск>/... немає двокрапки, і патерн, писаний під
-# Windows-шлях, її не бачить. Обидві форми перевіряються завжди.
-check 'абсолютний шлях WSL' \
+# Absolute paths. The first pattern is the one through which the sweep already gave a false
+# "clean": the /mnt/<drive>/... form has no colon, and a pattern written for a
+# Windows path does not see it. Both forms are always checked.
+check 'absolute WSL path' \
   '/mnt/[a-z]/' \
   '/mnt/e/proj/x'
 
-# Хвіст `[a-zA-Z_.]` тут не косметика: без нього патерн ловив би «https://»
-# (літера, двокрапка, скісна) у кожному посиланні.
-check 'абсолютний шлях Windows' \
+# The `[a-zA-Z_.]` tail here is not cosmetic: without it the pattern would catch "https://"
+# (letter, colon, slash) in every link.
+check 'absolute Windows path' \
   '[a-z]:[\\/][a-zA-Z_.]' \
   'C:\Users\bob'
 
-check 'домашня тека користувача' \
+check 'user home folder' \
   '/home/[a-z][a-z0-9_.-]*/' \
   '/home/bob/proj'
 
-check 'тека профілю або тимчасова' \
+check 'profile or temp folder' \
   'appdata|[\\/]temp[\\/]' \
   'AppData\Local'
 
-check 'тека оснастки поза проектом' \
+check 'tooling folder outside the project' \
   '[\\/]?_(backups|keys|tools)[\\/]' \
   'x/_keys/y'
 
-# Секрети. Ключі й мнемоніки — не «сліди машини», але прохід перед публікацією
-# єдиний, і розділяти два списки означало б колись прогнати лише один.
-check 'приватний ключ (PEM)' \
+# Secrets. Keys and mnemonics are not "machine traces", but the pre-publication sweep is
+# the only one, and splitting the two lists would mean someday running only one.
+check 'private key (PEM)' \
   "${PEM_A}${PEM_B}" \
   "-----BEGIN RSA PRIV${PEM_B}-----"
 
-check 'масив ключа Solana' \
+check 'Solana key array' \
   '\[([0-9]{1,3}, ?){20}' \
   '[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]'
 
-check 'мнемоніка' \
+check 'mnemonic' \
   'mnemonic|seed[ -]phrase' \
   'seed phrase'
 
-# Особисті дані — список поза репозиторієм, див. шапку.
+# Personal data — the list lives outside the repository, see the header.
 if [ -s "$IDENTITIES" ]; then
-  # Формат рядка: `регекс` або `регекс<TAB>зразок`.
+  # Line format: `regex` or `regex<TAB>sample`.
   #
-  # Другий стовпець потрібен рівно тоді, коли регекс містить екранування:
-  # зразком для `\.arena\.json` не може бути він сам — бекслеші в тексті
-  # зразка збігу не дають, і самоперевірка чесно валиться. Це не причіпка:
-  # саме так вона й має поводитись, бо патерн, що не ловить нічого, і патерн,
-  # що ловить неправильне, ззовні виглядають однаково.
+  # The second column is needed exactly when the regex contains escapes:
+  # the sample for `\.arena\.json` cannot be itself — backslashes in the sample
+  # text do not match, and the self-check honestly fails. That is not pedantry:
+  # that is exactly how it should behave, because a pattern that matches nothing and a
+  # pattern that matches the wrong thing look the same from outside.
   while IFS= read -r line || [ -n "$line" ]; do
     case "$line" in '' | '#'*) continue ;; esac
     re="${line%%	*}"
     sample="${line#*	}"
-    [ "$sample" = "$line" ] && sample="зразок ${re} зразок"
-    check "особисті дані: $re" "$re" "$sample"
+    [ "$sample" = "$line" ] && sample="sample ${re} sample"
+    check "personal data: $re" "$re" "$sample"
   done <"$IDENTITIES"
 else
   skipped_identities=1
@@ -192,23 +192,23 @@ fi
 
 echo
 if [ "$broken" -gt 0 ]; then
-  printf '✗ САМОПЕРЕВІРКА ПРОВАЛЕНА (%s патернів) — прохід не відбувся.\n' "$broken"
+  printf '✗ SELF-CHECK FAILED (%s patterns) — the sweep did not happen.\n' "$broken"
   exit 2
 fi
 if [ "$found" -gt 0 ]; then
-  printf '✗ знайдено слідів: %s. Push не робити.\n' "$found"
-  printf '  Поки push не зроблено, слід знімається переписуванням історії;\n'
-  printf '  після push він лишається в публічному репо назавжди.\n'
+  printf '✗ traces found: %s. Do not push.\n' "$found"
+  printf '  Until the push is made, a trace is removed by rewriting history;\n'
+  printf '  after the push it stays in the public repo forever.\n'
   exit 1
 fi
 if [ "$skipped_identities" -eq 1 ]; then
-  printf '✓ структурні патерни чисті.\n'
-  printf '! прохід по особистих даних не робився — немає %s.\n' "$IDENTITIES"
+  printf '✓ structural patterns are clean.\n'
+  printf '! the personal-data pass was not run — no %s.\n' "$IDENTITIES"
   if [ "$CI" -eq 1 ]; then
-    printf '  У CI цього файла і не буває — він живе поза репозиторієм навмисно.\n'
+    printf '  In CI this file never exists — it lives outside the repository on purpose.\n'
     exit 0
   fi
-  printf '  Це не «чисто», це «не перевіряли». Створіть файл: по регексу на рядок.\n'
+  printf '  This is not "clean", this is "unchecked". Create the file: one regex per line.\n'
   exit 1
 fi
-printf '✓ чисто: слідів не знайдено, самоперевірка пройдена.\n'
+printf '✓ clean: no traces found, self-check passed.\n'

@@ -1,9 +1,9 @@
-// Заміри M1 проти живого стека (API + worker + Supabase, окремі процеси): SC-002
-// (підтвердження переказу → лічильник на сторінці), SC-003 (підписи гаманця і час
-// на тому самому клієнтському шляху, що й браузер), SC-008 — з `fixtures/demo-run.json`.
-// Підсумок — `fixtures/measure.json`.
+// M1 measurements against the live stack (API + worker + Supabase, separate processes): SC-002
+// (transfer confirmation → the counter on the page), SC-003 (wallet signatures and time
+// on the same client path as the browser), SC-008 — from `fixtures/demo-run.json`.
+// Summary in `fixtures/measure.json`.
 //
-// Запуск: pnpm --filter @ccsupport/demo measure [--probes 3] [--api http://127.0.0.1:8787]
+// Run: pnpm --filter @ccsupport/demo measure [--probes 3] [--api http://127.0.0.1:8787]
 import { readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { parseArgs } from 'node:util'
@@ -29,7 +29,7 @@ const ROOT = new URL('../../../', import.meta.url)
 const RUN_FILE = new URL('fixtures/demo-run.json', ROOT)
 const MEASURE_FILE = new URL('fixtures/measure.json', ROOT)
 
-// Крок 1 с міряє сам індекс; сторінка опитує кожні 10 с і додає до 10 с зверху.
+// A 1 s step measures the index itself; the page polls every 10 s and adds up to 10 s on top.
 const POLL_MS = 1_000
 const WATCH_TIMEOUT_MS = 120_000
 const RECENT_LIMIT = 10
@@ -128,7 +128,7 @@ async function main(): Promise<void> {
   const startedAt = new Date()
   const probes: Probe[] = []
   const signers = []
-  // Послідовно: смуга `sendTransaction` 1/с спільна з API в сусідньому процесі.
+  // Sequential: the 1/s `sendTransaction` lane is shared with the API in the neighbouring process.
   for (let i = 0; i < args.probes; i += 1) {
     const plan = contributionPlan(i, args.probes)
     if (!plan.repeat) throw new Error('every probe repeats')
@@ -161,19 +161,19 @@ async function main(): Promise<void> {
 
   const s = measure.summary
   const sec = (ms: number) => `${(ms / 1000).toFixed(1)} s`
-  console.log('\n=== ПІДСУМОК ===')
-  console.log(`проб: ${probes.length - s.failed} ок, ${s.failed} відмов`)
+  console.log('\n=== SUMMARY ===')
+  console.log(`probes: ${probes.length - s.failed} ok, ${s.failed} failed`)
   console.log(
-    `SC-001 без сліду суми: ${s.sc001.clean}/${s.sc001.checked} — ${s.sc001.pass ? 'PASS' : 'FAIL'}`,
+    `SC-001 no amount trace: ${s.sc001.clean}/${s.sc001.checked} — ${s.sc001.pass ? 'PASS' : 'FAIL'}`,
   )
   console.log(
-    `SC-002 лічильник ≤ 30 с після підтвердження: max ${sec(s.sc002.maxMs)} (n=${s.sc002.samples}) — ${s.sc002.pass ? 'PASS' : 'FAIL'}`,
+    `SC-002 counter ≤ 30 s after confirmation: max ${sec(s.sc002.maxMs)} (n=${s.sc002.samples}) — ${s.sc002.pass ? 'PASS' : 'FAIL'}`,
   )
   console.log(
-    `SC-003 перший: p95 ${sec(s.sc003.first.p95Ms)}, ≤ ${s.sc003.first.signaturesMax} підписів (n=${s.sc003.first.samples}); повторний: p95 ${sec(s.sc003.repeat.p95Ms)}, ≤ ${s.sc003.repeat.signaturesMax} підписів (n=${s.sc003.repeat.samples}); CLI p95 ${sec(s.sc003.cliP95Ms.first)} / ${sec(s.sc003.cliP95Ms.repeat)} — ${s.sc003.pass ? 'PASS' : 'FAIL'}`,
+    `SC-003 first: p95 ${sec(s.sc003.first.p95Ms)}, ≤ ${s.sc003.first.signaturesMax} signatures (n=${s.sc003.first.samples}); repeat: p95 ${sec(s.sc003.repeat.p95Ms)}, ≤ ${s.sc003.repeat.signaturesMax} signatures (n=${s.sc003.repeat.samples}); CLI p95 ${sec(s.sc003.cliP95Ms.first)} / ${sec(s.sc003.cliP95Ms.repeat)} — ${s.sc003.pass ? 'PASS' : 'FAIL'}`,
   )
   console.log(
-    `SC-008 демо-набір ${(s.sc008.totalMs / 60_000).toFixed(1)} хв — ${s.sc008.pass ? 'PASS' : 'FAIL'}`,
+    `SC-008 demo set ${(s.sc008.totalMs / 60_000).toFixed(1)} min — ${s.sc008.pass ? 'PASS' : 'FAIL'}`,
   )
   console.log(`→ ${fileURLToPath(MEASURE_FILE)}`)
 }

@@ -27,7 +27,7 @@ const FAUCET = address('AJ6LFWEJgLEwkfyWWipZ8Le5fV9QjCV61UCnzv9g5ZUq')
 const WALLET = address('D4TkDq52FCqPyvwgQWBDepBumsYKB5ZjroRLfGckrYnQ')
 const MINT = address('6f1QTLNPh59wM26CQx1pnJTUcE814H64JaABjARPvtiC')
 
-// Парсери SDK хочуть обов'язкові `accounts`/`data`, у типі `Instruction` вони optional.
+// The SDK parsers want `accounts`/`data` required; in the `Instruction` type they are optional.
 const parts = (ix: Instruction) => ({
   programAddress: ix.programAddress,
   accounts: ix.accounts ?? [],

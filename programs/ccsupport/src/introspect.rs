@@ -4,9 +4,9 @@ use solana_instructions_sysvar::load_instruction_at_checked;
 
 use crate::errors::CcsError;
 
-// `TokenInstruction::ConfidentialTransferExtension` і `ConfidentialTransferInstruction::Transfer`
-// (spl-token-2022-interface 2.1); розкладка акаунтів — source, mint, destination,
-// далі акаунти доказів (їх число залежить від форми доказу), authority останній.
+// `TokenInstruction::ConfidentialTransferExtension` and `ConfidentialTransferInstruction::Transfer`
+// (spl-token-2022-interface 2.1); the account layout is source, mint, destination,
+// then the proof accounts (their number depends on the proof form), authority last.
 const CONFIDENTIAL_TRANSFER_EXTENSION: u8 = 27;
 const TRANSFER: u8 = 7;
 const SOURCE: usize = 0;
@@ -21,8 +21,8 @@ pub struct ExpectedTransfer {
     pub authority: Pubkey,
 }
 
-// Перший переказ, що збігається повністю, задовольняє; якщо такого немає, звіт —
-// про перший знайдений CT-переказ, бо саме його клієнт і мав на увазі.
+// The first fully matching transfer satisfies; if there is none, the report is about
+// the first CT transfer found, since that is the one the client meant.
 pub fn find_confidential_transfer(
     instructions: &AccountInfo,
     expected: &ExpectedTransfer,
@@ -93,8 +93,8 @@ mod tests {
         }
     }
 
-    // Розкладка з фікстури T006: source, mint, destination, три context-state
-    // акаунти доказів, authority останній.
+    // Layout from the T006 fixture: source, mint, destination, three context-state
+    // proof accounts, authority last.
     fn ct_transfer(e: &ExpectedTransfer) -> Instruction {
         Instruction {
             program_id: token_2022::ID,
@@ -149,7 +149,7 @@ mod tests {
     fn code(result: Result<()>) -> u32 {
         match result.unwrap_err() {
             Error::AnchorError(e) => e.error_code_number,
-            other => panic!("очікувалась AnchorError, отримано {other:?}"),
+            other => panic!("expected AnchorError, got {other:?}"),
         }
     }
 

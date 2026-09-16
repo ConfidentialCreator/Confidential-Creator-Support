@@ -1,4 +1,4 @@
-// IDL Anchor → kit-клієнт. Запускати після `scripts/wsl-build.sh idl`.
+// Anchor IDL → kit client. Run after `scripts/wsl-build.sh idl`.
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { rootNodeFromAnchor } from '@codama/nodes-from-anchor'
@@ -9,13 +9,13 @@ const idl = JSON.parse(
   readFileSync(new URL('../../../target/idl/ccsupport.json', import.meta.url), 'utf8'),
 )
 const codama = createFromRoot(rootNodeFromAnchor(idl))
-// Акаунт `Pledge` та інструкція `pledge` дають у клієнті два `PLEDGE_DISCRIMINATOR`;
-// інструкція йде під ім'ям accounts-структури програми, `MakePledge`.
+// The `Pledge` account and the `pledge` instruction would both produce `PLEDGE_DISCRIMINATOR`;
+// the instruction goes under the program's accounts struct name, `MakePledge`.
 codama.update(updateInstructionsVisitor({ pledge: { name: 'makePledge' } }))
-// Рендерер приймає теку пакета й пише в її `src/generated`; версії залежностей
-// у package.json тримаємо самі, тому синхронізацію вимкнено. Клієнт виконує не лише
-// Vite, а й Node без транспіляції (`apps/api`, `tools/*`): імпорти з `.ts` замість
-// тек, і жодного `enum` — strip-only режим Node його не стирає.
+// The renderer takes the package folder and writes into its `src/generated`; dependency
+// versions in package.json are managed by hand, so the sync is off. The client runs not only
+// under Vite but also under plain Node (`apps/api`, `tools/*`): imports carry `.ts` instead of
+// folders, and no `enum` — Node's strip-only mode does not erase it.
 codama.accept(
   renderVisitor(fileURLToPath(new URL('..', import.meta.url)), {
     erasableSyntax: true,

@@ -43,7 +43,7 @@ export const CREATOR = {
   description: 'Independent reporting on municipal budgets and public procurement.',
 } as const
 
-// Автор платить за реєстрацію, ATA й apply сам; порція faucet 0,02 SOL покриває це з запасом.
+// The creator pays for registration, the ATA and apply themselves; the 0.02 SOL faucet portion covers it with room to spare.
 const CREATOR_MIN_LAMPORTS = 10_000_000n
 
 const FIRST_BUDGET_MS = 180_000
@@ -72,7 +72,7 @@ export const contributionSchema = z.object({
   decryptedMatches: z.boolean(),
 })
 
-// Сум тут немає свідомо: файл комітиться, а SC-001 саме про те, що їх ніде не видно.
+// No amounts here on purpose: the file is committed, and SC-001 is exactly about them being visible nowhere.
 export const demoRunSchema = z.object({
   cluster: z.literal('devnet'),
   startedAt: z.string(),
@@ -191,8 +191,8 @@ export async function setupCreator(
   return { token, keys, availableBefore: available.units, signatures }
 }
 
-// FR-015: після всіх внесків автор застосовує pending, і приріст available
-// дорівнює сумі відправленого — комісії платформи немає.
+// FR-015: after all contributions the creator applies pending, and the available
+// balance grows by exactly the sum sent — there is no platform fee.
 async function creatorReceived(
   ctx: DemoContext,
   creator: KeyPairSigner,
@@ -217,8 +217,8 @@ async function creatorReceived(
   return available.units - availableBefore
 }
 
-// Прихильники ефемерні: SOL і публічний SUPD повертаються на faucet пачками, faucet
-// платить комісію. Депонований SUPD без Withdraw-доказу не повернути — лишається.
+// Supporters are ephemeral: SOL and public SUPD return to the faucet in batches, the faucet
+// pays the fee. Deposited SUPD cannot be returned without a Withdraw proof — it stays.
 export async function sweep(ctx: DemoContext, signers: KeyPairSigner[]): Promise<Signature[]> {
   const tokenProgram = TOKEN_2022_PROGRAM_ADDRESS
   const [faucetToken] = await findAssociatedTokenPda({
@@ -310,8 +310,8 @@ function summarize(
   }
 }
 
-// Депонований SUPD з ефемерних гаманців не повертається, тож кожен прогін коштує
-// faucet-у N порцій; SOL повертається sweep-ом, у польоті — паралельність + пачка.
+// Deposited SUPD does not come back from the ephemeral wallets, so every run costs the
+// faucet N portions; SOL comes back through the sweep, in flight is concurrency + one batch.
 export async function requireFaucetStock(
   ctx: Omit<DemoContext, 'creator'>,
   options: Us1Options,
@@ -356,7 +356,7 @@ export async function runUs1(
     plan: contributionPlan(i, options.repeats),
   }))
   let done = 0
-  // Sweep по ходу, а не наприкінці: інакше faucet тримає 0,02 SOL × N увесь прогін.
+  // Sweep as we go, not at the end: otherwise the faucet holds 0.02 SOL × N for the whole run.
   const pendingSweep: KeyPairSigner[] = []
   const sweepSignatures: Signature[] = []
   const sweepBatch = async (all = false) => {

@@ -2,8 +2,8 @@ use anchor_lang::prelude::*;
 
 use crate::errors::CcsError;
 
-// Ті самі числа — у `packages/shared/periods.ts` і в SQL індексу;
-// `fixtures/periods.json` звіряє всі три.
+// The same numbers live in `packages/shared/periods.ts` and in the index SQL;
+// `fixtures/periods.json` cross-checks all three.
 pub const PERIOD_SECONDS: i64 = 30 * 24 * 60 * 60;
 pub const GRACE_SECONDS: i64 = 3 * 24 * 60 * 60;
 pub const MAX_PERIODS: u8 = 12;

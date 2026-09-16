@@ -9,7 +9,7 @@ fn key(s: &str) -> Pubkey {
     s.parse().unwrap()
 }
 
-// Адреси — з `context` фікстури `fixtures/tx/transfer.json` (devnet, T006).
+// Addresses come from the `context` of the `fixtures/tx/transfer.json` fixture (devnet, T006).
 fn expected_from_fixture() -> ExpectedTransfer {
     ExpectedTransfer {
         mint: key("6f1QTLNPh59wM26CQx1pnJTUcE814H64JaABjARPvtiC"),

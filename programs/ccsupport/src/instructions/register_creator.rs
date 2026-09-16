@@ -23,9 +23,9 @@ pub struct RegisterCreator<'info> {
         init,
         payer = wallet,
         space = 8 + Handle::INIT_SPACE,
-        // Anchor виконує всі `init` до будь-якого constraint і до хендлера, а seed
-        // понад 32 байти валить деривацію PDA панікою — усічення дає довгому handle
-        // дійти до `InvalidHandle` замість аварійного завершення.
+        // Anchor runs every `init` before any constraint and before the handler, and a seed
+        // over 32 bytes makes the PDA derivation panic — truncating lets a long handle
+        // reach `InvalidHandle` instead of an abort.
         seeds = [Handle::SEED, &handle.as_bytes()[..handle.len().min(HANDLE_LEN)]],
         bump,
     )]

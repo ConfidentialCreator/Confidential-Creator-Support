@@ -1,9 +1,9 @@
-// Оператор платформи: `create-mint` випускає токен SUPD із ConfidentialTransferMint і
-// ключем аудиту, `mint-to <wallet> <units>` поповнює публічний баланс (faucet-гаманець
-// тощо), `init-config` створює `Config` програми з цим мінтом. Ключі — у CCS_KEYS_DIR
-// (типово ~/.config/ccsupport), у репо не потрапляють.
+// Platform operator: `create-mint` issues the SUPD token with ConfidentialTransferMint and
+// the audit key, `mint-to <wallet> <units>` tops up a public balance (the faucet wallet
+// and the like), `init-config` creates the program `Config` with this mint. Keys live in CCS_KEYS_DIR
+// (~/.config/ccsupport by default) and never enter the repo.
 //
-// Запуск: pnpm --filter @ccsupport/mint mint <create-mint | mint-to <wallet> <units> | init-config>
+// Run: pnpm --filter @ccsupport/mint mint <create-mint | mint-to <wallet> <units> | init-config>
 import { addressSchema } from '@ccsupport/shared'
 import {
   assertIsSuccessfulTransactionPlanResult,

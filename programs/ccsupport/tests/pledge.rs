@@ -102,13 +102,13 @@ fn a_renewal_before_expiry_extends_from_the_old_date() {
     assert_eq!(p.expires_at, NOW + 3 * PERIOD_SECONDS);
     assert_eq!(p.periods_total, 3);
     assert_eq!(p.contributions, 2);
-    assert!(p.show_publicly, "прапорець перезаписується аргументом");
+    assert!(p.show_publicly, "the flag is overwritten by the argument");
     assert_eq!(p.last_slot, 200);
     assert_eq!(creator_of(&result, &s).pledges_total, 1);
     assert_eq!(
         result.get_account(&s.pledge).unwrap().lamports,
         state.pledge.lamports,
-        "поновлення не тягне ренти вдруге"
+        "a renewal does not charge rent twice"
     );
 
     let e = event(&h);
@@ -130,7 +130,10 @@ fn a_renewal_after_expiry_restarts_from_now() {
     let result = contribute(&mut h, &s, &state, 12, false);
 
     let p = pledge_of(&result, &s);
-    assert_eq!(p.started_at, NOW, "дата початку — від першого внеску");
+    assert_eq!(
+        p.started_at, NOW,
+        "the start date comes from the first contribution"
+    );
     assert_eq!(p.expires_at, lapsed + 12 * PERIOD_SECONDS);
     assert_eq!(p.periods_total, 13);
     assert_eq!(p.contributions, 2);

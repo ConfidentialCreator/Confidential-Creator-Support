@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 
-// Повний профіль у кожній події: worker заповнює `creators` з логів, без
-// дочитування акаунта і гонки «акаунт уже змінено».
+// The full profile in every event: the worker fills `creators` from the logs, with no
+// account re-read and no "account already changed" race.
 #[event]
 pub struct CreatorRegistered {
     pub wallet: Pubkey,
@@ -22,8 +22,8 @@ pub struct CreatorUpdated {
     pub slot: u64,
 }
 
-// Знімок `Pledge` після внеску: worker робить upsert у `pledges` і додає рядок у
-// `contributions` (перший внесок — `contributions == 1`) без дочитування акаунта.
+// The `Pledge` snapshot after a contribution: the worker upserts `pledges` and adds a row to
+// `contributions` (first contribution — `contributions == 1`) without re-reading the account.
 #[event]
 pub struct Pledged {
     pub creator: Pubkey,

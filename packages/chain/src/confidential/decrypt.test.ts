@@ -101,11 +101,11 @@ describe('extractValidityContext', () => {
     const verify =
       'instructions' in message ? message.instructions.find((ix) => ix.data?.[0] === 12) : undefined
     if (!verify?.data) throw new Error('proof-2 fixture has no validity instruction')
-    // Той самий дискримінатор, але дані — лише u32 offset (варіант через Record).
+    // The same discriminator, but the data is only a u32 offset (the Record variant).
     const tampered = Buffer.from(bytes)
     const dataOffset = tampered.indexOf(Buffer.from(verify.data))
     expect(dataOffset).toBeGreaterThan(0)
-    // Байт довжини compact-u16 стоїть перед даними інструкції: 545 = [0xa1, 0x04].
+    // The compact-u16 length precedes the instruction data: 545 = [0xa1, 0x04].
     expect(tampered[dataOffset - 2]).toBe(0xa1)
     expect(tampered[dataOffset - 1]).toBe(0x04)
     const truncated = Buffer.concat([
@@ -211,8 +211,8 @@ describe('decryptAvailable', () => {
     })
   }
 
-  // Після переказу автор зробив ApplyPendingBalance: новий decryptable-баланс у тій
-  // транзакції — реальний AES-шифротекст суми під ключем автора.
+  // After the transfer the creator ran ApplyPendingBalance: the new decryptable balance in
+  // that transaction is a real AES ciphertext of the amount under the creator's key.
   function decryptableFromApplyCreator(): Uint8Array {
     const { wire } = fixture('apply-creator')
     const tx = getTransactionDecoder().decode(getBase64Encoder().encode(wire))

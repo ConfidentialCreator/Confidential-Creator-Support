@@ -6,15 +6,15 @@ edition.workspace = true
 license.workspace = true
 repository.workspace = true
 
-# `cdylib` їде в мережу; `lib` — щоб тести (mollusk) бачили той самий код
-# розкладки акаунтів, а не копію.
+# `cdylib` goes to the network; `lib` is so that the tests (mollusk) see the same
+# account layout code, not a copy.
 [lib]
 crate-type = ["cdylib", "lib"]
 name = "ccsupport"
 
-# Стандартний набір фіч Anchor. `custom-heap`, `custom-panic`, `anchor-debug`
-# не вмикаються, але оголошені: макрос `#[program]` розгортається у cfg на них,
-# а нерозпізнаний cfg — попередження, яке під `-D warnings` зупиняє гейт.
+# The standard Anchor feature set. `custom-heap`, `custom-panic`, `anchor-debug`
+# are never enabled but are declared: the `#[program]` macro expands into cfgs on them,
+# and an unrecognised cfg is a warning that stops the gate under `-D warnings`.
 [features]
 default = []
 cpi = ["no-entrypoint"]
@@ -26,16 +26,16 @@ custom-heap = []
 custom-panic = []
 anchor-debug = []
 
-# Те саме для `cfg(target_os = "solana")`.
+# The same for `cfg(target_os = "solana")`.
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(target_os, values("solana"))'] }
 
 [dependencies]
-# `init-if-needed` — `pledge` створює або продовжує один і той самий PDA.
+# `init-if-needed` — `pledge` creates or extends one and the same PDA.
 anchor-lang = { workspace = true, features = ["init-if-needed"] }
-# `token_interface` — читання ATA прихильника й автора під Token-2022 у `pledge`.
+# `token_interface` — reading the supporter's and creator's ATAs under Token-2022 in `pledge`.
 anchor-spl = { workspace = true, features = ["token_2022", "associated_token"] }
-# `pledge` читає sysvar `Instructions`: anchor-lang 1.2 не реекспортує
+# `pledge` reads the `Instructions` sysvar: anchor-lang 1.2 does not re-export
 # `load_instruction_at_checked`.
 solana-instructions-sysvar.workspace = true
 

@@ -1,7 +1,7 @@
-// Демо-набір US1 на devnet (SC-001, SC-003, SC-008, FR-015): автор + N синтетичних
-// прихильників через faucet і relay власного API, підсумок у `fixtures/demo-run.json`.
+// The US1 demo set on devnet (SC-001, SC-003, SC-008, FR-015): a creator + N synthetic
+// supporters through the faucet and relay of our own API, summary in `fixtures/demo-run.json`.
 //
-// Запуск: pnpm --filter @ccsupport/demo demo [--supporters 128] [--repeats 24] [--concurrency 6]
+// Run: pnpm --filter @ccsupport/demo demo [--supporters 128] [--repeats 24] [--concurrency 6]
 //   [--rps 8] [--send-rps 1]
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
@@ -25,7 +25,7 @@ const env = z
     SOLANA_RPC_URL: z.url({ protocol: /^https?$/ }),
     CCS_MINT: addressSchema,
     CCS_KEYS_DIR: z.preprocess(blankToUndefined, z.string().prefault(DEFAULT_KEYS_DIR)),
-    // Ті самі ключі, що й у `pnpm dev` API: платник доказів і faucet.
+    // The same keys as the `pnpm dev` API: the proof payer and the faucet.
     PROOF_PAYER_SECRET: z.string().min(1),
     FAUCET_SECRET: z.string().min(1),
   })
@@ -46,7 +46,7 @@ const args = z
   .object({
     supporters: z.coerce.number().int().min(1).prefault(128),
     repeats: z.coerce.number().int().min(0).prefault(24),
-    // Стільки, щоб смуга `sendTransaction` 1/с не простоювала, поки інші чекають підтверджень.
+    // Enough that the 1/s `sendTransaction` lane never idles while others wait for confirmations.
     concurrency: z.coerce.number().int().min(1).max(32).prefault(6),
     rps: z.coerce.number().positive().prefault(8),
     sendRps: z.coerce.number().positive().prefault(1),
@@ -82,19 +82,19 @@ async function main(): Promise<void> {
     writeFileSync(RUN_FILE, `${JSON.stringify(run, null, 2)}\n`)
 
     const s = run.summary
-    console.log('\n=== ПІДСУМОК ===')
+    console.log('\n=== SUMMARY ===')
     console.log(
-      `прихильників: ${s.succeeded} ок, ${s.failed} відмов; час ${(s.sc008.totalMs / 60_000).toFixed(1)} хв`,
+      `supporters: ${s.succeeded} ok, ${s.failed} failed; time ${(s.sc008.totalMs / 60_000).toFixed(1)} min`,
     )
     console.log(
-      `SC-001 без сліду суми: ${s.sc001.clean}/${s.sc001.checked} — ${s.sc001.pass ? 'PASS' : 'FAIL'}`,
+      `SC-001 no amount trace: ${s.sc001.clean}/${s.sc001.checked} — ${s.sc001.pass ? 'PASS' : 'FAIL'}`,
     )
     console.log(
-      `SC-003 перший p95 ${(s.sc003.firstP95Ms / 1000).toFixed(1)} s (max ${(s.sc003.firstMaxMs / 1000).toFixed(1)}), повторний p95 ${(s.sc003.repeatP95Ms / 1000).toFixed(1)} s (max ${(s.sc003.repeatMaxMs / 1000).toFixed(1)}, n=${s.sc003.repeatSamples}) — ${s.sc003.pass ? 'PASS' : 'FAIL'}`,
+      `SC-003 first p95 ${(s.sc003.firstP95Ms / 1000).toFixed(1)} s (max ${(s.sc003.firstMaxMs / 1000).toFixed(1)}), repeat p95 ${(s.sc003.repeatP95Ms / 1000).toFixed(1)} s (max ${(s.sc003.repeatMaxMs / 1000).toFixed(1)}, n=${s.sc003.repeatSamples}) — ${s.sc003.pass ? 'PASS' : 'FAIL'}`,
     )
-    console.log(`SC-008 ≤ 30 хв без ручних кроків — ${s.sc008.pass ? 'PASS' : 'FAIL'}`)
+    console.log(`SC-008 ≤ 30 min with no manual steps — ${s.sc008.pass ? 'PASS' : 'FAIL'}`)
     console.log(
-      `FR-015 розшифровано ключами автора: ${s.fr015.decryptedMatched}/${s.sc001.checked}, баланс автора зійшовся: ${s.fr015.creatorBalanceMatches} — ${s.fr015.pass ? 'PASS' : 'FAIL'}`,
+      `FR-015 decrypted with the creator keys: ${s.fr015.decryptedMatched}/${s.sc001.checked}, creator balance matches: ${s.fr015.creatorBalanceMatches} — ${s.fr015.pass ? 'PASS' : 'FAIL'}`,
     )
     console.log(`→ ${fileURLToPath(RUN_FILE)}`)
   } finally {

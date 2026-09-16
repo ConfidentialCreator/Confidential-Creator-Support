@@ -8,13 +8,13 @@ import {
   GroupedElGamalCiphertext3Handles,
 } from '@solana/zk-sdk'
 
-// Сума переказу в Token-2022 їде двома шифротекстами: lo — 16 біт, hi — 32 біти.
+// A Token-2022 transfer amount travels as two ciphertexts: lo is 16 bits, hi is 32 bits.
 export const LO_BITS = 16n
 export const MAX_SPLIT_AMOUNT = (1n << 48n) - 1n
-// Декодер дискретного логарифму в zk-sdk шукає лише в 32 бітах.
+// The discrete-logarithm decoder in zk-sdk searches only 32 bits.
 export const MAX_COMBINED_AMOUNT = (1n << 32n) - 1n
 
-// Порядок хендлів у grouped-шифротексті контексту validity-доказу переказу.
+// Handle order in the grouped ciphertext of a transfer's validity-proof context.
 export const HANDLE = { source: 0, destination: 1, auditor: 2 } as const
 export type Handle = (typeof HANDLE)[keyof typeof HANDLE]
 
@@ -38,8 +38,8 @@ export function encryptContribution(
 }
 
 function decryptOrUndefined(run: () => bigint): bigint | undefined {
-  // wasm кидає порожню помилку, коли дискретний логарифм не знайдено (чужий ключ
-  // або значення поза 32 бітами) — це штатна відмова, не збій.
+  // wasm throws an empty error when the discrete logarithm is not found (a foreign key
+  // or a value beyond 32 bits) — an expected refusal, not a failure.
   try {
     return run()
   } catch {
@@ -71,7 +71,7 @@ function groupedToPoints(grouped: Uint8Array, handle: Handle) {
   }
 }
 
-// lo + hi·2^16 як один шифротекст: одна операція дискретного логарифму замість двох.
+// lo + hi·2^16 as one ciphertext: one discrete-logarithm operation instead of two.
 export function decryptCombined(
   secret: ElGamalSecretKey,
   handle: Handle,

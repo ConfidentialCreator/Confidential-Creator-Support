@@ -27,7 +27,7 @@ export type ApiInput = {
   port: number
 }
 
-// Платник API читає статуси через спільну опитувалку демо — без власних запитів.
+// The API payer reads statuses through the demo's shared poller — no requests of its own.
 function payerRpc(rpc: Rpc<SolanaRpcApi>, sender: Sender): PayerRpc {
   return {
     sendTransaction: (wire) =>
@@ -39,8 +39,8 @@ function payerRpc(rpc: Rpc<SolanaRpcApi>, sender: Sender): PayerRpc {
   }
 }
 
-// API живе в процесі демо, а не поряд: Helius Free рахує `sendTransaction` 1/с на
-// ключ, і два процеси одну смугу між собою не поділять. Faucet увімкнено лише тут.
+// The API lives inside the demo process, not next to it: Helius Free counts `sendTransaction`
+// at 1/s per key, and two processes cannot share one lane. The faucet is enabled only here.
 export async function startApi(input: ApiInput): Promise<ApiHandle> {
   const keys = getBase58Encoder()
   const port = payerRpc(input.rpc, input.sender)

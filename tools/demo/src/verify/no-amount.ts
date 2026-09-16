@@ -1,7 +1,7 @@
-// SC-001: стороння перевірка внеску не дає суми. Шукаємо суму у трьох формах —
-// u64 LE (так її несе інструкція `Deposit` і поле балансу звичайного токена),
-// десяткове число і рядок з крапкою (так її показав би оглядач) — у байтах
-// транзакції, у логах і в даних обох ATA.
+// SC-001: a third-party check of a contribution yields no amount. The amount is searched
+// in three forms — u64 LE (as the `Deposit` instruction and a plain token balance carry it),
+// a decimal number and a dotted string (as an explorer would show it) — in the transaction
+// bytes, in the logs and in the data of both ATAs.
 import {
   type Address,
   type GetMultipleAccountsApi,
@@ -57,7 +57,7 @@ export function findAmountTraces(input: AmountTraceInput): AmountTrace[] {
   const ascii = new TextEncoder().encode(decimal)
   const ui = uiAmount(input.units, input.decimals)
   const decimalRe = wholeNumber(decimal)
-  // Ціла сума без дробової частини вже покрита формою `decimal`.
+  // A whole amount without a fractional part is already covered by the `decimal` form.
   const uiRe = ui.includes('.') ? wholeNumber(ui) : null
 
   if (containsBytes(input.transaction, le)) {

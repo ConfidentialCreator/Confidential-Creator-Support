@@ -38,18 +38,18 @@ export type ContributionInput = {
   rpc: Rpc<GetMultipleAccountsApi & GetMinimumBalanceForRentExemptionApi & GetAccountInfoApi>
   keys: ConfidentialKeys
   supporter: TransactionSigner
-  // Гаманець автора — seed `Pledge` і власник ATA-одержувача.
+  // The creator's wallet — the `Pledge` seed and the owner of the destination ATA.
   creator: Address
   mint: Address
   units: bigint
   periods: number
   showPublicly: boolean
-  // Платник доказів (relay); підпис додає сервер, тут — noop.
+  // The proof payer (relay); the server adds the signature, here it is a noop.
   payer: Address
 }
 
-// Три стадії йдуть послідовно й кожна бере свій blockhash у момент відправки,
-// тому lifetime тут не виставляється.
+// The three stages run in sequence and each takes its own blockhash at send time,
+// so no lifetime is set here.
 export type Contribution = {
   proofs: ContributionMessage[]
   transfer: ContributionMessage
@@ -134,8 +134,8 @@ export async function buildContribution(input: ContributionInput): Promise<Contr
   }
 }
 
-// Підписує ефемерні ключі акаунтів context-state/Record; підпис платника лишається
-// порожнім — його ставить relay.
+// Signs with the ephemeral keys of the context-state/Record accounts; the payer's
+// signature stays empty — the relay adds it.
 export async function signForRelay(
   message: ContributionMessage,
   lifetime: BlockhashLifetimeConstraint,

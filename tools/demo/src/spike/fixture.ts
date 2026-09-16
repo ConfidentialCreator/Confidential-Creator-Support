@@ -5,8 +5,8 @@ export const FIXTURE_DIR = new URL('../../../../fixtures/tx/', import.meta.url)
 
 const hex = z.string().regex(/^[0-9a-f]+$/)
 
-// Секрети тут — одноразові ключі спайку на devnet, потрібні тестам розшифрування
-// (T024, T048) як «відома сума»; до продукту вони стосунку не мають.
+// The secrets here are one-off devnet spike keys, needed by the decryption tests
+// (T024, T048) as a "known amount"; they have nothing to do with the product.
 export const txFixtureSchema = z.object({
   label: z.string(),
   cluster: z.literal('devnet'),

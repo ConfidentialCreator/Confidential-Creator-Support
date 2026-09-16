@@ -24,7 +24,7 @@ const fingerprint = (keys: ConfidentialKeys) => ({
   ae: Array.from(keys.ae().toBytes()),
 })
 
-// Гаманець, який підписує рівно те, що йому дали, — як Phantom/Solflare/Backpack.
+// A wallet that signs exactly what it is given — like Phantom/Solflare/Backpack.
 const asModifying = (inner: MessagePartialSigner): MessageModifyingSigner => ({
   address: inner.address,
   async modifyAndSignMessages(messages) {

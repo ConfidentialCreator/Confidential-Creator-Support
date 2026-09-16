@@ -1,9 +1,9 @@
-# Кінці рядків нормалізуються в LF при коміті.
-# Це має існувати ДО першого коміту: інакше CRLF заповзає у скрипти, і збірка
-# у WSL падає повідомленням, яке ніяк не вказує на справжню причину.
+# Line endings are normalised to LF on commit.
+# This must exist BEFORE the first commit: otherwise CRLF creeps into scripts and the
+# WSL build fails with a message that never points at the real cause.
 * text=auto eol=lf
 
-# Ці типи ламаються від CRLF беззастережно — фіксуємо явно.
+# These types break under CRLF unconditionally — pinned explicitly.
 *.sh   text eol=lf
 *.rs   text eol=lf
 *.toml text eol=lf
@@ -15,13 +15,13 @@
 *.yml  text eol=lf
 *.sql  text eol=lf
 
-# Бінарні — не чіпати
+# Binary — leave alone
 *.png  binary
 *.jpg  binary
 *.ico  binary
 *.so   binary
 *.wasm binary
 
-# Локи не роздувають дифф у рев'ю
+# Locks do not bloat review diffs
 pnpm-lock.yaml -diff
 Cargo.lock     -diff

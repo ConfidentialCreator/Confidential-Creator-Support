@@ -41,10 +41,10 @@ export type PreparationInput = {
   owner: TransactionSigner
   mint: Address
   keys: ConfidentialKeys
-  // Скільки має бути в available після підготовки (сума майбутнього внеску).
+  // How much must be available after preparation (the upcoming contribution).
   units: bigint
-  // Скільки зняти з публічного балансу; за замовчуванням — увесь, щоб наступні
-  // внески обходились без Deposit + ApplyPendingBalance.
+  // How much to take from the public balance; by default all of it, so that later
+  // contributions need no Deposit + ApplyPendingBalance.
   deposit?: bigint
 }
 

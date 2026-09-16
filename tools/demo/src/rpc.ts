@@ -9,7 +9,7 @@ import {
 } from '@solana/kit'
 
 export type PacingOptions = {
-  // Helius Free: 10 запитів/с на ключ, а `sendTransaction` — окремо 1/с.
+  // Helius Free: 10 requests/s per key, and `sendTransaction` separately at 1/s.
   rps: number
   sendRps: number
   maxAttempts?: number
@@ -51,8 +51,8 @@ function methodOf(config: Parameters<RpcTransport>[0]): string {
     : ''
 }
 
-// Один розклад на весь процес: API і прихильники стають в одну чергу, а 429
-// відсуває всіх, не лише того, хто його впіймав.
+// One schedule for the whole process: the API and the supporters share one queue, and a 429
+// pushes everyone back, not only the one who caught it.
 export function createPacedTransport(inner: RpcTransport, options: PacingOptions): RpcTransport {
   const maxAttempts = options.maxAttempts ?? 6
   const now = options.now ?? Date.now

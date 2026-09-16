@@ -27,7 +27,7 @@ export type Sender = {
   latestBlockhash(): Promise<Lifetime>
   send(message: Message): Promise<Signature>
   sendInstructions(feePayer: TransactionSigner, instructions: Instruction[]): Promise<Signature>
-  // Останній відомий статус; підпис стає в чергу спільного опитування.
+  // The last known status; the signature joins the shared polling queue.
   peek(signature: Signature): Status | null
 }
 
@@ -41,8 +41,8 @@ const SETTLED: ReadonlySet<Commitment> = new Set(['confirmed', 'finalized'])
 const STATUS_BATCH = 256
 const PEEK_TTL_MS = 90_000
 
-// Без WS: Helius Free дає 5 з'єднань, а прихильників у польоті більше. Один
-// `getSignatureStatuses` на секунду на всі підписи процесу — і для API-платника теж.
+// No WS: Helius Free allows 5 connections, and more supporters are in flight. One
+// `getSignatureStatuses` per second for every signature of the process — the API payer's too.
 export function createSender(rpc: Rpc<SolanaRpcApi>, options: SenderOptions = {}): Sender {
   const pollMs = options.pollMs ?? 1_000
   const timeoutMs = options.timeoutMs ?? 60_000
@@ -72,8 +72,8 @@ export function createSender(rpc: Rpc<SolanaRpcApi>, options: SenderOptions = {}
         known.delete(signature)
       }
     })
-    // Підписи, за якими ніхто не чекає (peek платника), живуть до фіналізації або
-    // до кінця життя blockhash — далі їх уже ніхто не спитає.
+    // Signatures nobody awaits (the payer's peek) live until finalisation or until the
+    // blockhash expires — nobody asks about them after that.
     for (const [signature, entry] of known) {
       if (waiters.has(signature)) continue
       if (
@@ -93,7 +93,7 @@ export function createSender(rpc: Rpc<SolanaRpcApi>, options: SenderOptions = {}
         try {
           await pollOnce()
         } catch {
-          // 429 після всіх спроб — наступний цикл спробує знову
+          // a 429 after all attempts — the next cycle tries again
         }
       }
       polling = null
@@ -109,8 +109,8 @@ export function createSender(rpc: Rpc<SolanaRpcApi>, options: SenderOptions = {}
   }
 
   let cached: { lifetime: Lifetime; at: number } | null = null
-  // `finalized`, не `confirmed`: за балансувальником Helius трапляється відстаючий
-  // вузол, і свіжий confirmed-blockhash він відкидає як «not found» на preflight.
+  // `finalized`, not `confirmed`: behind the Helius balancer there is sometimes a lagging
+  // node, and it rejects a fresh confirmed blockhash as "not found" on preflight.
   async function latestBlockhash(): Promise<Lifetime> {
     if (cached && Date.now() - cached.at < blockhashTtlMs) return cached.lifetime
     const { value } = await rpc.getLatestBlockhash({ commitment: 'finalized' }).send()

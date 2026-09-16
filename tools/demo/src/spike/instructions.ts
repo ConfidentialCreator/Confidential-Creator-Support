@@ -6,7 +6,7 @@ import {
   TOKEN_2022_PROGRAM_ADDRESS,
 } from '@solana-program/token-2022'
 
-// Anchor: 8 байт дискримінатора + periods u32 + show_publicly bool.
+// Anchor: 8 discriminator bytes + periods u32 + show_publicly bool.
 const PLEDGE_DATA_BYTES = 8 + 4 + 1
 
 export function isConfidentialTransfer(ix: Instruction): boolean {
@@ -21,8 +21,8 @@ export function findConfidentialTransfer(instructions: readonly Instruction[]): 
   return instructions.findIndex(isConfidentialTransfer)
 }
 
-// Заглушка `pledge` тієї ж ваги, що й справжня: program id, підписант-прихильник і
-// `extraAccounts` акаунтів, яких у транзакції переказу ще немає (кожен — 32 байти).
+// A `pledge` stub of the same weight as the real one: program id, the supporter signer and
+// `extraAccounts` accounts not yet in the transfer transaction (32 bytes each).
 export function syntheticPledge(supporter: Address, extraAccounts: number): Instruction {
   const decoder = getAddressDecoder()
   const extras = Array.from({ length: extraAccounts }, (_, i) => ({

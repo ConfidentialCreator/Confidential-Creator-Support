@@ -1,8 +1,8 @@
-# Пін ХОСТОВОГО тулчейну: тести, clippy, rustfmt.
+# Pin of the HOST toolchain: tests, clippy, rustfmt.
 #
-# BPF-збірку це не описує: cargo-build-sbf 3.1.10 несе власний rustc 1.89
-# усередині platform-tools і перемикає RUSTUP_TOOLCHAIN сам. Якщо колись
-# `anchor build` почне падати на несумісності каналів — причина тут, а не в коді.
+# It does not describe the BPF build: cargo-build-sbf 3.1.10 carries its own rustc 1.89
+# inside platform-tools and switches RUSTUP_TOOLCHAIN itself. If `anchor build`
+# ever starts failing on channel incompatibility, the cause is here, not in the code.
 [toolchain]
 channel = "1.97.1"
 components = ["rustfmt", "clippy"]

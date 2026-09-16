@@ -20,7 +20,7 @@ import {
   ZkElGamalProofInstruction,
 } from '@solana-program/zk-elgamal-proof'
 
-// Порядок хендлів у grouped-шифротексті переказу Token-2022.
+// Handle order in the grouped ciphertext of a Token-2022 transfer.
 export const HANDLE = { source: 0, destination: 1, auditor: 2 } as const
 export type CiphertextHandle = (typeof HANDLE)[keyof typeof HANDLE]
 
@@ -77,7 +77,7 @@ function groupedPoints(grouped: Uint8Array, handle: CiphertextHandle) {
   }
 }
 
-// lo + hi·2¹⁶ як один шифротекст — один дискретний логарифм замість двох.
+// lo + hi·2¹⁶ as one ciphertext — one discrete logarithm instead of two.
 function combine(ciphertext: ValidityContext, handle: CiphertextHandle): ElGamalCiphertext {
   const lo = groupedPoints(ciphertext.groupedLo, handle)
   const hi = groupedPoints(ciphertext.groupedHi, handle)
@@ -90,8 +90,8 @@ function combine(ciphertext: ValidityContext, handle: CiphertextHandle): ElGamal
   return combined
 }
 
-// wasm кидає рядок, не Error, коли логарифм не знайдено (чужий ключ або значення
-// поза 32 бітами) — це штатна відмова.
+// wasm throws a string, not an Error, when the logarithm is not found (a foreign key or
+// a value beyond 32 bits) — that is an expected refusal.
 function tryDecrypt(run: () => bigint): bigint | undefined {
   try {
     return run()
@@ -122,7 +122,7 @@ export function decryptContribution(
   const secret: ElGamalSecretKey = elgamal.secret()
   const units = tryDecrypt(() => secret.decrypt(combined))
   if (units !== undefined) return { ok: true, units }
-  // Понад 2³² одиниць склеєне значення поза межами пошуку — частини окремо.
+  // Beyond 2³² units the combined value is outside the search range — parts separately.
   const partLo = tryDecrypt(() => lo.decrypt(secret, handle))
   const partHi = tryDecrypt(() => hi.decrypt(secret, handle))
   if (partLo === undefined || partHi === undefined) return fail('wrong-key')
@@ -147,8 +147,8 @@ export function decryptAvailable(ae: AeKey, account: Token): DecryptResult {
   return units === undefined ? fail('wrong-key') : { ok: true, units }
 }
 
-// Pending їде двома ElGamal-шифротекстами: lo — 16 біт, hi — решта; кожна частина
-// шукається окремим логарифмом.
+// Pending travels as two ElGamal ciphertexts: lo is 16 bits, hi the rest; each part
+// is found by its own logarithm.
 export function decryptPending(elgamal: ElGamalKeypair, account: Token): DecryptResult {
   const extension = confidentialExtension(account)
   if (!extension) return fail('unconfigured')

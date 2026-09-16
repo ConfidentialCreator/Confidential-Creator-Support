@@ -19,8 +19,8 @@ const KEYPAIR_BYTES = 64
 
 const keypairBytes = z.array(z.number().int().min(0).max(255)).length(KEYPAIR_BYTES)
 
-// Розкладка `solana-keygen` (seed ‖ pubkey): той самий файл імпортується в гаманець
-// браузера для сценарію автора.
+// The `solana-keygen` layout (seed ‖ pubkey): the same file is imported into the browser
+// wallet for the creator scenario.
 export async function loadOrCreateKeypair(
   dir: string,
   name: string,

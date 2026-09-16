@@ -11,8 +11,8 @@ import { ConfidentialKeys } from '@solana/zk-sdk'
 const bytesEqual = (a: Uint8Array, b: Uint8Array) =>
   a.length === b.length && a.every((byte, i) => byte === b[i])
 
-// Одна деривація на (owner, mint): підпис канонічного `solana-conf-bal/v1 || owner || mint`.
-// Секрети живуть лише в об'єкті, який повертається, — жодної серіалізації.
+// One derivation per (owner, mint): a signature over the canonical `solana-conf-bal/v1 || owner || mint`.
+// The secrets live only in the returned object — no serialisation.
 export async function deriveConfidentialKeys(
   signer: MessageSigner,
   owner: Address,
@@ -30,8 +30,8 @@ export async function deriveConfidentialKeys(
   let signature: SignatureBytes | undefined
   if (isMessageModifyingSigner(signer)) {
     const [signed] = await signer.modifyAndSignMessages([message])
-    // Підпис над зміненим текстом прив'язав би ключі до схеми префіксування
-    // конкретного гаманця, і інший гаманець із тим самим ключем балансу б не прочитав.
+    // A signature over altered text would tie the keys to one wallet's prefixing
+    // scheme, and another wallet with the same key could not read the balance.
     if (!signed || !bytesEqual(signed.content, message.content)) {
       throw new Error('wallet altered the key-derivation message; keys would not be portable')
     }

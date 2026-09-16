@@ -143,7 +143,7 @@ fn a_taken_handle_is_rejected_for_another_wallet() {
 fn an_invalid_handle_fails_with_invalid_handle_even_past_the_seed_limit() {
     let mut h = Harness::new();
     for bad in ["Marrow", "ab", "marrow_dispatch", &"a".repeat(33)] {
-        // PDA — з усіченого seed, інструкція — з повним handle
+        // the PDA comes from the truncated seed, the instruction carries the full handle
         let mut s = creator_setup(&bad[..bad.len().min(32)]);
         s.handle = bad.to_string();
         let result = h.process(

@@ -8,32 +8,32 @@ edition = "2021"
 license = "UNLICENSED"
 repository = "https://github.com/ConfidentialCreator/Confidential-Creator-Support"
 
-# Версії тут — єдине місце правди для воркспейсу. Cargo.lock комітиться і є
-# піном; підняття будь-якого solana-крейта — свідома дія з перезапуском тестів,
-# не побічний ефект `cargo update`.
+# Versions here are the single source of truth for the workspace. Cargo.lock is
+# committed and is the pin; bumping any solana crate is a deliberate act with a test
+# rerun, not a side effect of `cargo update`.
 [workspace.dependencies]
 anchor-lang = "1.2.0"
 anchor-spl = "1.2.0"
 
-# Оснастка тестів. litesvm тут не збирається з Anchor (E0027 `touched_flags`).
-# mollusk живе на solana-крейтах четвертого покоління, anchor-lang — третього;
-# на цьому локу обидва реекспортують один `solana-address 2.6.1`, тож `Pubkey`
-# один тип — тест `pubkey_types_are_one` тримає це під компілятором.
+# Test tooling. litesvm does not build with Anchor here (E0027 `touched_flags`).
+# mollusk lives on fourth-generation solana crates, anchor-lang on the third;
+# on this lock both re-export one `solana-address 2.6.1`, so `Pubkey` is one
+# type — the `pubkey_types_are_one` test keeps that under the compiler.
 mollusk-svm = "0.15.1"
 mollusk-svm-bencher = "0.15.1"
 solana-account = "4.3"
 solana-instruction = "3.4"
 solana-pubkey = "4.2"
 solana-svm-log-collector = "4.2"
-# Читання sysvar `Instructions` у `pledge`: anchor-lang 1.2 реекспортує лише
-# `construct_instructions_data`, без `load_instruction_at_checked`.
+# Reading the `Instructions` sysvar in `pledge`: anchor-lang 1.2 re-exports only
+# `construct_instructions_data`, without `load_instruction_at_checked`.
 solana-instructions-sysvar = "3.0"
 base64 = "0.22"
 serde_json = "1"
 
 [profile.release]
-# `expires_at = max(now, expires_at) + periods × 30 днів` — тихе переповнення
-# дало б «вічну» підтримку, тому перевірки лишаються і в релізі.
+# `expires_at = max(now, expires_at) + periods × 30 days` — a silent overflow
+# would grant "eternal" support, so the checks stay on in release too.
 overflow-checks = true
 lto = "fat"
 codegen-units = 1

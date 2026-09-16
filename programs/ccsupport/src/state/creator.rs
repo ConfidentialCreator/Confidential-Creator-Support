@@ -4,7 +4,7 @@ pub const HANDLE_LEN: usize = 32;
 pub const NAME_MAX_LEN: usize = 64;
 pub const DESCRIPTION_MAX_LEN: usize = 256;
 
-// Суми внеску тут немає і не буде: єдине число — публічна рекомендація автора.
+// No contribution amount here, ever: the only number is the creator's public suggestion.
 #[account]
 #[derive(InitSpace)]
 pub struct Creator {

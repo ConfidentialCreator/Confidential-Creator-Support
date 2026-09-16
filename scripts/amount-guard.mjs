@@ -1,10 +1,10 @@
-// Гейт «жодного поля суми поза шифротекстами».
+// The "no amount field outside the ciphertexts" gate.
 //
-// Продукт стоїть на тому, що сума внеску існує лише в шифротекстах Token-2022 і
-// в браузері держателя ключа. Найпростіший спосіб це зламати — колонка `amount`
-// в індексі або поле `amount` у схемі API «для зручності». Гейт ганяє grep по
-// шарах, де суми бути не може, і падає на першому збігу; дозволена лише публічна
-// рекомендація автора `suggested_amount` / `suggestedAmount`.
+// The product rests on the contribution amount existing only in Token-2022 ciphertexts
+// and in the key holder's browser. The easiest way to break that is an `amount` column
+// in the index or an `amount` field in the API schema "for convenience". The gate greps
+// the layers where no amount may exist and fails on the first hit; the only allowed
+// one is the creator's public suggestion `suggested_amount` / `suggestedAmount`.
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, relative } from 'node:path'
 
@@ -42,8 +42,8 @@ for (const scope of SCOPES) {
 }
 
 if (hits.length > 0) {
-  console.error('amount-guard: поле суми поза шифротекстами:')
+  console.error('amount-guard: amount field outside the ciphertexts:')
   for (const h of hits) console.error(`  ${h}`)
   process.exit(1)
 }
-console.log(`amount-guard: чисто (${SCOPES.join(', ')})`)
+console.log(`amount-guard: clean (${SCOPES.join(', ')})`)

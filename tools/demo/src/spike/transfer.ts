@@ -1,8 +1,8 @@
-// Спайк S1 (T006): повний конфіденційний переказ на devnet тим самим SDK, що піде в
-// продукт. Міряє кількість і розмір транзакцій, запас під `pledge` у транзакції
-// переказу, час побудови доказів; знімає сирі транзакції у `fixtures/tx/`.
+// Spike S1 (T006): a full confidential transfer on devnet with the same SDK that goes into
+// the product. Measures the number and size of transactions, the room for `pledge` in the
+// transfer transaction, proof build time; captures raw transactions into `fixtures/tx/`.
 //
-// Запуск: pnpm --filter @ccsupport/demo spike:transfer (читає `.env` з кореня).
+// Run: pnpm --filter @ccsupport/demo spike:transfer (reads the root `.env`).
 import { readFileSync } from 'node:fs'
 import {
   type Address,
@@ -66,9 +66,9 @@ const env = z
 const DECIMALS = 6
 const DEPOSIT_UNITS = 25_000_000n
 const TRANSFER_UNITS = 7_250_000n
-// Скільки акаунтів `pledge` додає до тих, що вже є в транзакції переказу
-// (прихильник-підписант уже там): config, creator, pledge, sysvar Instructions,
-// System — 4 за планом T006, 5–6 із запасом.
+// How many accounts `pledge` adds to those already in the transfer transaction
+// (the supporter signer is already there): config, creator, pledge, sysvar Instructions,
+// System — 4 per the T006 plan, 5–6 with margin.
 const PLEDGE_EXTRA_ACCOUNTS = [4, 5, 6]
 
 const rpc = createSolanaRpc(env.SOLANA_RPC_URL)
@@ -211,7 +211,7 @@ async function main() {
     `payer ${payer.address}\nsupporter ${supporter.address}\ncreator ${creator.address}\nmint ${mint.address}`,
   )
 
-  console.log('\n— підготовка')
+  console.log('\n— preparation')
   await send(
     'fund',
     messageFor(payer, [
@@ -243,7 +243,7 @@ async function main() {
   const supporterKeys = await deriveKeys(supporter, mint.address)
   const creatorKeys = await deriveKeys(creator, mint.address)
   console.log(
-    `  деривація ElGamal+AES: ${supporterKeys.ms.toFixed(1)} ms (прихильник), ${creatorKeys.ms.toFixed(1)} ms (автор)`,
+    `  ElGamal+AES derivation: ${supporterKeys.ms.toFixed(1)} ms (supporter), ${creatorKeys.ms.toFixed(1)} ms (creator)`,
   )
 
   const [supporterToken] = await findAssociatedTokenPda({
@@ -257,7 +257,7 @@ async function main() {
     tokenProgram: TOKEN_2022_PROGRAM_ADDRESS,
   })
 
-  console.log('\n— перший внесок: підготовка гаманця прихильника (і автора)')
+  console.log('\n— first contribution: preparing the supporter (and creator) wallet')
   const [configureRow] = await runPlan(
     'configure',
     payer,
@@ -318,9 +318,7 @@ async function main() {
     ]),
   )
 
-  console.log(
-    '\n— повторний внесок: три докази (платник), переказ (прихильник), закриття (платник)',
-  )
+  console.log('\n— repeat contribution: three proofs (payer), transfer (supporter), close (payer)')
   const contributionStarted = performance.now()
   const buildStarted = performance.now()
   const transferPlan = await getConfidentialTransferWithRecordInstructionPlan({
@@ -358,7 +356,7 @@ async function main() {
     ]),
   )
 
-  console.log('\n— запас під `pledge` у транзакції переказу (лише компіляція, програми ще немає)')
+  console.log('\n— room for `pledge` in the transfer transaction (compile only, no program yet)')
   const { value: blockhash } = await rpc.getLatestBlockhash().send()
   const pledgeSizes: Array<{ extra: number; sizeBytes: number }> = []
   for (const extra of PLEDGE_EXTRA_ACCOUNTS) {
@@ -371,7 +369,7 @@ async function main() {
     pledgeSizes.push({ extra, sizeBytes: getTransactionSize(tx) })
   }
 
-  console.log('\n— перевірка: дискримінатори, розшифрування')
+  console.log('\n— check: discriminators, decryption')
   const transferIndex = findConfidentialTransfer([transfer])
   const parsed = parseConfidentialTransferInstruction({
     ...transfer,
@@ -419,7 +417,7 @@ async function main() {
       auditorElgamalSecret: hex(new Uint8Array(auditor.secret().toBytes())),
     },
   }
-  console.log('\n— фікстури')
+  console.log('\n— fixtures')
   for (const row of [
     configureRow,
     depositRow,
@@ -436,27 +434,27 @@ async function main() {
     setTransactionMessageLifetimeUsingBlockhash(blockhash, messageFor(supporter, [transfer])),
   )
   const largest = sent.reduce((a, b) => (b.sizeBytes > a.sizeBytes ? b : a))
-  console.log('\n=== ПІДСУМОК ===')
+  console.log('\n=== SUMMARY ===')
   console.log(
-    `транзакцій усього: ${sent.length}; найбільша: ${largest.label} ${largest.sizeBytes} B`,
+    `transactions in total: ${sent.length}; largest: ${largest.label} ${largest.sizeBytes} B`,
   )
   console.log(
-    `повторний внесок: ${proofRows.length} tx доказів + 1 переказ + ${closeRows.length} закриття; переказ підтверджено за ${(transferConfirmedMs / 1000).toFixed(1)} s, усе разом ${(contributionMs / 1000).toFixed(1)} s`,
+    `repeat contribution: ${proofRows.length} proof tx + 1 transfer + ${closeRows.length} close; transfer confirmed in ${(transferConfirmedMs / 1000).toFixed(1)} s, all together ${(contributionMs / 1000).toFixed(1)} s`,
   )
-  console.log(`побудова трьох доказів у Node: ${buildMs.toFixed(0)} ms`)
+  console.log(`building three proofs in Node: ${buildMs.toFixed(0)} ms`)
   console.log(
-    `переказ: ${transferRow.sizeBytes} B (base64 ${getBase64EncodedWireTransaction(transferTx).length}), ${transfer.accounts?.length ?? 0} акаунтів в інструкції, дискримінатори ${transfer.data?.[0]}/${transfer.data?.[1]}, знайдено: ${transferIndex === 0}`,
+    `transfer: ${transferRow.sizeBytes} B (base64 ${getBase64EncodedWireTransaction(transferTx).length}), ${transfer.accounts?.length ?? 0} accounts in the instruction, discriminators ${transfer.data?.[0]}/${transfer.data?.[1]}, found: ${transferIndex === 0}`,
   )
   for (const { extra, sizeBytes } of pledgeSizes) {
     console.log(
-      `  + pledge (${extra} нових акаунтів, 13 B даних): ${sizeBytes} B, запас ${getTransactionSizeLimit(transferTx) - sizeBytes} B`,
+      `  + pledge (${extra} new accounts, 13 B of data): ${sizeBytes} B, room ${getTransactionSizeLimit(transferTx) - sizeBytes} B`,
     )
   }
   console.log(
-    `аудитор розшифрував суму з інструкції: ${auditorAmount} (очікувано ${TRANSFER_UNITS}) за ${auditorDecryptMs.toFixed(0)} ms`,
+    `the auditor decrypted the amount from the instruction: ${auditorAmount} (expected ${TRANSFER_UNITS}) in ${auditorDecryptMs.toFixed(0)} ms`,
   )
   console.log(
-    `автор: available ${creatorBalance.availableBalance}, pending ${creatorBalance.pendingBalance}; прихильник: available ${supporterBalance.availableBalance} (очікувано ${DEPOSIT_UNITS - TRANSFER_UNITS})`,
+    `creator: available ${creatorBalance.availableBalance}, pending ${creatorBalance.pendingBalance}; supporter: available ${supporterBalance.availableBalance} (expected ${DEPOSIT_UNITS - TRANSFER_UNITS})`,
   )
   if (auditorAmount !== TRANSFER_UNITS || creatorBalance.availableBalance !== TRANSFER_UNITS) {
     throw new Error('amounts do not match')

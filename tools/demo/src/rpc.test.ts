@@ -57,7 +57,7 @@ describe('createPacedTransport', () => {
       request(3),
       request(4),
     ])
-    // відповіді йдуть у порядку виконання: 1, 3, 4, потім 2 через секунду
+    // responses arrive in execution order: 1, 3, 4, then 2 a second later
     await expect(settle(all, 2_000)).resolves.toEqual(['a', 'd', 'b', 'c'])
     expect(calls).toEqual([
       { at: 0, method: 'sendTransaction' },

@@ -42,8 +42,8 @@ export type PledgeParams = {
   showPublicly: boolean
 }
 
-// Кодер u8 пише `undefined` як 0 — програма відповіла б 6008 уже після підпису
-// й комісії, тому межа перевіряється тут.
+// The u8 encoder writes `undefined` as 0 — the program would answer 6008 only after the
+// signature and the fee, so the bound is checked here.
 export async function pledgeInstruction({
   supporter,
   creatorWallet,

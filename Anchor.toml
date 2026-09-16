@@ -19,8 +19,8 @@ url = "https://api.apr.dev"
 cluster = "devnet"
 wallet = "~/.config/solana/id.json"
 
-# `anchor test` не використовується: тести програми — mollusk у `cargo test`.
-# Артефакт для мережі збирає `scripts/wsl-build.sh build-sbf`, не `anchor build`
-# (той дає SBPFv3, який Agave 3.1.10 не виконує).
+# `anchor test` is not used: the program tests are mollusk under `cargo test`.
+# The network artifact is built by `scripts/wsl-build.sh build-sbf`, not `anchor build`
+# (that one produces SBPFv3, which Agave 3.1.10 does not execute).
 [scripts]
 test = "cargo test --workspace"

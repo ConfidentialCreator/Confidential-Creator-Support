@@ -1,7 +1,7 @@
-// Спайк S2 (T007): скільки коштує розшифрувати 128 внесків у Node. Той самий
-// бенч у браузері запускає заглушка `apps/web/src/App.tsx`.
+// Spike S2 (T007): what it costs to decrypt 128 contributions in Node. The same
+// bench in the browser is run by the `apps/web/src/App.tsx` stub.
 //
-// Запуск: pnpm --filter @ccsupport/demo spike:decrypt [N]
+// Run: pnpm --filter @ccsupport/demo spike:decrypt [N]
 import { AeKey, ElGamalKeypair } from '@solana/zk-sdk'
 import {
   decryptAvailable,
@@ -21,7 +21,7 @@ const auditor = new ElGamalKeypair()
 const stranger = new ElGamalKeypair()
 const aes = new AeKey()
 
-// Внески 1..1000 токенів при 6 знаках — усі нижче 2^32 одиниць.
+// Contributions of 1..1000 tokens at 6 decimals — all below 2^32 units.
 const amounts = Array.from(
   { length: count },
   (_, i) => BigInt(1 + ((i * 7919) % 1000)) * 1_000_000n,
@@ -45,33 +45,33 @@ function report(label: string, result: { totalMs: number; meanMs: number; maxMs:
   )
 }
 
-console.log(`Node ${process.version}, ${count} внесків\n`)
-report('шифрування (lo + hi, 3 хендли)', encryption)
+console.log(`Node ${process.version}, ${count} contributions\n`)
+report('encryption (lo + hi, 3 handles)', encryption)
 
 const split = timed(
   ciphertexts,
   (c) => decryptSplit(destination.secret(), HANDLE.destination, c),
   now,
 )
-report('автор, split — 2 DL на внесок', split)
+report('creator, split — 2 DL per contribution', split)
 const combined = timed(
   ciphertexts,
   (c) => decryptCombined(destination.secret(), HANDLE.destination, c),
   now,
 )
-report('автор, combined — 1 DL на внесок', combined)
+report('creator, combined — 1 DL per contribution', combined)
 const auditorRun = timed(
   ciphertexts,
   (c) => decryptCombined(auditor.secret(), HANDLE.auditor, c),
   now,
 )
-report('аудитор, combined', auditorRun)
+report('auditor, combined', auditorRun)
 const wrong = timed(
   ciphertexts.slice(0, 8),
   (c) => decryptCombined(stranger.secret(), HANDLE.destination, c),
   now,
 )
-report('чужий ключ, combined (8 шт., усі undefined)', wrong)
+report('foreign key, combined (8 of them, all undefined)', wrong)
 
 const balances = amounts.map((amount) => aes.encrypt(amount).toBytes())
 const aesRun = timed(balances, (b) => decryptAvailable(aes, b), now)
@@ -83,5 +83,5 @@ const ok =
   auditorRun.results.every((v, i) => v === amounts[i]) &&
   wrong.results.every((v) => v === undefined) &&
   aesRun.results.every((v, i) => v === amounts[i])
-console.log(`\nзвірка сум: ${ok ? 'ok' : 'MISMATCH'}`)
+console.log(`\namount check: ${ok ? 'ok' : 'MISMATCH'}`)
 if (!ok) process.exit(1)

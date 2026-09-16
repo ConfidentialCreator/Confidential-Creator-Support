@@ -1,10 +1,10 @@
-# Робочі документи проекту в репозиторій не потрапляють.
-# Свіжий клон приходить без docs/ і без CLAUDE.md — бекап поза git.
+# Working documents of the project do not go into the repository.
+# A fresh clone comes without docs/ and without CLAUDE.md — backed up outside git.
 *.md
 !README.md
 
-# Експорт генератора інтерфейсів: несе власний package.json і .env із ключем.
-# Переноситься в apps/web руками (M0), сама тека в репо не потрапляє ніколи.
+# UI generator export: carries its own package.json and a .env with a key.
+# Ported into apps/web by hand (M0); the folder itself never enters the repo.
 design-export/
 
 # Node
@@ -20,8 +20,8 @@ target/
 test-ledger/
 .build.log
 
-# Секрети. Програмний keypair теж: він дає право задеплоїти під той самий адрес.
-# Ключ аудиту й authority мінта — теж keypair-файли, живуть поза репо.
+# Secrets. The program keypair too: it grants deploying under the same address.
+# The audit key and the mint authority are keypair files as well, kept outside the repo.
 .env
 .env.*
 !.env.example
@@ -30,7 +30,7 @@ id.json
 *-keypair.json
 *.keypair.json
 
-# Оточення розробника
+# Developer environment
 .DS_Store
 Thumbs.db
 .idea/

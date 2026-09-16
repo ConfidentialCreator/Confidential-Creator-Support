@@ -23,7 +23,7 @@ import type { ConfidentialKeys } from '@solana/zk-sdk'
 import type { Sender } from './send.ts'
 import { type AmountTrace, verifyNoAmount } from './verify/no-amount.ts'
 
-// Порція faucet (T027): 100 SUPD — план обох внесків має в неї вміститись.
+// The faucet portion (T027): 100 SUPD — the plan for both contributions must fit in it.
 export const SUPPORTER_UNITS = 100_000_000n
 const ONE = 1_000_000n
 const FAUCET_ATTEMPTS = 3
@@ -32,8 +32,8 @@ const FAUCET_RETRY_MS = 3_000
 export type ContributionEntry = { units: bigint; periods: number }
 export type ContributionPlan = { first: ContributionEntry; repeat?: ContributionEntry }
 
-// Суми детерміновані від індексу й ніколи не круглі: круглу «5 SUPD» = 5000000
-// можна сплутати з числом CU у логах, і SC-001 давав би хибний слід.
+// Amounts are deterministic from the index and never round: a round "5 SUPD" = 5000000
+// could be mistaken for a CU count in the logs, and SC-001 would report a false trace.
 export function contributionPlan(index: number, repeats: number): ContributionPlan {
   const entry = (salt: number): ContributionEntry => ({
     units:
@@ -70,7 +70,7 @@ export type ContributionResult = {
   proofSignatures: Signature[]
   transferSignature: Signature
   closeSignatures: Signature[]
-  // від початку (перший — від підготовки гаманця) до підтвердження переказу / до закриття доказів
+  // from the start (for a first one, from wallet preparation) to transfer confirmation / to proof close
   confirmedMs: number
   totalMs: number
   amountTraces: AmountTrace[]
@@ -89,8 +89,8 @@ export type SupporterResult = {
 
 const faucetSchema = apiResponseSchema(faucetResponseSchema)
 
-// Локально проксі немає, тож кожен прихильник приходить зі своєю адресою — як у
-// реальності зі 128 гаманців; ліміт relay 20/хв тоді рахується по-прихильниково.
+// There is no proxy locally, so every supporter arrives with its own address — as in
+// reality with 128 wallets; the relay limit of 20/min is then counted per supporter.
 export function forwardedFetch(ip: string): typeof fetch {
   return (input, init) => {
     const headers = new Headers(init?.headers)
@@ -112,7 +112,7 @@ export async function requestFaucet(
   })
   const body = faucetSchema.parse(await response.json())
   if ('data' in body) return body.data.signature as Signature
-  // Faucet-транзакцію API шле без пейсингу; 429 від RPC приходить сюди як INTERNAL.
+  // The API sends the faucet transaction without pacing; a 429 from the RPC arrives here as INTERNAL.
   if (body.error.code === 'INTERNAL' && attempt < FAUCET_ATTEMPTS) {
     await new Promise((resolve) => setTimeout(resolve, FAUCET_RETRY_MS))
     return requestFaucet(ctx, wallet, fetchImpl, attempt + 1)
@@ -131,8 +131,8 @@ export async function prepare(
     supporter.address,
     ctx.mint,
   )
-  // Весь публічний баланс — як у продукті (T022): депозит рівно на суму внеску
-  // видав би її стороннньому, хоч переказ і зашифровано.
+  // The whole public balance, as in the product (T022): a deposit of exactly the contribution
+  // would reveal it to an outsider even though the transfer is encrypted.
   const preparation = await planPreparation(account, decimals, {
     rpc: ctx.rpc,
     owner: supporter,
@@ -140,8 +140,8 @@ export async function prepare(
     keys,
     units: plan.first.units,
   })
-  // Три кроки SDK в одній транзакції: Apply читає pending уже після Deposit, а
-  // Helius Free пропускає одну `sendTransaction` на секунду.
+  // Three SDK steps in one transaction: Apply reads pending after Deposit already, and
+  // Helius Free lets one `sendTransaction` through per second.
   const signature = await ctx.sender.sendInstructions(
     supporter,
     preparation.steps.flatMap((step) => step.instructions),
@@ -149,8 +149,8 @@ export async function prepare(
   return { token, signatures: [signature] }
 }
 
-// По одній tx на запит, blockhash — перед самим підписом: у смузі `sendTransaction`
-// 1/с пачка з чотирьох, підписана наперед, дочекалася б кінця життя blockhash.
+// One tx per request, blockhash right before signing: in the 1/s `sendTransaction` lane
+// a batch of four signed up front would outlive its blockhash.
 async function relayBatch(
   messages: ContributionMessage[],
   ctx: DemoContext,
@@ -226,7 +226,7 @@ export async function verify(
       p.traces.map((t) => ({ ...t, where: `proof ${i + 1} ${t.where}` })),
     ),
   ]
-  // Шифротекст автора живе лише у validity-контексті (рішення A, T024).
+  // The creator's ciphertext lives only in the validity context (decision A, T024).
   const context = proofs.map((p) => extractValidityContext(p.wire)).find((c) => c !== null)
   const decrypted = context ? decryptContribution(ctx.creator.keys.elgamal(), context) : null
   return {

@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
-# Деплой і перевірка програми на devnet із WSL. Кликати з PowerShell (див. wsl-build.sh):
-#   wsl.exe -e bash /mnt/<диск>/<шлях до репо>/scripts/wsl-deploy.sh <deploy|verify|status>
+# Deploys and verifies the program on devnet from WSL. Call from PowerShell (see wsl-build.sh):
+#   wsl.exe -e bash /mnt/<drive>/<path to repo>/scripts/wsl-deploy.sh <deploy|verify|status>
 #
-# deploy  — заливає target/deploy/ccsupport.so (лише SBPFv0) під declare_id! програми;
-#           upgrade authority — окремий ключ поза репо, створюється за потреби.
-# verify  — байткод у мережі байт у байт дорівнює локальному .so і має e_flags 0x0.
-# status  — `solana program show` + баланс деплоєра.
+# deploy  — uploads target/deploy/ccsupport.so (SBPFv0 only) under the program's declare_id!;
+#           the upgrade authority is a separate key outside the repo, created on demand.
+# verify  — the bytecode on chain equals the local .so byte for byte and has e_flags 0x0.
+# status  — `solana program show` + the deployer balance.
 #
-# RPC — SOLANA_RPC_URL із .env у корені (Helius; публічний devnet ріже деплой на
-# сотнях транзакцій), інакше публічний devnet.
+# RPC — SOLANA_RPC_URL from the root .env (Helius; the public devnet cuts a deploy off
+# at hundreds of transactions), otherwise the public devnet.
 
 set -euo pipefail
 
@@ -29,7 +29,7 @@ url_from_env() {
 }
 URL="${SOLANA_RPC_URL:-$(url_from_env)}"
 URL="${URL:-devnet}"
-# Ключ Helius сидить у query-рядку — у вивід іде лише хост.
+# The Helius key sits in the query string — only the host goes to the output.
 URL_SHOWN="$(printf '%s' "$URL" | sed 's#\(https\?://[^/?]*\).*#\1#')"
 
 cd "$ROOT"
@@ -37,8 +37,8 @@ cd "$ROOT"
 run() {
   echo "── $* ──" >>"$LOG"
   if ! "$@" >>"$LOG" 2>&1; then
-    echo "ПОМИЛКА: ${*//$URL/$URL_SHOWN}"
-    echo "── останні 40 рядків $LOG ──"
+    echo "ERROR: ${*//$URL/$URL_SHOWN}"
+    echo "── last 40 lines of $LOG ──"
     tail -40 "$LOG" | sed "s#$URL#$URL_SHOWN#g"
     exit 1
   fi
@@ -48,25 +48,25 @@ check_v0() {
   local so="$1" flags
   flags="$(readelf -h "$so" | awk '/Flags:/ {print $2}')"
   if [[ "$flags" != "0x0" ]]; then
-    echo "ПОМИЛКА: $so має e_flags=$flags, очікувалось 0x0 (SBPFv0) — спершу wsl-build.sh build-sbf"
+    echo "ERROR: $so has e_flags=$flags, expected 0x0 (SBPFv0) — run wsl-build.sh build-sbf first"
     exit 1
   fi
 }
 
 require_program_keypair() {
   if [[ ! -f "$PROGRAM_KEYPAIR" ]]; then
-    echo "немає ключа програми $PROGRAM_KEYPAIR (бекап — поза репозиторієм)" >&2
+    echo "program key $PROGRAM_KEYPAIR is missing (restore it from the operator backup)" >&2
     exit 1
   fi
 }
 
-# Deployer — не id.json: id.json спільний для всіх проектів на цій машині, а
-# upgrade authority має жити поряд із рештою ключів проекту.
+# The deployer is not id.json: id.json is shared by every project on this machine, and
+# the upgrade authority should live next to the rest of the project keys.
 ensure_deployer() {
   if [[ ! -f "$DEPLOYER" ]]; then
     mkdir -p "$(dirname "$DEPLOYER")"
     run solana-keygen new --no-bip39-passphrase --silent --outfile "$DEPLOYER"
-    echo "створено deployer $DEPLOYER"
+    echo "created deployer $DEPLOYER"
   fi
 }
 
@@ -75,8 +75,8 @@ PROGRAM_ID="$(solana-keygen pubkey "$PROGRAM_KEYPAIR" 2>/dev/null || echo 8tX3MJ
 : >"$LOG"
 echo "solana:   $(solana --version)"
 echo "rpc:      $URL_SHOWN"
-echo "програма: $PROGRAM_ID"
-echo "лог:      $LOG"
+echo "program:  $PROGRAM_ID"
+echo "log:      $LOG"
 echo
 
 case "$CMD" in
@@ -85,14 +85,14 @@ case "$CMD" in
     ensure_deployer
     check_v0 "$SO"
     size="$(stat -c %s "$SO")"
-    # Місце під апгрейди: ProgramData фіксує довжину на весь час життя програми.
+    # Room for upgrades: ProgramData fixes the length for the whole life of the program.
     max_len=$(( size * 3 / 2 ))
     rent="$(solana rent "$max_len" --url "$URL" --output json | sed -n 's/.*"rentExemptMinimumLamports": *\([0-9]*\).*/\1/p')"
     balance="$(solana balance "$(solana-keygen pubkey "$DEPLOYER")" --url "$URL" --lamports | awk '{print $1}')"
     echo "deployer: $(solana-keygen pubkey "$DEPLOYER")  $(( balance / 1000000 ))e-3 SOL"
-    echo ".so:      $size байтів, max-len $max_len, рента ProgramData ≈ $(( rent / 1000000 ))e-3 SOL (+ стільки ж тимчасово на буфер)"
+    echo ".so:      $size bytes, max-len $max_len, ProgramData rent ≈ $(( rent / 1000000 ))e-3 SOL (+ the same again temporarily for the buffer)"
     if (( balance < rent * 2 + 100000000 )); then
-      echo "ПОМИЛКА: замало SOL на deployer — поповнити: solana airdrop 5 $(solana-keygen pubkey "$DEPLOYER") --url devnet"
+      echo "ERROR: not enough SOL on the deployer — top up: solana airdrop 5 $(solana-keygen pubkey "$DEPLOYER") --url devnet"
       exit 1
     fi
     run solana program deploy "$SO" \
@@ -102,7 +102,7 @@ case "$CMD" in
       --max-len "$max_len" \
       --url "$URL" \
       --commitment confirmed
-    echo "OK — задеплоєно $PROGRAM_ID"
+    echo "OK — deployed $PROGRAM_ID"
     "$0" verify
     ;;
   verify)
@@ -110,29 +110,29 @@ case "$CMD" in
     dump="$(mktemp --suffix=.so)"
     run solana program dump "$PROGRAM_ID" "$dump" --url "$URL"
     size="$(stat -c %s "$SO")"
-    # Дамп — увесь ProgramData, за .so ідуть нулі до max-len.
+    # The dump is the whole ProgramData: zeros follow the .so up to max-len.
     if ! cmp -s -n "$size" "$SO" "$dump"; then
-      echo "ПОМИЛКА: байткод у мережі відрізняється від $SO"
+      echo "ERROR: the bytecode on chain differs from $SO"
       rm -f "$dump"
       exit 1
     fi
     if tail -c +"$((size + 1))" "$dump" | tr -d '\0' | grep -q .; then
-      echo "ПОМИЛКА: за межами $size байтів у ProgramData не нулі"
+      echo "ERROR: ProgramData is not all zeros beyond $size bytes"
       rm -f "$dump"
       exit 1
     fi
     check_v0 "$dump"
     rm -f "$dump"
-    echo "OK — байткод у мережі = $SO ($size байтів), SBPFv0"
+    echo "OK — bytecode on chain = $SO ($size bytes), SBPFv0"
     ;;
   status)
     if ! solana program show "$PROGRAM_ID" --url "$URL" 2>/dev/null | sed "s#$URL#$URL_SHOWN#g"; then
-      echo "програма $PROGRAM_ID у мережі відсутня — $0 deploy"
+      echo "program $PROGRAM_ID is not on chain — $0 deploy"
     fi
     if [[ -f "$DEPLOYER" ]]; then
       echo "deployer: $(solana-keygen pubkey "$DEPLOYER")  $(solana balance "$(solana-keygen pubkey "$DEPLOYER")" --url "$URL")"
     else
-      echo "deployer: ще не створено ($DEPLOYER)"
+      echo "deployer: not created yet ($DEPLOYER)"
     fi
     ;;
   *)
