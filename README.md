@@ -121,10 +121,11 @@ Steps: Render → New → Blueprint → this repository; fill in the `sync: fals
 `VITE_API_URL` for Pages.
 
 A free instance spins down after 15 minutes without traffic and takes about a minute to
-come back; while it sleeps the index does not move (the backfill catches up on wake). A free
-uptime pinger (cron-job.org, UptimeRobot) hitting `/health` every 10 minutes keeps it awake,
-and the 750 free hours a month cover one service around the clock. The process idles at
-about 105 MB, well inside the 512 MB of the free instance.
+come back; while it sleeps the index does not move (the backfill catches up on wake).
+`.github/workflows/keepalive.yml` requests `/health` every 5 minutes from GitHub Actions to
+keep it awake (GitHub pauses schedules after 60 days without a commit — re-enable under
+Actions), and the 750 free hours a month cover one service around the clock. The process
+idles at about 105 MB, well inside the 512 MB of the free instance.
 
 ## Layout
 
