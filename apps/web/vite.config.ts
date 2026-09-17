@@ -8,6 +8,9 @@ import wasm from 'vite-plugin-wasm'
 // ("missing field type"), and without it the wasm module initialises through TLA.
 export default defineConfig(({ mode }) => ({
   plugins: [react(), wasm()],
+  // GitHub Pages serves a project site under `/<repo>/`; the Pages workflow sets
+  // BASE_PATH, a local build and a custom domain keep `/`.
+  base: process.env.BASE_PATH ?? '/',
   // The codama client gates its error messages on `process.env["NODE_ENV"]`, and the
   // browser has no `process`.
   define: { 'process.env': JSON.stringify({ NODE_ENV: mode }) },

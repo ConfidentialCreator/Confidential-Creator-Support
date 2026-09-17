@@ -8,7 +8,7 @@ import { Support } from './screens/Support/Support.tsx'
 
 export function Router() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <Routes>
         <Route path="/c/:handle" element={<CreatorPage />} />
         <Route path="/support/:handle" element={<Support />} />
