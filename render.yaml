@@ -1,0 +1,38 @@
+# Render Blueprint: the api with the indexer inside it, as one free web service.
+# The free instance is the only one Render gives away and it cannot run a background
+# worker, so RUN_WORKER moves the indexer into the api process. It spins down after
+# 15 minutes without traffic — an external pinger on /health every 10 minutes keeps
+# it awake, and the 750 free instance hours per month cover one service around the
+# clock. Values marked sync: false are entered in the Render dashboard, never here.
+services:
+  - type: web
+    name: ccsupport-api
+    runtime: node
+    plan: free
+    region: frankfurt
+    buildCommand: corepack enable && pnpm install --frozen-lockfile
+    startCommand: node apps/api/src/main.ts
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: RUN_WORKER
+        value: "true"
+      - key: FAUCET_ENABLED
+        value: "true"
+      - key: LOG_LEVEL
+        value: info
+      # The Pages origin, scheme and host only.
+      - key: WEB_ORIGIN
+        sync: false
+      - key: SOLANA_RPC_URL
+        sync: false
+      # Supabase transaction pooler, port 6543.
+      - key: DATABASE_URL
+        sync: false
+      - key: CCS_MINT
+        sync: false
+      - key: PROOF_PAYER_SECRET
+        sync: false
+      - key: FAUCET_SECRET
+        sync: false

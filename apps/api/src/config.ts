@@ -53,6 +53,9 @@ export const apiConfigSchema = z
     faucetEnabled: flag,
     faucetSecret: z.string().optional(),
     mint: z.string().optional(),
+    // One free-tier web service is all a hosting platform gives away; the indexer then
+    // runs inside this process instead of as a second one.
+    worker: flag,
   })
   .transform(({ faucetEnabled, faucetSecret, mint, ...rest }, ctx) => {
     if (!faucetEnabled) return { ...rest, faucet: null }
@@ -71,7 +74,8 @@ export type ApiConfig = z.infer<typeof apiConfigSchema>
 
 export function apiConfigFromEnv(env: Record<string, string | undefined>): ApiConfig {
   return apiConfigSchema.parse({
-    port: env.API_PORT,
+    // Hosting platforms hand the port over as PORT; API_PORT stays the explicit choice.
+    port: env.API_PORT ?? env.PORT,
     logLevel: env.LOG_LEVEL,
     webOrigin: env.WEB_ORIGIN,
     rpcUrl: env.SOLANA_RPC_URL,
@@ -80,5 +84,6 @@ export function apiConfigFromEnv(env: Record<string, string | undefined>): ApiCo
     faucetEnabled: env.FAUCET_ENABLED,
     faucetSecret: env.FAUCET_SECRET,
     mint: env.CCS_MINT,
+    worker: env.RUN_WORKER,
   })
 }

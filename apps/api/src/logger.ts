@@ -5,7 +5,7 @@ import type { AppEnv } from './env.ts'
 
 export type Logger = PinoLogger
 
-// One JSON line per event on stdout; Railway collects it. Pretty-printing is the
+// One JSON line per event on stdout; the host collects it. Pretty-printing is the
 // developer's pipe (`pino-pretty`), not a dependency of the service.
 export function createLogger(level: LogLevel): Logger {
   return pino({

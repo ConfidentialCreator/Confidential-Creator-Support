@@ -1,5 +1,7 @@
 import { fetchPublicBalance } from '@ccsupport/chain'
 import { createDb, drizzleCreatorsReader } from '@ccsupport/db'
+import { wsUrlFor } from '@ccsupport/worker/config'
+import { startWorker, type WorkerHandle } from '@ccsupport/worker/run'
 import { serve } from '@hono/node-server'
 import { createKeyPairFromBytes, createSolanaRpc, type Rpc, type SolanaRpcApi } from '@solana/kit'
 import { createApp } from './app.ts'
@@ -42,6 +44,15 @@ async function main(): Promise<void> {
     await createKeyPairFromBytes(config.proofPayerSecret),
   )
   const faucet = await faucetDeps(rpc, config.faucet)
+  // Before the server binds: a health check that answers only after the backfill has
+  // run means the index is caught up by the time traffic arrives.
+  const worker: WorkerHandle | null = config.worker
+    ? await startWorker({
+        config: { rpcUrl: config.rpcUrl, wsUrl: wsUrlFor(config.rpcUrl) },
+        logger: logger.child({ component: 'worker' }),
+        database,
+      })
+    : null
 
   const app = createApp({
     logger,
@@ -64,17 +75,19 @@ async function main(): Promise<void> {
     )
   })
 
-  // Railway sends SIGTERM on redeploy; in-flight relay requests get to finish and the
-  // fallback timer covers one that never does.
+  // The platform sends SIGTERM on redeploy; in-flight relay requests get to finish and
+  // the fallback timer covers one that never does.
   for (const signal of ['SIGTERM', 'SIGINT'] as const) {
     process.once(signal, () => {
       logger.info({ signal }, 'shutting down')
       const forceExit = setTimeout(() => process.exit(1), 10_000)
       server.close(() => {
-        database.close().finally(() => {
-          clearTimeout(forceExit)
-          process.exit(0)
-        })
+        Promise.resolve(worker?.stop())
+          .then(() => database.close())
+          .finally(() => {
+            clearTimeout(forceExit)
+            process.exit(0)
+          })
       })
     })
   }

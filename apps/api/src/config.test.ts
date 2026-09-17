@@ -26,6 +26,17 @@ describe('apiConfigFromEnv', () => {
     expect(config.faucet).toBeNull()
   })
 
+  it('runs the worker in-process only when RUN_WORKER says so', () => {
+    expect(apiConfigFromEnv(base).worker).toBe(false)
+    expect(apiConfigFromEnv({ ...base, RUN_WORKER: 'true' }).worker).toBe(true)
+    expect(apiConfigFromEnv({ ...base, RUN_WORKER: 'no' }).worker).toBe(false)
+  })
+
+  it('falls back to the PORT a hosting platform assigns, API_PORT winning', () => {
+    expect(apiConfigFromEnv({ ...base, PORT: '10000' }).port).toBe(10_000)
+    expect(apiConfigFromEnv({ ...base, PORT: '10000', API_PORT: '9000' }).port).toBe(9_000)
+  })
+
   it('coerces the port and the log level', () => {
     const config = apiConfigFromEnv({ ...base, API_PORT: '9000', LOG_LEVEL: 'debug' })
     expect(config.port).toBe(9000)

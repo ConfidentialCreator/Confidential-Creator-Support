@@ -96,7 +96,35 @@ worker and writes `fixtures/measure.json`.
 On-chain work runs in WSL and is called from PowerShell:
 `wsl.exe -e bash /mnt/<drive>/<repo>/scripts/wsl-build.sh <build-sbf|idl|build|fmt|fmt-check|clippy|test|gate>`
 and `scripts/wsl-deploy.sh <deploy|verify|status>`. The network artifact is SBPFv0
-(`build-sbf`); `anchor build` is only for the IDL. Deployment to hosting is not covered here.
+(`build-sbf`); `anchor build` is only for the IDL.
+
+## Web on GitHub Pages
+
+`.github/workflows/pages.yml` builds `apps/web` on every push to `main` and deploys it to
+GitHub Pages under `/<repository>/` (a custom domain sets the variable `PAGES_BASE_PATH=/`).
+One-time repository settings: **Pages → Source: GitHub Actions**; variables `VITE_API_URL`,
+`VITE_CCS_MINT`, `VITE_SOLANA_CLUSTER`; secret `VITE_SOLANA_RPC_URL`. The RPC key ends up in
+the bundle like any `VITE_*` value — restrict it to the Pages domain in the RPC provider.
+
+Pages hosts the static web only. The api (proof relay, faucet, read routes) and the worker
+(indexer) are processes with a payer key and a database connection — they run elsewhere, the
+api's `WEB_ORIGIN` is the Pages origin, and `VITE_API_URL` points at the api.
+
+## Api and indexer on Render (free)
+
+`render.yaml` is a Render Blueprint for one free web service: the api with the indexer
+running inside it (`RUN_WORKER=true` — the free instance cannot run a background worker).
+Steps: Render → New → Blueprint → this repository; fill in the `sync: false` variables
+(`WEB_ORIGIN` = the Pages origin, `SOLANA_RPC_URL`, `DATABASE_URL` on the 6543 pooler,
+`CCS_MINT`, `PROOF_PAYER_SECRET`, `FAUCET_SECRET`); run `db:migrate` once from a machine with
+`MIGRATE_DATABASE_URL`. The service answers on `https://<name>.onrender.com` — that is
+`VITE_API_URL` for Pages.
+
+A free instance spins down after 15 minutes without traffic and takes about a minute to
+come back; while it sleeps the index does not move (the backfill catches up on wake). A free
+uptime pinger (cron-job.org, UptimeRobot) hitting `/health` every 10 minutes keeps it awake,
+and the 750 free hours a month cover one service around the clock. The process idles at
+about 105 MB, well inside the 512 MB of the free instance.
 
 ## Layout
 
