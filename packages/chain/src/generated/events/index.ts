@@ -9,3 +9,4 @@
 export * from "./creatorRegistered.ts";
 export * from "./creatorUpdated.ts";
 export * from "./pledged.ts";
+export * from "./visibilityChanged.ts";

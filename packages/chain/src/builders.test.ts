@@ -1,10 +1,11 @@
-import { type Address, address, createNoopSigner } from '@solana/kit'
+import { AccountRole, type Address, address, createNoopSigner } from '@solana/kit'
 import { describe, expect, it } from 'vitest'
 import {
   CCSUPPORT_PROGRAM_ADDRESS,
   parseInitConfigInstruction,
   parseMakePledgeInstruction,
   parseRegisterCreatorInstruction,
+  parseSetVisibilityInstruction,
   parseUpdateCreatorInstruction,
 } from './generated/index.ts'
 import { configPda, creatorPda, handlePda, pledgePda } from './pda.ts'
@@ -13,6 +14,7 @@ import {
   type PledgeParams,
   pledgeInstruction,
   registerCreatorInstruction,
+  setVisibilityInstruction,
   updateCreatorInstruction,
 } from './program.ts'
 
@@ -128,4 +130,27 @@ describe('pledgeInstruction', () => {
       pledgeInstruction({ supporter, creatorWallet: CREATOR_WALLET, periods, showPublicly: false }),
     ).rejects.toThrow()
   })
+})
+
+describe('setVisibilityInstruction', () => {
+  it.each([true, false])(
+    'round-trips showPublicly=%s and resolves the Pledge PDA',
+    async (showPublicly) => {
+      const supporter = createNoopSigner(SUPPORTER)
+      const ix = await setVisibilityInstruction({
+        supporter,
+        creatorWallet: CREATOR_WALLET,
+        showPublicly,
+      })
+      const parsed = parseSetVisibilityInstruction(ix)
+
+      expect(ix.programAddress).toBe(CCSUPPORT_PROGRAM_ADDRESS)
+      expect(parsed.data).toEqual(expect.objectContaining({ showPublicly }))
+      expect(parsed.accounts.supporter.address).toBe(SUPPORTER)
+      expect(parsed.accounts.supporter.role).toBe(AccountRole.READONLY_SIGNER)
+      expect(parsed.accounts.pledge.address).toBe(await first(pledgePda(CREATOR_WALLET, SUPPORTER)))
+      expect(parsed.accounts.pledge.role).toBe(AccountRole.WRITABLE)
+      expect(Object.keys(parsed.accounts)).toEqual(['supporter', 'pledge'])
+    },
+  )
 })

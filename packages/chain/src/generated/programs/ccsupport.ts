@@ -51,18 +51,22 @@ import {
   getInitConfigInstructionAsync,
   getMakePledgeInstructionAsync,
   getRegisterCreatorInstructionAsync,
+  getSetVisibilityInstruction,
   getUpdateCreatorInstructionAsync,
   parseInitConfigInstruction,
   parseMakePledgeInstruction,
   parseRegisterCreatorInstruction,
+  parseSetVisibilityInstruction,
   parseUpdateCreatorInstruction,
   type InitConfigAsyncInput,
   type MakePledgeAsyncInput,
   type ParsedInitConfigInstruction,
   type ParsedMakePledgeInstruction,
   type ParsedRegisterCreatorInstruction,
+  type ParsedSetVisibilityInstruction,
   type ParsedUpdateCreatorInstruction,
   type RegisterCreatorAsyncInput,
+  type SetVisibilityInput,
   type UpdateCreatorAsyncInput,
 } from "../instructions/index.ts";
 import { findConfigPda, findCreatorPda } from "../pdas/index.ts";
@@ -144,9 +148,11 @@ export const CcsupportEvent = {
   0: "CreatorRegistered",
   1: "CreatorUpdated",
   2: "Pledged",
+  3: "VisibilityChanged",
   CreatorRegistered: 0,
   CreatorUpdated: 1,
   Pledged: 2,
+  VisibilityChanged: 3,
 } as const;
 
 export type CcsupportEvent = (typeof CcsupportEvent)[Exclude<
@@ -191,6 +197,17 @@ export function identifyCcsupportEvent(
   ) {
     return CcsupportEvent.Pledged;
   }
+  if (
+    containsBytes(
+      data,
+      fixEncoderSize(getBytesEncoder(), 8).encode(
+        new Uint8Array([70, 199, 105, 125, 45, 149, 60, 242]),
+      ),
+      0,
+    )
+  ) {
+    return CcsupportEvent.VisibilityChanged;
+  }
   throw new Error(
     "The provided event could not be identified as a ccsupport event.",
   );
@@ -200,11 +217,13 @@ export const CcsupportInstruction = {
   0: "InitConfig",
   1: "MakePledge",
   2: "RegisterCreator",
-  3: "UpdateCreator",
+  3: "SetVisibility",
+  4: "UpdateCreator",
   InitConfig: 0,
   MakePledge: 1,
   RegisterCreator: 2,
-  UpdateCreator: 3,
+  SetVisibility: 3,
+  UpdateCreator: 4,
 } as const;
 
 export type CcsupportInstruction = (typeof CcsupportInstruction)[Exclude<
@@ -253,6 +272,17 @@ export function identifyCcsupportInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
+        new Uint8Array([182, 23, 73, 166, 255, 234, 36, 196]),
+      ),
+      0,
+    )
+  ) {
+    return CcsupportInstruction.SetVisibility;
+  }
+  if (
+    containsBytes(
+      data,
+      fixEncoderSize(getBytesEncoder(), 8).encode(
         new Uint8Array([39, 221, 251, 213, 194, 161, 31, 207]),
       ),
       0,
@@ -278,6 +308,9 @@ export type ParsedCcsupportInstruction<
   | ({
       instructionType: typeof CcsupportInstruction.RegisterCreator;
     } & ParsedRegisterCreatorInstruction<TProgram>)
+  | ({
+      instructionType: typeof CcsupportInstruction.SetVisibility;
+    } & ParsedSetVisibilityInstruction<TProgram>)
   | ({
       instructionType: typeof CcsupportInstruction.UpdateCreator;
     } & ParsedUpdateCreatorInstruction<TProgram>);
@@ -306,6 +339,13 @@ export function parseCcsupportInstruction<TProgram extends string>(
       return {
         instructionType: CcsupportInstruction.RegisterCreator,
         ...parseRegisterCreatorInstruction(instruction),
+      };
+    }
+    case CcsupportInstruction.SetVisibility: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: CcsupportInstruction.SetVisibility,
+        ...parseSetVisibilityInstruction(instruction),
       };
     }
     case CcsupportInstruction.UpdateCreator: {
@@ -359,6 +399,10 @@ export type CcsupportPluginInstructions = {
     input: RegisterCreatorAsyncInput,
   ) => ReturnType<typeof getRegisterCreatorInstructionAsync> &
     SelfPlanAndSendFunctions;
+  setVisibility: (
+    input: SetVisibilityInput,
+  ) => ReturnType<typeof getSetVisibilityInstruction> &
+    SelfPlanAndSendFunctions;
   updateCreator: (
     input: UpdateCreatorAsyncInput,
   ) => ReturnType<typeof getUpdateCreatorInstructionAsync> &
@@ -403,6 +447,11 @@ export function ccsupportProgram() {
             addSelfPlanAndSendFunctions(
               client,
               getRegisterCreatorInstructionAsync(input),
+            ),
+          setVisibility: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetVisibilityInstruction(input),
             ),
           updateCreator: (input) =>
             addSelfPlanAndSendFunctions(

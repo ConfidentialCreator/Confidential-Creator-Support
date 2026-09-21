@@ -469,3 +469,22 @@ pub fn pledge_accounts(
         mollusk_svm::program::keyed_account_for_system_program(),
     ]
 }
+
+pub fn set_visibility(s: &PledgeSetup, show_publicly: bool) -> Instruction {
+    Instruction {
+        program_id: ccsupport::ID,
+        accounts: ccsupport::accounts::SetVisibility {
+            supporter: s.supporter,
+            pledge: s.pledge,
+        }
+        .to_account_metas(None),
+        data: ccsupport::instruction::SetVisibility { show_publicly }.data(),
+    }
+}
+
+pub fn set_visibility_accounts(s: &PledgeSetup, state: &PledgeState) -> Vec<(Pubkey, Account)> {
+    vec![
+        (s.supporter, signer_account()),
+        (s.pledge, state.pledge.clone()),
+    ]
+}

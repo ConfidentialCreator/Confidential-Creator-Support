@@ -40,4 +40,8 @@ pub mod ccsupport {
     pub fn pledge(ctx: Context<MakePledge>, periods: u8, show_publicly: bool) -> Result<()> {
         instructions::pledge_handler(ctx, periods, show_publicly)
     }
+
+    pub fn set_visibility(ctx: Context<SetVisibility>, show_publicly: bool) -> Result<()> {
+        instructions::set_visibility_handler(ctx, show_publicly)
+    }
 }

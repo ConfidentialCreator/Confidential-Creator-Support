@@ -36,3 +36,11 @@ pub struct Pledged {
     pub show_publicly: bool,
     pub slot: u64,
 }
+
+#[event]
+pub struct VisibilityChanged {
+    pub creator: Pubkey,
+    pub supporter: Pubkey,
+    pub show_publicly: bool,
+    pub slot: u64,
+}

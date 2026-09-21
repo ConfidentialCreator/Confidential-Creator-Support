@@ -9,4 +9,5 @@
 export * from "./initConfig.ts";
 export * from "./makePledge.ts";
 export * from "./registerCreator.ts";
+export * from "./setVisibility.ts";
 export * from "./updateCreator.ts";

@@ -4,6 +4,7 @@ import {
   getInitConfigInstructionAsync,
   getMakePledgeInstructionAsync,
   getRegisterCreatorInstructionAsync,
+  getSetVisibilityInstruction,
   getUpdateCreatorInstructionAsync,
 } from './generated/index.ts'
 import { creatorPda, handlePda, pledgePda } from './pda.ts'
@@ -56,4 +57,19 @@ export async function pledgeInstruction({
   const [creator] = await creatorPda(creatorWallet)
   const [pledge] = await pledgePda(creatorWallet, supporter.address)
   return getMakePledgeInstructionAsync({ supporter, creator, pledge, periods, showPublicly })
+}
+
+export type SetVisibilityParams = {
+  supporter: TransactionSigner
+  creatorWallet: Address
+  showPublicly: boolean
+}
+
+export async function setVisibilityInstruction({
+  supporter,
+  creatorWallet,
+  showPublicly,
+}: SetVisibilityParams) {
+  const [pledge] = await pledgePda(creatorWallet, supporter.address)
+  return getSetVisibilityInstruction({ supporter, pledge, showPublicly })
 }
