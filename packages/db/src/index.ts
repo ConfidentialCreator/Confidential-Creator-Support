@@ -1,3 +1,5 @@
 export * from './client.ts'
+export * from './queries/active.ts'
 export * from './queries/creators.ts'
+export * from './queries/series.ts'
 export * as schema from './schema.ts'

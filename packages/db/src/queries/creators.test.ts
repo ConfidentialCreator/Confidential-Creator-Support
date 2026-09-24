@@ -1,4 +1,3 @@
-import { GRACE_SECONDS } from '@ccsupport/shared'
 import { afterEach, describe, expect, it } from 'vitest'
 import { createDb, type DbHandle } from '../client.ts'
 import { contributionsPage, creatorByHandle, supportersPage } from './creators.ts'
@@ -28,8 +27,8 @@ describe('creatorByHandle', () => {
     expect(
       sql.match(/select count\(\*\) from "pledges" as p where p\.creator = "creators"\.wallet/g),
     ).toHaveLength(2)
-    expect(sql.match(/p\.expires_at \+ make_interval\(secs => \$\d+\) > \$\d+/g)).toHaveLength(1)
-    expect(params).toEqual([GRACE_SECONDS, NOW.toISOString(), 'marrow-dispatch', 1])
+    expect(sql.match(/ccs_is_active\(p\.expires_at, \$\d+::timestamptz\)/g)).toHaveLength(1)
+    expect(params).toEqual([NOW.toISOString(), 'marrow-dispatch', 1])
   })
 
   it('selects only the public profile columns', () => {
@@ -54,20 +53,19 @@ describe('supportersPage', () => {
     const { sql, params } = supportersPage(db(), CREATOR, NOW, null, 51).toSQL()
     expect(sql).toContain('"pledges"."creator" = $')
     expect(sql).toContain('"pledges"."show_publicly" = $')
-    expect(sql).toContain('make_interval(secs => $')
+    expect(sql).toContain('ccs_is_active("pledges"."expires_at", $')
     expect(sql).toContain('order by "pledges"."started_at" asc, "pledges"."supporter" asc')
     expect(sql).not.toContain('(("pledges"."started_at", "pledges"."supporter") >')
-    expect(params).toEqual([CREATOR, true, GRACE_SECONDS, NOW.toISOString(), 51])
+    expect(params).toEqual([CREATOR, true, NOW.toISOString(), 51])
   })
 
   it('continues after the keyset of the last listed supporter', () => {
     const after = { startedAt: new Date('2026-09-01T00:00:00Z'), supporter: SUPPORTER }
     const { sql, params } = supportersPage(db(), CREATOR, NOW, after, 10).toSQL()
-    expect(sql).toContain('("pledges"."started_at", "pledges"."supporter") > ($5::timestamptz, $6)')
+    expect(sql).toContain('("pledges"."started_at", "pledges"."supporter") > ($4::timestamptz, $5)')
     expect(params).toEqual([
       CREATOR,
       true,
-      GRACE_SECONDS,
       NOW.toISOString(),
       after.startedAt.toISOString(),
       SUPPORTER,
