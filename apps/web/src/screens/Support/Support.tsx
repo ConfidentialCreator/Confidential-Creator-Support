@@ -2,10 +2,12 @@ import {
   type ConfidentialKeys,
   confidentialAccountState,
   decryptAvailable,
+  fetchMaybePledge,
   fetchRelayPayer,
   type PreparationStep,
+  pledgePda,
 } from '@ccsupport/chain'
-import { type Address, type CreatorProfile, MAX_PERIODS, PERIOD_SECONDS } from '@ccsupport/shared'
+import type { Address, CreatorProfile } from '@ccsupport/shared'
 import { address, createSolanaRpc, type TransactionSendingSigner } from '@solana/kit'
 import { useSelectedWalletAccount, useWalletAccountTransactionSendingSigner } from '@solana/react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -38,6 +40,7 @@ import {
   STAGE_TEXT,
   stepLabels,
 } from './flow.ts'
+import { Periods } from './Periods.tsx'
 
 const rpc = createSolanaRpc(webEnv.rpcUrl)
 const ports = { ops: chainOps(rpc), port: chainPort(rpc), relay: apiRelay(webEnv.apiUrl) }
@@ -106,15 +109,33 @@ function WithAccount({ account, profile, mint }: AccountProps) {
       return { ...token, lamports }
     },
   })
+  // Read from the chain, not the index: the program extends this very account, and a
+  // second contribution right after the first must already see the new expiry.
+  const pledge = useQuery({
+    queryKey: ['pledge', profile.wallet, account.address],
+    queryFn: async () => {
+      const [pda] = await pledgePda(profile.wallet, owner)
+      const maybe = await fetchMaybePledge(rpc, pda)
+      return maybe.exists
+        ? { expiresAt: Number(maybe.data.expiresAt), showPublicly: maybe.data.showPublicly }
+        : null
+    },
+    refetchInterval: false,
+  })
   const payer = useQuery({
     queryKey: ['relay-payer'],
     queryFn: () => fetchRelayPayer(webEnv.apiUrl),
     refetchInterval: false,
   })
 
-  if (wallet.isPending || payer.isPending) return <div className="help">reading the chain…</div>
+  if (wallet.isPending || pledge.isPending || payer.isPending) {
+    return <div className="help">reading the chain…</div>
+  }
   if (wallet.isError) {
     return <div className="text-refused">the chain did not answer: {wallet.error.message}</div>
+  }
+  if (pledge.isError) {
+    return <div className="text-refused">the chain did not answer: {pledge.error.message}</div>
   }
   if (payer.isError) {
     return <div className="text-refused">the relay is not reachable: {payer.error.message}</div>
@@ -125,8 +146,9 @@ function WithAccount({ account, profile, mint }: AccountProps) {
       profile={profile}
       mint={mint}
       wallet={wallet.data}
+      pledge={pledge.data}
       payer={payer.data}
-      refresh={() => wallet.refetch()}
+      refresh={() => Promise.all([wallet.refetch(), pledge.refetch()])}
     />
   )
 }
@@ -136,15 +158,18 @@ type FormProps = {
   profile: CreatorProfile
   mint: Address
   wallet: TokenAccount & { lamports: bigint }
+  pledge: { expiresAt: number; showPublicly: boolean } | null
   payer: Address
   refresh: () => Promise<unknown>
 }
 
-function Form({ signer, profile, mint, wallet, payer, refresh }: FormProps) {
+function Form({ signer, profile, mint, wallet, pledge, payer, refresh }: FormProps) {
   const { keys } = useConfidentialKeys()
   const [amount, setAmount] = useState(formatUnits(profile.suggestedAmount, wallet.decimals))
   const [periods, setPeriods] = useState(1)
-  const [showPublicly, setShowPublicly] = useState(false)
+  // A renewal writes the flag again, so it starts from the one on chain: an unchanged
+  // form must not quietly take a listed wallet off the page.
+  const [showPublicly, setShowPublicly] = useState(pledge?.showPublicly ?? false)
   const [progress, setProgress] = useState<Progress | null>(null)
 
   const units = parseUnits(amount, wallet.decimals)
@@ -211,31 +236,12 @@ function Form({ signer, profile, mint, wallet, payer, refresh }: FormProps) {
       ))}
       {DEVNET && needsFunds && <Faucet wallet={signer.address} refresh={refresh} />}
 
-      <h2>Periods</h2>
-      <div className="flex items-baseline gap-4">
-        <button
-          type="button"
-          className="act px-2.5"
-          onClick={() => setPeriods(Math.max(1, periods - 1))}
-          disabled={contribute.isPending}
-        >
-          −
-        </button>
-        <span>{periods}</span>
-        <button
-          type="button"
-          className="act px-2.5"
-          onClick={() => setPeriods(Math.min(MAX_PERIODS, periods + 1))}
-          disabled={contribute.isPending}
-        >
-          +
-        </button>
-        <span>
-          {periods} {periods === 1 ? 'period' : 'periods'} = {(periods * PERIOD_SECONDS) / 86_400}{' '}
-          days
-        </span>
-      </div>
-      <div className="help">One payment covers all chosen periods. Nothing renews by itself.</div>
+      <Periods
+        periods={periods}
+        onChange={setPeriods}
+        expiresAt={pledge?.expiresAt ?? null}
+        disabled={contribute.isPending}
+      />
 
       <h2>Listing</h2>
       <label className="flex items-baseline gap-4">
