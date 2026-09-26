@@ -23,6 +23,10 @@ const profile = {
   createdSlot: 498_814_836,
   activeSupporters: 128,
   totalSupporters: 128,
+  series: [
+    { month: '2026-08', active: 0 },
+    { month: '2026-09', active: 128 },
+  ],
 }
 
 describe('pageQuerySchema', () => {
@@ -74,7 +78,19 @@ describe('creatorProfileSchema', () => {
       'createdSlot',
       'activeSupporters',
       'totalSupporters',
+      'series',
     ])
+  })
+
+  it('rejects a series month that is not YYYY-MM and a negative monthly count', () => {
+    const month = (m: string) => ({ ...profile, series: [{ month: m, active: 1 }] })
+    expect(creatorProfileSchema.safeParse(month('2026-9')).success).toBe(false)
+    expect(creatorProfileSchema.safeParse(month('2026-13')).success).toBe(false)
+    expect(creatorProfileSchema.safeParse(month('2026-09-01')).success).toBe(false)
+    expect(
+      creatorProfileSchema.safeParse({ ...profile, series: [{ month: '2026-09', active: -1 }] })
+        .success,
+    ).toBe(false)
   })
 })
 

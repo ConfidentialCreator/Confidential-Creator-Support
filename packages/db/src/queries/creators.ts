@@ -2,6 +2,7 @@ import { and, asc, desc, eq, type SQL, sql } from 'drizzle-orm'
 import type { Db } from '../client.ts'
 import { contributions, creators, pledges } from '../schema.ts'
 import { activeAt, asTimestamptz } from './active.ts'
+import { monthlySeries, type SeriesRow } from './series.ts'
 
 export type SupporterKey = { startedAt: Date; supporter: string }
 export type ContributionKey = { slot: string; sig: string }
@@ -105,6 +106,7 @@ export type CreatorsReader = {
     after: ContributionKey | null,
     limit: number,
   ) => Promise<ContributionRow[]>
+  series: (creator: string, now: Date) => Promise<SeriesRow[]>
 }
 
 export function drizzleCreatorsReader(db: Db): CreatorsReader {
@@ -112,5 +114,6 @@ export function drizzleCreatorsReader(db: Db): CreatorsReader {
     profile: async (handle, now) => (await creatorByHandle(db, handle, now))[0],
     supporters: (creator, now, after, limit) => supportersPage(db, creator, now, after, limit),
     contributions: (creator, after, limit) => contributionsPage(db, creator, after, limit),
+    series: async (creator, now) => [...(await monthlySeries(db, creator, now))],
   }
 }

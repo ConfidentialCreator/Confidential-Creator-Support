@@ -7,8 +7,11 @@ import {
   getCreatorRegisteredEventDecoder,
   getCreatorUpdatedEventDecoder,
   getPledgedEventDecoder,
+  getVisibilityChangedEventDecoder,
   PLEDGED_EVENT_DISCRIMINATOR,
   type PledgedEvent,
+  VISIBILITY_CHANGED_EVENT_DISCRIMINATOR,
+  type VisibilityChangedEvent,
 } from '@ccsupport/chain'
 import { containsBytes, getBase64Encoder, type ReadonlyUint8Array } from '@solana/kit'
 
@@ -16,6 +19,7 @@ export type ProgramEvent =
   | { kind: 'creatorRegistered'; data: CreatorRegisteredEvent }
   | { kind: 'creatorUpdated'; data: CreatorUpdatedEvent }
   | { kind: 'pledged'; data: PledgedEvent }
+  | { kind: 'visibilityChanged'; data: VisibilityChangedEvent }
 
 // Base58 program id, so `Program log: success` from a program never pops the stack.
 const INVOKE = /^Program ([1-9A-HJ-NP-Za-km-z]{32,44}) invoke \[\d+\]$/
@@ -31,6 +35,9 @@ function decodeEvent(bytes: ReadonlyUint8Array): ProgramEvent | null {
   }
   if (containsBytes(bytes, CREATOR_UPDATED_EVENT_DISCRIMINATOR, 0)) {
     return { kind: 'creatorUpdated', data: getCreatorUpdatedEventDecoder().decode(bytes) }
+  }
+  if (containsBytes(bytes, VISIBILITY_CHANGED_EVENT_DISCRIMINATOR, 0)) {
+    return { kind: 'visibilityChanged', data: getVisibilityChangedEventDecoder().decode(bytes) }
   }
   return null
 }

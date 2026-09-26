@@ -1,5 +1,7 @@
 import { readFileSync } from 'node:fs'
+import { CCSUPPORT_PROGRAM_ADDRESS, getVisibilityChangedEventEncoder } from '@ccsupport/chain'
 import { createDb, type DbHandle } from '@ccsupport/db'
+import { type Address, getBase64Decoder } from '@solana/kit'
 import { afterEach, describe, expect, it } from 'vitest'
 import { z } from 'zod'
 import {
@@ -11,6 +13,7 @@ import {
   type IndexWrites,
   planWrites,
   pledgeUpsert,
+  visibilityUpdate,
 } from './apply.ts'
 import type { ChainReader, RecipientCiphertext } from './ciphertext.ts'
 import type { ProgramTransaction } from './cursor.ts'
@@ -47,6 +50,28 @@ const txOf = (f: Fixture, over: Partial<ProgramTransaction> = {}): ProgramTransa
 const CREATOR = '6znwWkzSGUcgFzLaXHo28o5uaweFn1hNeuW4pcaekQSk'
 const SUPPORTER_0 = 'FQqLH29wPz6vwGhe9MSxzEFZg7qfzrZkW2bKcY91GAZw'
 const NOW = new Date('2026-09-15T12:00:00Z')
+const VISIBILITY_SIG =
+  '5STQAx9AuBLwk4MCuox4p1M8s7qqJKtDo1N567sgwTWWoGZsTNVWYwZHaRF3JAechZM2c9BK1AVrppJncQya8BAg'
+
+// No devnet transaction carries VisibilityChanged yet, so its log is encoded from the IDL.
+const visibilityTx = (showPublicly: boolean): ProgramTransaction => ({
+  signature: VISIBILITY_SIG,
+  slot: 500_000_000n,
+  blockTime: null,
+  logs: [
+    `Program ${CCSUPPORT_PROGRAM_ADDRESS} invoke [1]`,
+    `Program data: ${getBase64Decoder().decode(
+      getVisibilityChangedEventEncoder().encode({
+        creator: CREATOR as Address,
+        supporter: SUPPORTER_0 as Address,
+        showPublicly,
+        slot: 500_000_000n,
+      }),
+    )}`,
+    `Program ${CCSUPPORT_PROGRAM_ADDRESS} success`,
+  ],
+  failed: false,
+})
 
 const ciphertextOf = (f: Fixture): RecipientCiphertext => ({
   groupedLo: Uint8Array.from({ length: 128 }, (_, i) => i),
@@ -76,6 +101,15 @@ function memoryWriter() {
       insertContribution: (row) => {
         batch.push('contributions')
         if (!contributions.has(row.sig)) contributions.set(row.sig, row)
+        return Promise.resolve()
+      },
+      setVisibility: ({ creator, supporter, showPublicly }) => {
+        batch.push('visibility')
+        const key = `${creator}/${supporter}`
+        const pledge = pledges.get(key)
+        if (typeof pledge === 'object' && pledge !== null) {
+          pledges.set(key, { ...pledge, showPublicly })
+        }
         return Promise.resolve()
       },
     }
@@ -187,6 +221,16 @@ describe('planWrites', () => {
     expect(writes[0]?.row).toMatchObject({ contributions: 2, periodsTotal: 13 })
   })
 
+  it('turns VisibilityChanged into a flag change of the pledge, nothing else', () => {
+    const tx = visibilityTx(false)
+    expect(planWrites(tx, parseEvents(tx.logs), null, NOW)).toEqual([
+      {
+        table: 'visibility',
+        row: { creator: CREATOR, supporter: SUPPORTER_0, showPublicly: false },
+      },
+    ])
+  })
+
   it('refuses a Pledged without ciphertext or without block time', () => {
     const f = fixture('pledge-first')
     const events = parseEvents(f.logMessages)
@@ -263,6 +307,25 @@ describe('createApplier', () => {
     expect(chain.calls).toBe(withTime * 2 + 1)
   })
 
+  it('flips only the flag of an indexed pledge, without a ciphertext or block time', async () => {
+    const memory = memoryWriter()
+    const chain = chainOf([first])
+    const apply = createApplier({ writer: memory.writer, chain, now: () => NOW })
+    await apply(txOf(first))
+    const before = memory.pledges.get(`${CREATOR}/${SUPPORTER_0}`)
+    const calls = chain.calls
+    await apply(visibilityTx(false))
+    expect(chain.calls).toBe(calls)
+    expect(memory.transactions.at(-1)).toEqual(['visibility'])
+    expect(before).toMatchObject({ showPublicly: true })
+    expect(memory.pledges.get(`${CREATOR}/${SUPPORTER_0}`)).toMatchObject({
+      showPublicly: false,
+      contributions: 1,
+      lastSig: first.signature,
+    })
+    expect(memory.contributions.size).toBe(1)
+  })
+
   it('rejects when the proof transaction cannot be read, writing nothing', async () => {
     const memory = memoryWriter()
     const chain = chainOf([{ ...first, ciphertext: undefined }])
@@ -313,5 +376,15 @@ describe('drizzle statements', () => {
     const contributionSql = contributionInsert(handle.db, contribution.row).toSQL()
     expect(contributionSql.sql).toContain('on conflict ("sig") do nothing')
     expect(contributionSql.params).toContain(contribution.row.proofSig)
+  })
+
+  it('visibility update sets show_publicly of one pledge and leaves the snapshot alone', () => {
+    handle = createDb(URL)
+    const row = { creator: CREATOR, supporter: SUPPORTER_0, showPublicly: true }
+    const { sql, params } = visibilityUpdate(handle.db, row).toSQL()
+    expect(sql).toBe(
+      'update "pledges" set "show_publicly" = $1 where ("pledges"."creator" = $2 and "pledges"."supporter" = $3)',
+    )
+    expect(params).toEqual([true, CREATOR, SUPPORTER_0])
   })
 })

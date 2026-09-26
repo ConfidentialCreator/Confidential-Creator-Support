@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { extendExpiry, GRACE_SECONDS, isActive, PERIOD_SECONDS } from './periods.ts'
+import { daysLeft, extendExpiry, GRACE_SECONDS, isActive, PERIOD_SECONDS } from './periods.ts'
 
 const NOW = 1_800_000_000
 
@@ -26,5 +26,21 @@ describe('isActive', () => {
     const expiresAt = NOW
     expect(isActive(NOW + GRACE_SECONDS - 1, expiresAt)).toBe(true)
     expect(isActive(NOW + GRACE_SECONDS, expiresAt)).toBe(false)
+  })
+})
+
+describe('daysLeft', () => {
+  const DAY = 24 * 3600
+
+  it('counts a started day as a whole one, so the last day before expiry reads 1', () => {
+    expect(daysLeft(NOW, NOW + PERIOD_SECONDS)).toBe(30)
+    expect(daysLeft(NOW, NOW + 2 * DAY + 1)).toBe(3)
+    expect(daysLeft(NOW, NOW + 1)).toBe(1)
+  })
+
+  it('reads 0 from the expiry on, grace included: the paid term is over', () => {
+    expect(daysLeft(NOW, NOW)).toBe(0)
+    expect(daysLeft(NOW + GRACE_SECONDS - 1, NOW)).toBe(0)
+    expect(daysLeft(NOW + 100 * DAY, NOW)).toBe(0)
   })
 })

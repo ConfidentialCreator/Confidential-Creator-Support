@@ -47,6 +47,11 @@ const contributionAt = (i: number): ContributionRow => ({
   groupedHi: new Uint8Array(128).fill(255 - i),
 })
 
+const SERIES = [
+  { month: '2026-08', active: 1 },
+  { month: '2026-09', active: 3 },
+]
+
 const isActive = (p: Pledge) => p.expiresAt.getTime() + GRACE_SECONDS * 1000 > NOW.getTime()
 
 function build(pledges: Pledge[], contributions: ContributionRow[]) {
@@ -87,6 +92,10 @@ function build(pledges: Pledge[], contributions: ContributionRow[]) {
         .sort((a, b) => Number(BigInt(b.slot) - BigInt(a.slot)))
         .slice(0, limit)
     },
+    series: async (creator, now) => {
+      calls.push(`series:${creator}:${now.toISOString()}`)
+      return SERIES
+    },
   }
   const app = new Hono<AppEnv>()
     .use('*', requestLogger(pino({ level: 'silent' })))
@@ -112,15 +121,20 @@ describe('GET /creators/:handle', () => {
       createdSlot: 498_814_836,
       activeSupporters: 3,
       totalSupporters: 4,
+      series: SERIES,
     })
-    expect(calls).toEqual([`profile:${HANDLE}:${NOW.toISOString()}`])
+    expect(calls).toEqual([
+      `profile:${HANDLE}:${NOW.toISOString()}`,
+      `series:${CREATOR}:${NOW.toISOString()}`,
+    ])
   })
 
-  it('is 404 NOT_FOUND for a handle nobody registered', async () => {
-    const { get } = build([], [])
+  it('is 404 NOT_FOUND for a handle nobody registered, without asking for a series', async () => {
+    const { get, calls } = build([], [])
     const res = await get('/creators/nobody-here')
     expect(res.status).toBe(404)
     expect((await errorOf(res)).code).toBe('NOT_FOUND')
+    expect(calls).toEqual([`profile:nobody-here:${NOW.toISOString()}`])
   })
 
   it('is 400 INVALID_INPUT for a handle outside the pattern, before any lookup', async () => {

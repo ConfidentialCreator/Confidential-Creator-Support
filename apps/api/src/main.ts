@@ -1,5 +1,5 @@
 import { fetchPublicBalance } from '@ccsupport/chain'
-import { createDb, drizzleCreatorsReader } from '@ccsupport/db'
+import { createDb, drizzleCreatorsReader, drizzleSupportersReader } from '@ccsupport/db'
 import { wsUrlFor } from '@ccsupport/worker/config'
 import { startWorker, type WorkerHandle } from '@ccsupport/worker/run'
 import { serve } from '@hono/node-server'
@@ -65,6 +65,7 @@ async function main(): Promise<void> {
     },
     relay: { payer },
     creators: { reader: drizzleCreatorsReader(database.db) },
+    supporters: { reader: drizzleSupportersReader(database.db) },
     ...(faucet && { devnet: faucet.devnet }),
   })
 

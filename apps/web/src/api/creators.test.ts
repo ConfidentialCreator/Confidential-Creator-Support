@@ -13,6 +13,7 @@ const profile = {
   createdSlot: 498814836,
   activeSupporters: 128,
   totalSupporters: 130,
+  series: [{ month: '2026-09', active: 128 }],
 }
 
 const notFound = { error: { code: 'NOT_FOUND', message: 'no creator with this handle' } }

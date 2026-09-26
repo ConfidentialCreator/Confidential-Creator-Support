@@ -8,6 +8,7 @@ import { type CreatorsDeps, creatorsRoute } from './routes/creators.ts'
 import { type DevnetDeps, devnetRoute } from './routes/devnet.ts'
 import { type HealthDeps, healthRoute } from './routes/health.ts'
 import { type RelayDeps, relayRoute } from './routes/relay.ts'
+import { type SupportersDeps, supportersRoute } from './routes/supporters.ts'
 
 export type AppDeps = {
   logger: Logger
@@ -16,6 +17,7 @@ export type AppDeps = {
   relay: RelayDeps
   // Absent in the demo process, which has no index of its own.
   creators?: CreatorsDeps
+  supporters?: SupportersDeps
   // Absent outside devnet: the route is not mounted, so /devnet/faucet is a plain 404.
   devnet?: DevnetDeps
   rateLimit?: RateLimitOptions
@@ -37,7 +39,10 @@ export function createApp(deps: AppDeps) {
 
   const routed = app.route('/', healthRoute(deps.health)).route('/', relayRoute(deps.relay))
   const withCreators = deps.creators ? routed.route('/', creatorsRoute(deps.creators)) : routed
-  return deps.devnet ? withCreators.route('/', devnetRoute(deps.devnet)) : withCreators
+  const withSupporters = deps.supporters
+    ? withCreators.route('/', supportersRoute(deps.supporters))
+    : withCreators
+  return deps.devnet ? withSupporters.route('/', devnetRoute(deps.devnet)) : withSupporters
 }
 
 export type App = ReturnType<typeof createApp>

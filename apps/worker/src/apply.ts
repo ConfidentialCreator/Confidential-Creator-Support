@@ -1,4 +1,5 @@
 import { type Db, schema } from '@ccsupport/db'
+import { and, eq } from 'drizzle-orm'
 import {
   type ChainReader,
   fetchRecipientCiphertext,
@@ -10,16 +11,19 @@ import { type ProgramEvent, parseEvents } from './events.ts'
 export type CreatorRow = typeof schema.creators.$inferInsert
 export type PledgeRow = typeof schema.pledges.$inferInsert
 export type ContributionRow = typeof schema.contributions.$inferInsert
+export type VisibilityRow = { creator: string; supporter: string; showPublicly: boolean }
 
 export type IndexWrite =
   | { table: 'creators'; row: CreatorRow }
   | { table: 'pledges'; row: PledgeRow }
   | { table: 'contributions'; row: ContributionRow }
+  | { table: 'visibility'; row: VisibilityRow }
 
 export type IndexWrites = {
   upsertCreator: (row: CreatorRow) => Promise<void>
   upsertPledge: (row: PledgeRow) => Promise<void>
   insertContribution: (row: ContributionRow) => Promise<void>
+  setVisibility: (row: VisibilityRow) => Promise<void>
 }
 
 // Runs the writes of one chain transaction inside one database transaction.
@@ -70,6 +74,11 @@ export function planWrites(
       })
       continue
     }
+    if (event.kind === 'visibilityChanged') {
+      const { creator, supporter, showPublicly } = event.data
+      writes.push({ table: 'visibility', row: { creator, supporter, showPublicly } })
+      continue
+    }
     writes.push({
       table: 'creators',
       row: {
@@ -111,15 +120,26 @@ export function createApplier({
     const writes = planWrites({ ...tx, blockTime }, events, ciphertext, now())
     await writer(async (w) => {
       for (const write of writes) {
-        if (write.table === 'creators') await w.upsertCreator(write.row)
-        else if (write.table === 'pledges') await w.upsertPledge(write.row)
-        else await w.insertContribution(write.row)
+        switch (write.table) {
+          case 'creators':
+            await w.upsertCreator(write.row)
+            break
+          case 'pledges':
+            await w.upsertPledge(write.row)
+            break
+          case 'contributions':
+            await w.insertContribution(write.row)
+            break
+          case 'visibility':
+            await w.setVisibility(write.row)
+            break
+        }
       }
     })
   }
 }
 
-type Executor = Pick<Db, 'insert'>
+type Executor = Pick<Db, 'insert' | 'update'>
 
 // `CreatorUpdated` cannot change the handle and must not move the registration slot.
 export const creatorUpsert = (db: Executor, row: CreatorRow) =>
@@ -159,6 +179,15 @@ export const contributionInsert = (db: Executor, row: ContributionRow) =>
     .values(row)
     .onConflictDoNothing({ target: schema.contributions.sig })
 
+// The program lets only an existing pledge change its flag, so there is no row to insert.
+export const visibilityUpdate = (db: Executor, row: VisibilityRow) =>
+  db
+    .update(schema.pledges)
+    .set({ showPublicly: row.showPublicly })
+    .where(
+      and(eq(schema.pledges.creator, row.creator), eq(schema.pledges.supporter, row.supporter)),
+    )
+
 export function drizzleWriter(db: Db): IndexWriter {
   return (fn) =>
     db.transaction((tx) =>
@@ -171,6 +200,9 @@ export function drizzleWriter(db: Db): IndexWriter {
         },
         insertContribution: async (row) => {
           await contributionInsert(tx, row)
+        },
+        setVisibility: async (row) => {
+          await visibilityUpdate(tx, row)
         },
       }),
     )

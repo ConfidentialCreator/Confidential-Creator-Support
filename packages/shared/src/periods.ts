@@ -14,3 +14,11 @@ export function extendExpiry(now: number, expiresAt: number, periods: number): n
 export function isActive(now: number, expiresAt: number): boolean {
   return expiresAt + GRACE_SECONDS > now
 }
+
+const DAY_SECONDS = 24 * 60 * 60
+
+// Grace is not counted: a renewal extends from the old expiry, so grace days are paid by
+// the next period rather than left over from this one.
+export function daysLeft(now: number, expiresAt: number): number {
+  return Math.max(0, Math.ceil((expiresAt - now) / DAY_SECONDS))
+}

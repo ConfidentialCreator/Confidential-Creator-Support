@@ -31,6 +31,10 @@ export const creatorProfileSchema = z.object({
   createdSlot: slot,
   activeSupporters: counter,
   totalSupporters: counter,
+  // Months are UTC, oldest first; `active` counts pledges that lived through the month.
+  series: z.array(
+    z.object({ month: z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/), active: counter }),
+  ),
 })
 
 export type CreatorProfile = z.infer<typeof creatorProfileSchema>

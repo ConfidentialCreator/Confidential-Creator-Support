@@ -1,5 +1,9 @@
 import { readFileSync } from 'node:fs'
-import { CCSUPPORT_PROGRAM_ADDRESS, getPledgedEventEncoder } from '@ccsupport/chain'
+import {
+  CCSUPPORT_PROGRAM_ADDRESS,
+  getPledgedEventEncoder,
+  getVisibilityChangedEventEncoder,
+} from '@ccsupport/chain'
 import { type Address, getBase64Decoder } from '@solana/kit'
 import { describe, expect, it } from 'vitest'
 import { z } from 'zod'
@@ -77,6 +81,29 @@ describe('parseEvents', () => {
     if (first?.kind !== 'pledged' || renewal?.kind !== 'pledged') throw new Error('kind')
     expect(renewal.data.startedAt).toBe(first.data.startedAt)
     expect(renewal.data.expiresAt).toBeGreaterThan(first.data.expiresAt)
+  })
+
+  // No devnet transaction carries this event yet, so the line is encoded from the IDL.
+  it('reads VisibilityChanged with the new flag', () => {
+    const line = `Program data: ${getBase64Decoder().decode(
+      getVisibilityChangedEventEncoder().encode({
+        creator: CREATOR,
+        supporter: SUPPORTER_0,
+        showPublicly: true,
+        slot: 7,
+      }),
+    )}`
+    const logs = [
+      `Program ${CCSUPPORT_PROGRAM_ADDRESS} invoke [1]`,
+      line,
+      `Program ${CCSUPPORT_PROGRAM_ADDRESS} success`,
+    ]
+    expect(parseEvents(logs)).toEqual([
+      {
+        kind: 'visibilityChanged',
+        data: { creator: CREATOR, supporter: SUPPORTER_0, showPublicly: true, slot: 7n },
+      },
+    ])
   })
 
   it('ignores event-shaped data logged by another program', () => {

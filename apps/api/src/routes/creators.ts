@@ -49,9 +49,11 @@ export function creatorsRoute(deps: CreatorsDeps): Hono<AppEnv> {
 
   return new Hono<AppEnv>()
     .get('/creators/:handle', validateHandle, async (c) => {
-      const profile = await deps.reader.profile(c.req.valid('param').handle, now())
+      const at = now()
+      const profile = await deps.reader.profile(c.req.valid('param').handle, at)
       if (!profile) return fail(c, 'NOT_FOUND', 'no creator with this handle')
-      return c.json({ data: { ...profile, createdSlot: Number(profile.createdSlot) } })
+      const series = await deps.reader.series(profile.wallet, at)
+      return c.json({ data: { ...profile, createdSlot: Number(profile.createdSlot), series } })
     })
     .get('/creators/:handle/supporters', validateHandle, validateQuery, async (c) => {
       const { cursor, limit } = c.req.valid('query')
