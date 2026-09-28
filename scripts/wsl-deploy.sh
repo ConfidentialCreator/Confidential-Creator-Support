@@ -3,7 +3,8 @@
 #   wsl.exe -e bash /mnt/<drive>/<path to repo>/scripts/wsl-deploy.sh <deploy|verify|status>
 #
 # deploy  — uploads target/deploy/ccsupport.so (SBPFv0 only) under the program's declare_id!;
-#           the upgrade authority is a separate key outside the repo, created on demand.
+#           the upgrade authority is a separate key outside the repo, created on demand;
+#           a program already on chain is upgraded in place.
 # verify  — the bytecode on chain equals the local .so byte for byte and has e_flags 0x0.
 # status  — `solana program show` + the deployer balance.
 #
@@ -85,21 +86,37 @@ case "$CMD" in
     ensure_deployer
     check_v0 "$SO"
     size="$(stat -c %s "$SO")"
-    # Room for upgrades: ProgramData fixes the length for the whole life of the program.
-    max_len=$(( size * 3 / 2 ))
-    rent="$(solana rent "$max_len" --url "$URL" --output json | sed -n 's/.*"rentExemptMinimumLamports": *\([0-9]*\).*/\1/p')"
     balance="$(solana balance "$(solana-keygen pubkey "$DEPLOYER")" --url "$URL" --lamports | awk '{print $1}')"
     echo "deployer: $(solana-keygen pubkey "$DEPLOYER")  $(( balance / 1000000 ))e-3 SOL"
-    echo ".so:      $size bytes, max-len $max_len, ProgramData rent ≈ $(( rent / 1000000 ))e-3 SOL (+ the same again temporarily for the buffer)"
-    if (( balance < rent * 2 + 100000000 )); then
-      echo "ERROR: not enough SOL on the deployer — top up: solana airdrop 5 $(solana-keygen pubkey "$DEPLOYER") --url devnet"
+    data_len="$(solana program show "$PROGRAM_ID" --url "$URL" 2>/dev/null | awk '/^Data Length:/ {print $3}')"
+    if [[ -n "$data_len" ]]; then
+      # An upgrade only pays for the buffer (refunded when it is written into ProgramData);
+      # --max-len is left out so the CLI does not grow ProgramData past its original room.
+      if (( size > data_len )); then
+        echo "ERROR: .so is $size bytes, ProgramData holds $data_len — the upgrade would extend it; decide on that explicitly"
+        exit 1
+      fi
+      rent="$(solana rent "$size" --url "$URL" --output json | sed -n 's/.*"rentExemptMinimumLamports": *\([0-9]*\).*/\1/p')"
+      echo ".so:      $size bytes into ProgramData of $data_len, buffer rent ≈ $(( rent / 1000000 ))e-3 SOL (refunded)"
+      need=$(( rent + 100000000 ))
+      max_len_args=()
+    else
+      # Room for upgrades: ProgramData fixes the length for the whole life of the program.
+      max_len=$(( size * 3 / 2 ))
+      rent="$(solana rent "$max_len" --url "$URL" --output json | sed -n 's/.*"rentExemptMinimumLamports": *\([0-9]*\).*/\1/p')"
+      echo ".so:      $size bytes, max-len $max_len, ProgramData rent ≈ $(( rent / 1000000 ))e-3 SOL (+ the same again temporarily for the buffer)"
+      need=$(( rent * 2 + 100000000 ))
+      max_len_args=(--max-len "$max_len")
+    fi
+    if (( balance < need )); then
+      echo "ERROR: not enough SOL on the deployer — need $(( need / 1000000 ))e-3; top up: solana airdrop 5 $(solana-keygen pubkey "$DEPLOYER") --url devnet"
       exit 1
     fi
     run solana program deploy "$SO" \
       --program-id "$PROGRAM_KEYPAIR" \
       --upgrade-authority "$DEPLOYER" \
       --keypair "$DEPLOYER" \
-      --max-len "$max_len" \
+      "${max_len_args[@]}" \
       --url "$URL" \
       --commitment confirmed
     echo "OK — deployed $PROGRAM_ID"
