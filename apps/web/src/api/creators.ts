@@ -13,7 +13,7 @@ import { z } from 'zod'
 
 const envelope = z.object({ data: z.unknown() })
 
-async function read<T extends z.ZodType>(
+export async function read<T extends z.ZodType>(
   url: string,
   schema: T,
   fetchImpl: typeof fetch,

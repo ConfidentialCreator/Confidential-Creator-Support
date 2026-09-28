@@ -3,6 +3,7 @@ import { routes } from './components/Chrome.tsx'
 import { Audit } from './screens/Audit/Audit.tsx'
 import { CreatorPage } from './screens/CreatorPage/CreatorPage.tsx'
 import { Dashboard } from './screens/Dashboard/Dashboard.tsx'
+import { Me } from './screens/Me/Me.tsx'
 import { Register } from './screens/Register/Register.tsx'
 import { Support } from './screens/Support/Support.tsx'
 
@@ -14,6 +15,7 @@ export function Router() {
         <Route path="/support/:handle" element={<Support />} />
         <Route path="/creator" element={<Dashboard />} />
         <Route path="/creator/new" element={<Register />} />
+        <Route path="/me" element={<Me />} />
         <Route path="/audit" element={<Audit />} />
         <Route path="*" element={<Navigate to={routes.page} replace />} />
       </Routes>

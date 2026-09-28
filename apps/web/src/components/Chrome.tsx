@@ -8,6 +8,7 @@ export const routes = {
   page: `/c/${creator.handle}`,
   support: `/support/${creator.handle}`,
   cabinet: '/creator',
+  me: '/me',
   audit: '/audit',
 } as const
 
@@ -15,6 +16,7 @@ const nav = [
   ['Page', routes.page],
   ['Support', routes.support],
   ['Cabinet', routes.cabinet],
+  ['My support', routes.me],
   ['Audit', routes.audit],
 ] as const
 
@@ -28,13 +30,17 @@ export function Chrome({ mock = false, children }: { mock?: boolean; children: R
         <ApiStatus />
       </div>
       <WalletRow />
-      <nav className="my-2 mb-5 flex gap-3">
+      <nav className="my-2 mb-5 flex flex-wrap gap-x-3">
         {nav.map(([label, to], i) => (
           <span key={to} className="flex gap-3">
             {i > 0 && <span className="text-muted">·</span>}
             <NavLink
               to={to}
-              className={({ isActive }) => (isActive ? 'border-b-2 border-ink' : 'text-muted')}
+              className={({ isActive }) =>
+                isActive
+                  ? 'whitespace-nowrap border-b-2 border-ink'
+                  : 'whitespace-nowrap text-muted'
+              }
             >
               {label}
             </NavLink>
