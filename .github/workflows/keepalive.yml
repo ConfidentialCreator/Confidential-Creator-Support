@@ -20,6 +20,9 @@ jobs:
     steps:
       # A sleeping instance takes about a minute to answer the first request.
       - name: GET /health
+        # An explicit `bash` runs with pipefail; the default shell does not, and `cut`
+        # then turns a timed-out request into a green run.
+        shell: bash
         run: |
           curl --silent --show-error --fail --max-time 120 \
             "${{ vars.VITE_API_URL || 'https://ccsupport-api.onrender.com' }}/health" \
