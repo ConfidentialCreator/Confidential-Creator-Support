@@ -1,6 +1,7 @@
 import { createDb } from '@ccsupport/db'
 import { pino } from 'pino'
 import { workerConfigFromEnv } from './config.ts'
+import { serializeErr } from './log.ts'
 import { startWorker } from './run.ts'
 
 const SHUTDOWN_GRACE_MS = 10_000
@@ -11,6 +12,7 @@ async function main(): Promise<void> {
     level: config.logLevel,
     base: { service: 'worker' },
     timestamp: pino.stdTimeFunctions.isoTime,
+    serializers: { err: serializeErr },
   })
   const database = createDb(config.databaseUrl)
   const worker = await startWorker({ config, logger, database })

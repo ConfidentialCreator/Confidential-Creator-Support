@@ -5,7 +5,8 @@
   "type": "module",
   "exports": {
     "./run": "./src/run.ts",
-    "./config": "./src/config.ts"
+    "./config": "./src/config.ts",
+    "./log": "./src/log.ts"
   },
   "scripts": {
     "dev": "node --watch --env-file-if-exists=../../.env src/main.ts",

@@ -1,8 +1,9 @@
 import { apiErrorBodySchema } from '@ccsupport/shared'
-import { address } from '@solana/kit'
+import { address, SOLANA_ERROR__RPC__TRANSPORT_HTTP_ERROR, SolanaError } from '@solana/kit'
 import { pino } from 'pino'
 import { describe, expect, it } from 'vitest'
 import { type AppDeps, createApp } from './app.ts'
+import { createLogger } from './logger.ts'
 
 const ORIGIN = 'http://localhost:5173'
 const PAYER = address('AJ6LFWEJgLEwkfyWWipZ8Le5fV9QjCV61UCnzv9g5ZUq')
@@ -54,6 +55,26 @@ describe('GET /health', () => {
       },
     })
     expect((await hanging.request('/health')).status).toBe(503)
+  })
+
+  it('answers 503, not 500, when the rpc rate-limits and the failure is really logged', async () => {
+    const lines: string[] = []
+    const res = await build({
+      logger: createLogger('error', { write: (l) => lines.push(l) }),
+      health: {
+        payer: PAYER,
+        slot: async () => {
+          throw new SolanaError(SOLANA_ERROR__RPC__TRANSPORT_HTTP_ERROR, {
+            headers: new Headers(),
+            message: 'max usage reached',
+            statusCode: 429,
+          })
+        },
+        payerLamports: async () => 0n,
+      },
+    }).request('/health')
+    expect(res.status).toBe(503)
+    expect(lines.map((l) => JSON.parse(l).msg)).toEqual(['health check failed'])
   })
 })
 

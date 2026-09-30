@@ -1,5 +1,6 @@
+import { serializeErr } from '@ccsupport/worker/log'
 import type { MiddlewareHandler } from 'hono'
-import { type Logger as PinoLogger, pino } from 'pino'
+import { type DestinationStream, type Logger as PinoLogger, pino } from 'pino'
 import type { LogLevel } from './config.ts'
 import type { AppEnv } from './env.ts'
 
@@ -7,12 +8,16 @@ export type Logger = PinoLogger
 
 // One JSON line per event on stdout; the host collects it. Pretty-printing is the
 // developer's pipe (`pino-pretty`), not a dependency of the service.
-export function createLogger(level: LogLevel): Logger {
-  return pino({
-    level,
-    base: { service: 'api' },
-    timestamp: pino.stdTimeFunctions.isoTime,
-  })
+export function createLogger(level: LogLevel, destination?: DestinationStream): Logger {
+  return pino(
+    {
+      level,
+      base: { service: 'api' },
+      timestamp: pino.stdTimeFunctions.isoTime,
+      serializers: { err: serializeErr },
+    },
+    destination,
+  )
 }
 
 export const REQUEST_ID_HEADER = 'x-request-id'
