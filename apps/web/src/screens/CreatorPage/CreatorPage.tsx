@@ -7,6 +7,7 @@ import { Sealed } from '../../components/Sealed.tsx'
 import { webEnv } from '../../config.ts'
 import { TOKEN, trunc, withUnit } from '../../mockData.ts'
 import { formatDay, formatUnits, formatUtc, TOKEN_DECIMALS } from './format.ts'
+import { History } from './History.tsx'
 
 export function CreatorPage() {
   const { handle = '' } = useParams()
@@ -90,6 +91,9 @@ function Profile({ profile, asOf }: { profile: CreatorProfile; asOf: Date }) {
         The fact that you support is public. The amount is sealed — readable by you, the creator and
         the auditor, and by nobody else.
       </p>
+
+      <h2>Supporters by month</h2>
+      <History profile={profile} />
 
       <h2>Listed supporters</h2>
       <Listed handle={profile.handle} />
