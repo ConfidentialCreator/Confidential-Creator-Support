@@ -1,10 +1,10 @@
 name: Keep the api awake
 
 # The free Render instance spins down after 15 minutes without traffic, and while it
-# sleeps the index does not move. A request every 5 minutes (GitHub may run a schedule
-# a few minutes late) keeps it up; the 750 free instance hours a month cover one
-# service around the clock. GitHub disables schedules after 60 days without a commit —
-# re-enable it under Actions if the repository goes quiet.
+# sleeps the index does not move. The uptime monitor on /health is what keeps it up:
+# GitHub runs a `*/5` schedule 10–17 minutes apart, so this is only a second wake-up.
+# GitHub disables schedules after 60 days without a commit — re-enable it under
+# Actions if the repository goes quiet.
 
 on:
   schedule:

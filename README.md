@@ -98,34 +98,61 @@ On-chain work runs in WSL and is called from PowerShell:
 and `scripts/wsl-deploy.sh <deploy|verify|status>`. The network artifact is SBPFv0
 (`build-sbf`); `anchor build` is only for the IDL.
 
-## Web on GitHub Pages
+## Deployment
 
-`.github/workflows/pages.yml` builds `apps/web` on every push to `main` and deploys it to
-GitHub Pages under `/<repository>/` (a custom domain sets the variable `PAGES_BASE_PATH=/`).
-One-time repository settings: **Pages → Source: GitHub Actions**; variables `VITE_API_URL`,
-`VITE_CCS_MINT`, `VITE_SOLANA_CLUSTER`; secret `VITE_SOLANA_RPC_URL`. The RPC key ends up in
-the bundle like any `VITE_*` value — restrict it to the Pages domain in the RPC provider.
+The demo runs on free tiers, each on the owner's own account: the database on Supabase, the
+api with the indexer on Render, the web on GitHub Pages, and an uptime monitor that keeps the
+api awake. No value from these services lives in the repository — `render.yaml` and
+`pages.yml` name the variables, the dashboards hold them.
 
-Pages hosts the static web only. The api (proof relay, faucet, read routes) and the worker
-(indexer) are processes with a payer key and a database connection — they run elsewhere, the
-api's `WEB_ORIGIN` is the Pages origin, and `VITE_API_URL` points at the api.
+### Database — Supabase
 
-## Api and indexer on Render (free)
+One project, two connection strings: the transaction pooler (port 6543) is `DATABASE_URL` for
+the api and the indexer; the session pooler (port 5432) is `MIGRATE_DATABASE_URL`, used only to
+apply migrations. Run `pnpm --filter @ccsupport/db db:migrate` from a machine whose `.env` has
+`MIGRATE_DATABASE_URL` — once, and again after each release that adds a file under
+`packages/db/migrations`.
+
+### Api and indexer — Render (free)
 
 `render.yaml` is a Render Blueprint for one free web service: the api with the indexer
 running inside it (`RUN_WORKER=true` — the free instance cannot run a background worker).
 Steps: Render → New → Blueprint → this repository; fill in the `sync: false` variables
-(`WEB_ORIGIN` = the Pages origin, `SOLANA_RPC_URL`, `DATABASE_URL` on the 6543 pooler,
-`CCS_MINT`, `PROOF_PAYER_SECRET`, `FAUCET_SECRET`); run `db:migrate` once from a machine with
-`MIGRATE_DATABASE_URL`. The service answers on `https://<name>.onrender.com` — that is
-`VITE_API_URL` for Pages.
+(`WEB_ORIGIN` = the Pages origin, `SOLANA_RPC_URL`, `DATABASE_URL`, `CCS_MINT`,
+`PROOF_PAYER_SECRET`, `FAUCET_SECRET`). Every push to `main` redeploys it. The service answers
+on `https://<name>.onrender.com` — that is `VITE_API_URL` for Pages. The process idles at about
+105 MB, well inside the 512 MB of the free instance, and the 750 free hours a month cover one
+service around the clock.
 
-A free instance spins down after 15 minutes without traffic and takes about a minute to
-come back; while it sleeps the index does not move (the backfill catches up on wake).
-`.github/workflows/keepalive.yml` requests `/health` every 5 minutes from GitHub Actions to
-keep it awake (GitHub pauses schedules after 60 days without a commit — re-enable under
-Actions), and the 750 free hours a month cover one service around the clock. The process
-idles at about 105 MB, well inside the 512 MB of the free instance.
+`SOLANA_RPC_URL` is spent by the indexer and the relay; when its provider's monthly credits run
+out the RPC answers 429 and `/health` turns 503 — replace the key in Render; the service
+restarts with it, no code change needed.
+
+### Web — GitHub Pages
+
+`.github/workflows/pages.yml` builds `apps/web` on every push to `main` and deploys it to
+GitHub Pages under `/<repository>/` (a custom domain sets the variable `PAGES_BASE_PATH=/`).
+One-time repository settings: **Pages → Source: GitHub Actions**; variables `VITE_API_URL`,
+`VITE_CCS_MINT`, `VITE_SOLANA_CLUSTER` (Settings → Secrets and variables → Actions, not
+Environments). The secret `VITE_SOLANA_RPC_URL` is optional: without it the browser reads the
+public devnet RPC, which is enough for one person's reads; with it the key ends up in the
+bundle like any `VITE_*` value — restrict it to the Pages domain in the RPC provider.
+
+Pages hosts the static web only; the api's `WEB_ORIGIN` must be the Pages origin (scheme and
+host, no path), or the browser's requests are refused by CORS.
+
+### Keep-alive — UptimeRobot
+
+A free Render instance spins down after 15 minutes without HTTP traffic and takes about a
+minute to come back; while it sleeps the index does not move (the backfill catches up on
+wake). An HTTP monitor on `https://<name>.onrender.com/health` every 5 minutes keeps it up —
+the path matters, the root answers 404 and the monitor would stay red; `HEAD` is accepted.
+The monitor also mails the owner when the api goes down. UptimeRobot's free plan is for
+non-commercial use; if that becomes a problem, any external pinger with the same URL and
+interval does the job — cron-job.org is free and has no such clause. A GitHub Actions
+schedule is not a substitute: `*/5` runs drift to 10–17 minutes apart, past the 15-minute
+limit.
+`.github/workflows/keepalive.yml` still pings from Actions as a second, best-effort wake-up.
 
 ## Layout
 

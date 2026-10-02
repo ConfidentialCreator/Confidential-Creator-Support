@@ -13,7 +13,7 @@ export type HealthDeps = {
 }
 
 // A dependency that hangs is, for a healthcheck, the same as one that failed —
-// without a cap the probe hangs as long as the RPC does and Railway sees a timeout
+// without a cap the probe hangs as long as the RPC does and Render sees a timeout
 // instead of `ok: false`.
 function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
   return new Promise<T>((resolve, reject) => {
@@ -22,7 +22,7 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
   })
 }
 
-// `ok` is reachability of the RPC — what the Railway probe and the keep-alive ask.
+// `ok` is reachability of the RPC — what the Render health check and the uptime monitor ask.
 // `payerLamports` is the operator's gauge for topping up; a low balance is not an
 // outage, so it never flips `ok`.
 export function healthRoute(deps: HealthDeps): Hono<AppEnv> {

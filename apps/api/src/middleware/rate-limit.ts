@@ -41,7 +41,7 @@ export function clientIp(c: Context<AppEnv>): string {
 
 // Sliding window of request timestamps per key. A fixed window is cheaper but lets
 // twice the limit through at the boundary of two windows. The counter lives in the
-// process: one container on Railway, no Redis in the stack.
+// process: one Render instance, no Redis in the stack.
 export function createRateLimiter(options: RateLimiterOptions = {}): RateLimiter {
   const limit = options.limit ?? RATE_LIMIT
   const windowMs = options.windowMs ?? WINDOW_MS

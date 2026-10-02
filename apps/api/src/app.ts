@@ -31,7 +31,7 @@ export function createApp(deps: AppDeps) {
   app.use('*', requestLogger(deps.logger))
   app.use('*', cors({ origin: deps.webOrigin, allowHeaders: ['Content-Type'] }))
   // Only the paths that spend the payer's SOL (PLAN → API); /health stays outside
-  // so the Railway probe is never throttled by us.
+  // so the Render health check and the uptime monitor are never throttled by us.
   app.use('/relay/*', rateLimit(deps.rateLimit))
 
   app.notFound(notFoundHandler)
