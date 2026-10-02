@@ -1,0 +1,28 @@
+{
+  "cluster": "devnet",
+  "finishedAt": "2026-10-02T07:55:06.473Z",
+  "api": "https://ccsupport-api.onrender.com",
+  "handle": "marrow-dispatch",
+  "supporter": "BZoaxCKwqteXmttxgeVeiwmr8oKfMjTHqwhXBPL3wrye",
+  "signatures": {
+    "faucet": "3yfx5pABNuDXi5mC7y8uQrfJutCoubKZUaYvPFmgX9pRrHPVAuh4PTWazJLZn5tTb5h9x3yjWq1k4rPDUS2a4VYd",
+    "preparation": [
+      "2zvL3WZcvWXFMUk8B4MhjCTvJMX4ikaDSa9XyaVzMyYFAwFNjvmKuZzRvkYwpLRKJKNZNMf3m5yCU6mrnh4GVwtj"
+    ],
+    "first": "4RUzRAycGs1ksSGd3MJxWm1uuhaBAqtand6QTseecq4At156tGiFxUKKM6sN88PPwFgeokR2iPDQy1VYi3aBkhBj",
+    "renewal": "RCx7r4ts7pu84ZVQZ1xYEJFtY64yjumZr5yZy8seWCmM1itc4wsWmJNNWZoXQTGQPUmkEmphm3Q1hve5BxhCApB"
+  },
+  "before": {
+    "expiresAt": "2026-11-01T07:54:39.000Z",
+    "activeSupporters": 350
+  },
+  "verdict": {
+    "samples": 16,
+    "inactive": 0,
+    "expectedExpiresAt": "2026-12-01T07:54:39.000Z",
+    "indexedMs": 1189.732600000003,
+    "counterBefore": 350,
+    "counterMoves": 0,
+    "pass": true
+  }
+}

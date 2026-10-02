@@ -9,6 +9,7 @@
   "scripts": {
     "demo": "node --env-file=../../.env src/main.ts",
     "measure": "node --env-file=../../.env src/measure.ts",
+    "renewal": "node --env-file=../../.env src/renewal.ts",
     "spike:transfer": "node --env-file=../../.env src/spike/transfer.ts",
     "spike:decrypt": "node src/spike/decrypt.ts",
     "test": "vitest run",
