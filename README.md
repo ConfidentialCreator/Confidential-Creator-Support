@@ -148,8 +148,12 @@ restarts with it, no code change needed.
 
 ### Web — GitHub Pages
 
-`.github/workflows/pages.yml` builds `apps/web` on every push to `main` and deploys it to
-GitHub Pages under `/<repository>/` (a custom domain sets the variable `PAGES_BASE_PATH=/`).
+`.github/workflows/pages.yml` deploys on every push to `main`: the landing page
+(`apps/landing`, static, no build) at `/<repository>/` and `apps/web` under
+`/<repository>/app/` (a custom domain sets the variable `PAGES_BASE_PATH=/app/`). The root
+`404.html` is the app shell, so deep links into the app work, and links from v0.1.0 that point
+outside `/app/` are moved under it. The landing reads the live supporter count from
+`VITE_API_URL` and keeps its printed figures when the api does not answer.
 One-time repository settings: **Pages → Source: GitHub Actions**; variables `VITE_API_URL`,
 `VITE_CCS_MINT`, `VITE_SOLANA_CLUSTER` (Settings → Secrets and variables → Actions, not
 Environments). The secret `VITE_SOLANA_RPC_URL` is optional: without it the browser reads the
@@ -183,6 +187,7 @@ limit.
 - `apps/api` — Hono: proof relay, public read routes, devnet faucet.
 - `apps/worker` — indexer: program events → index, backfill plus a log subscription.
 - `apps/web` — React + Vite: creator page, support flow, creator and supporter cabinets.
+- `apps/landing` — the landing page at the site root: one HTML file, one stylesheet, no build.
 - `tools/mint`, `tools/demo` — operator commands; demo set, spikes and measurements.
 - `fixtures/` — real devnet transactions and the measured runs; no amounts inside.
 - `scripts/` — gate helpers, WSL build/deploy, trace sweep before a push.

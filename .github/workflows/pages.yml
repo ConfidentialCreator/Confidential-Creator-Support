@@ -1,11 +1,12 @@
 name: Pages
 
-# Deploys apps/web to GitHub Pages. The api and the worker are processes with keys
-# and a database connection — they are hosted elsewhere, and the web reaches the api
-# through VITE_API_URL. Repository settings needed once: Pages → Source: GitHub Actions;
-# variables VITE_API_URL, VITE_CCS_MINT, VITE_SOLANA_CLUSTER (and PAGES_BASE_PATH=/ for
-# a custom domain); secret VITE_SOLANA_RPC_URL — the Helius key lands in the bundle, so
-# restrict it to the Pages domain in the Helius dashboard.
+# Deploys the landing (apps/landing, static, no build) to the root of GitHub Pages and
+# apps/web under /app/. The api and the worker are processes with keys and a database
+# connection — they are hosted elsewhere, and both pages reach the api through
+# VITE_API_URL. Repository settings needed once: Pages → Source: GitHub Actions;
+# variables VITE_API_URL, VITE_CCS_MINT, VITE_SOLANA_CLUSTER (and PAGES_BASE_PATH=/app/
+# for a custom domain); secret VITE_SOLANA_RPC_URL — the Helius key lands in the bundle,
+# so restrict it to the Pages domain in the Helius dashboard.
 
 on:
   push:
@@ -40,24 +41,31 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      # A project site lives under /<repo>/; a custom domain sets PAGES_BASE_PATH to /.
+      # A project site lives under /<repo>/ with the app in /<repo>/app/; a custom domain
+      # sets PAGES_BASE_PATH to /app/.
       - name: Build the web
         run: pnpm --filter @ccsupport/web build
         env:
-          BASE_PATH: ${{ vars.PAGES_BASE_PATH || format('/{0}/', github.event.repository.name) }}
+          BASE_PATH: ${{ vars.PAGES_BASE_PATH || format('/{0}/app/', github.event.repository.name) }}
           VITE_API_URL: ${{ vars.VITE_API_URL }}
           VITE_CCS_MINT: ${{ vars.VITE_CCS_MINT }}
           VITE_SOLANA_CLUSTER: ${{ vars.VITE_SOLANA_CLUSTER }}
           VITE_SOLANA_RPC_URL: ${{ secrets.VITE_SOLANA_RPC_URL }}
 
-      # Pages has no rewrites: an unknown path is served 404.html, and a copy of the
-      # app shell there lets the router take over on a deep link.
-      - name: SPA fallback
-        run: cp apps/web/dist/index.html apps/web/dist/404.html
+      # Pages has no rewrites and serves a custom 404 only from the site root, so the root
+      # 404.html is the app shell: a deep link under /app/ lands there and the router takes
+      # over; a v0.1.0 link outside /app/ is moved under it by the app before routing.
+      - name: Assemble the site
+        run: |
+          mkdir -p site
+          cp -r apps/landing/. site/
+          cp -r apps/web/dist site/app
+          cp apps/web/dist/index.html site/404.html
+          sed -i 's|<meta name="ccs-api" content="">|<meta name="ccs-api" content="${{ vars.VITE_API_URL }}">|' site/index.html
 
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: apps/web/dist
+          path: site
 
   deploy:
     needs: build

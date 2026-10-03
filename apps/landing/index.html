@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Confidential Creator Support — public support, sealed amounts</title>
+<meta name="description" content="Recurring support for creators on Solana: the fact of support is public and verifiable on chain, the amount of every contribution is encrypted.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Confidential Creator Support — public support, sealed amounts">
+<meta property="og:description" content="The fact of support is public and verifiable on chain. The amount of every contribution is encrypted. A working demo on Solana devnet.">
+<meta property="og:url" content="https://confidentialcreator.github.io/Confidential-Creator-Support/">
+<meta property="og:image" content="https://confidentialcreator.github.io/Confidential-Creator-Support/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Confidential Creator Support: the fact is public, the amount is not.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#f3efe6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#151513" media="(prefers-color-scheme: dark)">
+<meta name="ccs-api" content="">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..700;1,6..72,300..700&amp;display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="masthead wrap">
+  <div class="masthead-rule">
+    <div class="nameplate">
+      <img src="assets/mark.svg" width="64" height="64" alt="">
+      <span>Confidential Creator Support</span>
+    </div>
+  </div>
+  <div class="dateline">
+    <span>Solana devnet</span>
+    <span><span id="dateline-date">Printed 3 October 2026</span> · <span id="dateline-source">figures as read that day</span></span>
+    <span>Release v0.2.0</span>
+  </div>
+</header>
+
+<main>
+  <section class="lead-story wrap" aria-labelledby="headline">
+    <p class="kicker">The lead story is printed from the chain</p>
+    <h1 class="headline" id="headline"><span id="count">350</span> <span id="people">people support</span> The Marrow Dispatch this period.</h1>
+    <p class="deck">How much each of them gave is printed nowhere — not on this page, not in the index, not on an explorer.</p>
+
+    <div class="lead">
+      <div class="lead-main">
+        <div class="table-box">
+          <table class="ledger">
+            <caption class="label"><span id="ledger-caption">The first five of 350 on the creator's public list.</span> Wallets and dates are public on chain; the amounts are ciphertext.</caption>
+            <thead>
+              <tr><th scope="col">Supporter</th><th scope="col" class="since">Since</th><th scope="col">Until</th><th scope="col" class="r">Amount</th></tr>
+            </thead>
+            <tbody id="ledger">
+              <tr><td class="mono">Aqp9…dcDh</td><td class="since">15 Sep 2026</td><td>14 Nov 2026</td><td class="r"><span class="bar" role="img" aria-label="Amount sealed"></span></td></tr>
+              <tr><td class="mono">38pS…Dby5</td><td class="since">15 Sep 2026</td><td>10 Oct 2027</td><td class="r"><span class="bar" role="img" aria-label="Amount sealed"></span></td></tr>
+              <tr><td class="mono">92iK…UHmV</td><td class="since">15 Sep 2026</td><td>13 Jan 2027</td><td class="r"><span class="bar" role="img" aria-label="Amount sealed"></span></td></tr>
+              <tr><td class="mono">6NqB…BdCx</td><td class="since">15 Sep 2026</td><td>14 Nov 2026</td><td class="r"><span class="bar" role="img" aria-label="Amount sealed"></span></td></tr>
+              <tr><td class="mono">2fXq…ebJ3</td><td class="since">15 Sep 2026</td><td>14 Dec 2026</td><td class="r"><span class="bar" role="img" aria-label="Amount sealed"></span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <aside class="lead-side" aria-label="About this demo">
+        <p>The Marrow Dispatch is a demo creator on Solana devnet. Its supporters are wallets raised by a script; the transfers and the proofs are real.</p>
+        <div class="actions">
+          <a class="btn btn-ink" href="app/c/marrow-dispatch">Open the creator's page</a>
+          <a class="btn" href="app/support/marrow-dispatch">Support with devnet funds</a>
+        </div>
+        <p class="caption note">Devnet funds come from a faucet on the support page. No real money moves.</p>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section wrap" aria-labelledby="does">
+    <h2 class="section-label" id="does">What it does</h2>
+    <div class="cols3 does">
+      <article>
+        <h3>The fact is public.</h3>
+        <p>A creator's page counts the people who support them this period, and the count can be rebuilt from chain state without the platform. The program — not the index — writes a pledge only when a confidential transfer from the supporter to the creator is in the same transaction.</p>
+      </article>
+      <article>
+        <h3>The amount is sealed.</h3>
+        <p>Every contribution is a Token-2022 confidential transfer. The amount exists only as ciphertext, readable by the supporter, the creator and the holder of the audit key. There is no amount field in the program, the database or the api.</p>
+      </article>
+      <article>
+        <h3>Support recurs, on your terms.</h3>
+        <p>One payment covers 1 to 12 periods of 30 days; the expiry date is shown before you sign. Renewing before the date extends from it, so you never drop out of the count. After expiry there are 3 days of grace. Nothing renews by itself.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="section wrap" aria-labelledby="how">
+    <h2 class="section-label" id="how">How it works</h2>
+    <ol class="cols4 steps">
+      <li><div class="step-no" aria-hidden="true">1</div><p><strong>Connect a wallet.</strong> One signature derives your confidential keys; they never leave the tab.</p></li>
+      <li><div class="step-no" aria-hidden="true">2</div><p><strong>Contribute.</strong> The app builds the transactions; your wallet only signs — once for a repeat contribution.</p></li>
+      <li><div class="step-no" aria-hidden="true">3</div><p><strong>The program checks the transfer.</strong> A pledge without a confidential transfer to the creator in the same transaction is refused.</p></li>
+      <li><div class="step-no" aria-hidden="true">4</div><p><strong>The creator decrypts in the browser.</strong> The server holds one key, and it only pays for proofs.</p></li>
+    </ol>
+  </section>
+
+  <section class="section wrap" aria-labelledby="measured">
+    <h2 class="section-label tight" id="measured">Measured on devnet</h2>
+    <p class="section-title">Eight budgets, eight measurements.</p>
+    <div class="table-box">
+      <table class="facts">
+        <thead>
+          <tr><th scope="col">Criterion</th><th scope="col">Budget</th><th scope="col">Measured</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>No amount recoverable from the transaction, logs or either token account</td><td>100 %</td><td>152/152 (demo) + 6/6 (probes)</td></tr>
+          <tr><td>Page counter matches the chain after a confirmation</td><td>≤ 30 s</td><td>1.8 s max (index); the page polls every 10 s</td></tr>
+          <tr><td>Repeat contribution: click → confirmed</td><td>≤ 60 s p95, ≤ 2 wallet confirmations</td><td>12.0 s p95 alone (33.6 s under load), 1 confirmation</td></tr>
+          <tr><td>First contribution, with wallet preparation</td><td>≤ 3 min, ≤ 6 confirmations</td><td>18.9 s in the browser, 3 confirmations</td></tr>
+          <tr><td>Creator's cabinet decrypts every contribution</td><td>128 in ≤ 20 s</td><td>420 in 8.9 s, first amount in 0.4 s</td></tr>
+          <tr><td>128 supporters raised by script</td><td>≤ 30 min</td><td>20.0 min</td></tr>
+          <tr><td>A lapsed supporter leaves the count after period + grace</td><td>≤ 1 h</td><td>At the read itself: one second before expiry + grace active, at it not</td></tr>
+          <tr><td>Renewal before expiry: reads showing “inactive”</td><td>0</td><td>0 of 16, through the hosted api; new expiry = old + 30 days, indexed in 1.2 s</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="caption">Sources: <a href="https://github.com/ConfidentialCreator/Confidential-Creator-Support/tree/main/fixtures">fixtures/demo-run.json, measure.json and renewal.json</a> in the repository; measured 15 September – 2 October 2026. Nobody waited 33 days on devnet: the end of a period is shown on substituted time in the index and on a warped clock in the program tests.</p>
+  </section>
+
+  <section class="section wrap" aria-labelledby="limits">
+    <div class="limits">
+      <h2 class="section-title" id="limits">Not printed on this page, because it is not true</h2>
+      <ul class="cols3">
+        <li>
+          <p><strong>It does not hide who supports.</strong> A supporter's wallet is visible on chain by design; anonymity is a different product.</p>
+          <p><strong>It does not hide amounts from the audit key.</strong> Its holder can read every amount; in the demo that is the operator, keeping the key offline.</p>
+        </li>
+        <li>
+          <p><strong>No selective disclosure and no auditor's tool yet</strong> — that is the next release.</p>
+          <p><strong>No withdrawal yet:</strong> a creator's funds stay in the confidential balance.</p>
+          <p><strong>No reminders outside the app</strong> — no email.</p>
+        </li>
+        <li>
+          <p><strong>No stablecoin.</strong> The token is a demo mint, SUPD, on devnet. No fiat, no KYC.</p>
+          <p><strong>The demo does not prove</strong> fee economics on mainnet or throughput at thousands of supporters.</p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section wrap" aria-labelledby="faq">
+    <h2 class="section-label" id="faq">Questions</h2>
+    <div class="cols4 faq">
+      <div><h3>Can anyone see that I support a creator?</h3><p>Yes. Your wallet and the dates are public; only the amount is sealed.</p></div>
+      <div><h3>Who can read my amount?</h3><p>You, the creator and the holder of the audit key. Not the platform's server.</p></div>
+      <div><h3>Does it charge me again by itself?</h3><p>No. You renew yourself, up to 12 periods at once.</p></div>
+      <div><h3>What if the platform goes away?</h3><p>Every counter can be rebuilt from chain state. The server key only pays for proofs and cannot move tokens.</p></div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer wrap">
+  <div class="footer-rule">
+    <span class="label">Confidential Creator Support · devnet demo · v0.2.0</span>
+    <nav aria-label="Project">
+      <a href="https://github.com/ConfidentialCreator/Confidential-Creator-Support">Source code</a>
+      <a href="https://github.com/ConfidentialCreator/Confidential-Creator-Support/releases/tag/v0.2.0">Release v0.2.0</a>
+      <a href="https://github.com/ConfidentialCreator/Confidential-Creator-Support/issues">Questions and issues</a>
+    </nav>
+  </div>
+</footer>
+
+<script>
+  // The printed figures above are the fallback; the api replaces them only when it answers in time
+  // with the shape it promises. Wallets are written as text, never as markup.
+  (() => {
+    const api = document.querySelector('meta[name="ccs-api"]')?.content.replace(/\/+$/, '')
+    if (!api) return
+    const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    const LONG = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+    const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+    const WALLET = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/
+    const day = (d) => `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`
+    const cut = (w) => `${w.slice(0, 4)}…${w.slice(-4)}`
+    const date = (s) => (typeof s === 'string' && !Number.isNaN(Date.parse(s)) ? new Date(s) : null)
+
+    const abort = new AbortController()
+    const timer = setTimeout(() => abort.abort(), 4000)
+    const get = (path) =>
+      fetch(api + path, { signal: abort.signal }).then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+
+    Promise.all([get('/creators/marrow-dispatch'), get('/creators/marrow-dispatch/supporters?limit=5')])
+      .then(([creator, list]) => {
+        const count = creator?.data?.activeSupporters
+        const rows = (list?.data?.items ?? [])
+          .map((i) => ({ wallet: i?.wallet, since: date(i?.since), until: date(i?.expiresAt) }))
+          .filter((r) => typeof r.wallet === 'string' && WALLET.test(r.wallet) && r.since && r.until)
+        if (!Number.isInteger(count) || count < 0 || rows.length === 0) return
+
+        document.getElementById('count').textContent = count.toLocaleString('en-GB')
+        document.getElementById('people').textContent = count === 1 ? 'person supports' : 'people support'
+        document.getElementById('ledger-caption').textContent =
+          `The first ${['one', 'two', 'three', 'four', 'five'][rows.length - 1] ?? rows.length} of ${count.toLocaleString('en-GB')} on the creator's public list.`
+
+        const body = document.getElementById('ledger')
+        const template = body.rows[0]
+        body.replaceChildren(
+          ...rows.map((r) => {
+            const tr = template.cloneNode(true)
+            tr.cells[0].textContent = cut(r.wallet)
+            tr.cells[1].textContent = day(r.since)
+            tr.cells[2].textContent = day(r.until)
+            return tr
+          }),
+        )
+
+        const now = new Date()
+        document.getElementById('dateline-date').textContent =
+          `${DAYS[now.getUTCDay()]}, ${now.getUTCDate()} ${LONG[now.getUTCMonth()]} ${now.getUTCFullYear()}`
+        document.getElementById('dateline-source').textContent = 'read live from the index'
+      })
+      .catch(() => {})
+      .finally(() => clearTimeout(timer))
+  })()
+</script>
+</body>
+</html>
