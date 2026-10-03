@@ -19,14 +19,30 @@ Nobody — not the page, not the indexer, not an explorer — can see how much a
   key and the mint authority offline, and funds one server key that pays for the zero-knowledge
   proof transactions. The server never holds a supporter's or a creator's key.
 
-## What v0.1.0 shows — and what it does not
+## What v0.2.0 shows — and what it does not
 
-Shown, on devnet: a clean wallet gets devnet funds → prepares its confidential balance →
-contributes to a creator → the transaction is on the explorer with no amount in it → the
-creator's page counter goes up → the creator's cabinet shows the amount. A script raises 128
-synthetic supporters (plus 24 repeat contributions) in about 20 minutes with no manual steps.
+Live on devnet: https://confidentialcreator.github.io/Confidential-Creator-Support/ — the web on
+GitHub Pages, the api and the indexer on Render, the index on Supabase. Supporters get the demo
+token (`SUPD`, not a stablecoin) from a devnet faucet on the page.
 
-Measured on devnet (`fixtures/demo-run.json`, `fixtures/measure.json`):
+v0.1.0 showed a single contribution: a clean wallet prepares its confidential balance,
+contributes to a creator, the explorer shows no amount, the creator's page counter goes up and
+the creator's cabinet decrypts the amount. v0.2.0 makes the support recurring:
+
+- **Periods and expiry.** A contribution pays for 1..12 periods of 30 days. The form shows the
+  expiry date before the wallet signs; the date is public on chain, the amount is not.
+- **Renewal without a gap.** Renewing before the expiry date extends from that date, not from
+  today, so a supporter never drops out of the count while renewing. After expiry the new
+  periods start from the day of the renewal.
+- **Grace of 3 days.** A supporter stays active until `expiry + 3 days`, then leaves the count
+  on their own — nothing has to run for that: the status is computed from the chain-derived
+  expiry at the moment of reading. Nothing renews by itself; there is no auto-charge.
+- **Supporter's cabinet** (`/me`) — every creator the wallet supports, "ends in N days",
+  renewal, and whether the wallet is listed on the creator's page (it is counted either
+  way).
+- **Supporters by month** on the creator's page — how many were active each month, counts only.
+
+Measured on devnet (`fixtures/demo-run.json`, `fixtures/measure.json`, `fixtures/renewal.json`):
 
 | Criterion | Budget | Measured |
 |---|---|---|
@@ -36,13 +52,15 @@ Measured on devnet (`fixtures/demo-run.json`, `fixtures/measure.json`):
 | First contribution (with wallet preparation) | ≤ 3 min, ≤ 6 confirmations | 18.9 s in the browser, 3 confirmations |
 | Creator's cabinet decrypts every contribution | 128 in ≤ 20 s | 420 in 8.9 s, first amount in 0.4 s |
 | 128 supporters raised by script | ≤ 30 min | 20.0 min |
+| A lapsed supporter leaves the count after period + grace | ≤ 1 h | at the read itself; one second before `expiry + grace` active, at it not (Postgres, the repository's migrations) |
+| Renewal before expiry: reads showing "inactive" | 0 | 0 of 16 (one read a second around the renewal, through the hosted api); new expiry = old + 30 days, indexed in 1.2 s |
 
-Not in v0.1.0, on purpose: renewal reminders and expiry dates in the UI; the supporter's own
-cabinet (a supporter does not see their contribution in the app); selective disclosure of an
-amount and the auditor's tool (the audit key exists in the mint, but nothing reads with it yet);
-withdrawal (a creator's funds stay in the confidential balance). Everything runs on a laptop,
-not on hosting. The token is a demo mint (`SUPD`), not a stablecoin; supporters get it from a
-devnet faucet.
+Nobody waited 33 days on devnet: the end of a period is shown on substituted time in the index
+queries and on a warped clock in the program tests, not on the calendar.
+
+Not in v0.2.0, on purpose: selective disclosure of an amount and the auditor's tool (the audit
+key exists in the mint, but nothing reads with it yet); withdrawal (a creator's funds stay in
+the confidential balance); reminders outside the app — no email.
 
 The devnet demo does not prove: fee economics on mainnet, behaviour with a public stablecoin
 whose audit key belongs to someone else, or throughput at thousands of supporters.
@@ -164,7 +182,7 @@ limit.
 - `packages/db` — Drizzle schema and read queries for the index (Supabase).
 - `apps/api` — Hono: proof relay, public read routes, devnet faucet.
 - `apps/worker` — indexer: program events → index, backfill plus a log subscription.
-- `apps/web` — React + Vite: creator page, support flow, creator cabinet.
+- `apps/web` — React + Vite: creator page, support flow, creator and supporter cabinets.
 - `tools/mint`, `tools/demo` — operator commands; demo set, spikes and measurements.
 - `fixtures/` — real devnet transactions and the measured runs; no amounts inside.
 - `scripts/` — gate helpers, WSL build/deploy, trace sweep before a push.
