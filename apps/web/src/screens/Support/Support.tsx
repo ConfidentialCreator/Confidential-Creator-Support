@@ -18,6 +18,7 @@ import { fetchCreator } from '../../api/creators.ts'
 import { requestFaucet } from '../../api/faucet.ts'
 import { Chrome, Mono } from '../../components/Chrome.tsx'
 import { Sealed } from '../../components/Sealed.tsx'
+import { KEY_MESSAGE_HINT } from '../../confidential/explain.ts'
 import { useConfidentialKeys } from '../../confidential/KeysProvider.tsx'
 import { webEnv } from '../../config.ts'
 import { TOKEN, trunc } from '../../mockData.ts'
@@ -273,6 +274,7 @@ function Form({ signer, profile, mint, wallet, pledge, payer, refresh }: FormPro
         signatures in the wallet at most · the platform pays for the proofs, you pay only for what
         you sign
       </div>
+      {keys === null && <div className="help">Step 1: {KEY_MESSAGE_HINT}</div>}
 
       <p className="mt-6">
         <button

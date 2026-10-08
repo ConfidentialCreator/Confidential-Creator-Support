@@ -68,10 +68,16 @@ whose audit key belongs to someone else, or throughput at thousands of supporter
 ## Wallets
 
 Any Wallet Standard wallet that offers `solana:signMessage` and `solana:signAndSendTransaction`
-(Phantom, Solflare, Backpack and the like). Wallets do not make confidential transfers
-themselves: the app builds every transaction and the wallet only signs. The confidential keys
-(ElGamal + AES) come from one signature over a canonical message and never leave the tab.
-A wallet without message signing cannot derive the keys.
+and signs a binary message. Solflare is tested end to end on devnet. Wallets do not make
+confidential transfers themselves: the app builds every transaction and the wallet only signs.
+The confidential keys (ElGamal + AES) come from one signature over the canonical binary message
+`solana-conf-bal/v1 || owner || mint` and never leave the tab. A wallet without message signing
+cannot derive the keys.
+
+Phantom connects and signs transactions, but refuses any binary message ("You cannot sign
+solana transactions using sign message"), so it cannot derive the keys; the app says so and
+points to Solflare. Solflare signs the message and labels it "unreadable"; the app explains
+next to the button that it is the key seed, not a transaction.
 
 ## How it holds
 

@@ -11,6 +11,7 @@ import {
   useMemo,
   useState,
 } from 'react'
+import { explainKeyFailure } from './explain.ts'
 import { createKeySession, type DeriveKeys, type KeySession } from './session.ts'
 
 export type ConfidentialKeysState = {
@@ -69,7 +70,7 @@ function WithSigner({ account, mint, session, children }: SignerProps) {
       setKeys(derived)
       return derived
     } catch (err) {
-      const failure = err instanceof Error ? err : new Error(String(err))
+      const failure = explainKeyFailure(err instanceof Error ? err : new Error(String(err)))
       setError(failure)
       throw failure
     }

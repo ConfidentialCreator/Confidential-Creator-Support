@@ -18,6 +18,7 @@ import { Link } from 'react-router'
 import { type Contribution, fetchAllContributions, fetchCreator } from '../../api/creators.ts'
 import { Chrome, Kv, Mono } from '../../components/Chrome.tsx'
 import { Sealed } from '../../components/Sealed.tsx'
+import { KEY_MESSAGE_HINT } from '../../confidential/explain.ts'
 import { useConfidentialKeys } from '../../confidential/KeysProvider.tsx'
 import { webEnv } from '../../config.ts'
 import { TOKEN, trunc } from '../../mockData.ts'
@@ -131,17 +132,20 @@ function Cabinet({ owner, mint, creator }: CabinetProps) {
           {amounts.timing && ` · ${timingText(amounts.timing, items.length)}`}
         </div>
       ) : (
-        <p className="mb-3">
-          <button
-            type="button"
-            className={derive ? 'act' : 'act act-off'}
-            disabled={!derive}
-            onClick={() => derive?.().catch(() => undefined)}
-          >
-            Sign to derive keys
-          </button>
-          {keysError && <span className="ml-3 text-refused">{keysError.message}</span>}
-        </p>
+        <>
+          <p className="mb-1">
+            <button
+              type="button"
+              className={derive ? 'act' : 'act act-off'}
+              disabled={!derive}
+              onClick={() => derive?.().catch(() => undefined)}
+            >
+              Sign to derive keys
+            </button>
+            {keysError && <span className="ml-3 text-refused">{keysError.message}</span>}
+          </p>
+          <div className="help mb-3">{KEY_MESSAGE_HINT}</div>
+        </>
       )}
       {amounts.error && <div className="text-refused">decryption stopped: {amounts.error}</div>}
 
