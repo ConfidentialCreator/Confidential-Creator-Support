@@ -197,3 +197,7 @@ limit.
 - `tools/mint`, `tools/demo` — operator commands; demo set, spikes and measurements.
 - `fixtures/` — real devnet transactions and the measured runs; no amounts inside.
 - `scripts/` — gate helpers, WSL build/deploy, trace sweep before a push.
+
+## License
+
+Apache License 2.0 — see [LICENSE](LICENSE). Copyright 2026 ConfidentialCreator.

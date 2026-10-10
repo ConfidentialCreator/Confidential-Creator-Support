@@ -2,6 +2,7 @@
   "name": "ccsupport",
   "version": "0.0.0",
   "private": true,
+  "license": "Apache-2.0",
   "description": "Recurring creator support on Solana where the fact of support is public and the amount is confidential",
   "packageManager": "pnpm@9.15.0",
   "engines": {
