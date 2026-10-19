@@ -78,7 +78,10 @@ function groupedPoints(grouped: Uint8Array, handle: CiphertextHandle) {
 }
 
 // lo + hi·2¹⁶ as one ciphertext — one discrete logarithm instead of two.
-function combine(ciphertext: ValidityContext, handle: CiphertextHandle): ElGamalCiphertext {
+export function combineCiphertext(
+  ciphertext: ValidityContext,
+  handle: CiphertextHandle,
+): ElGamalCiphertext {
   const lo = groupedPoints(ciphertext.groupedLo, handle)
   const hi = groupedPoints(ciphertext.groupedHi, handle)
   const scale = 1n << LO_BITS
@@ -113,7 +116,7 @@ export function decryptContribution(
   let lo: GroupedElGamalCiphertext3Handles
   let hi: GroupedElGamalCiphertext3Handles
   try {
-    combined = combine(ciphertext, handle)
+    combined = combineCiphertext(ciphertext, handle)
     lo = GroupedElGamalCiphertext3Handles.fromBytes(ciphertext.groupedLo)
     hi = GroupedElGamalCiphertext3Handles.fromBytes(ciphertext.groupedHi)
   } catch {
