@@ -1,6 +1,7 @@
 export type { ConfidentialKeys } from '@solana/zk-sdk'
 
 export * from './confidential/account.ts'
+export * from './confidential/audit.ts'
 export * from './confidential/contribute.ts'
 export * from './confidential/decrypt.ts'
 export * from './confidential/disclose.ts'
